@@ -204,7 +204,7 @@ const WorkDetails = ({ setOpenWork, work }) => {
   useEffect(() => {
     let count = 0;
     let Members = [];
-    task.forEach((item) => {
+    task?.forEach((item) => {
       if (item.status === "COMPLETED") {
         count++;
       }
@@ -221,9 +221,9 @@ const WorkDetails = ({ setOpenWork, work }) => {
       }
     });
     setCompleted(count);
-    setProgress((completed / task.length) * 100);
+    setProgress((completed / task?.length) * 100);
     setMembers(Members);
-  }, [work]);
+  }, [work, task, completed]);
 
   return (
     <Modal open={true} onClose={() => setOpenWork(false)}>
@@ -318,9 +318,9 @@ const WorkDetails = ({ setOpenWork, work }) => {
                   Members
                 </Date>
               </TableHeader>
-              {task.map((item, index) => (
+              {/* {task.map((item, index) => (
                 <TaskCard item={item} index={index} members={members}/>
-              ))}
+              ))} */}
             </Table>
           </Bottom>
         </Wrapper>

@@ -22,6 +22,8 @@ import ToastMessage from './components/ToastMessage';
 import { useSelector } from "react-redux";
 // import AddNewTeam from './components/AddNewTeam';
 import { useEffect } from 'react';
+import ProjectDetails from "./pages/ProjectDetails";
+import WorkDetailsPage from "./pages/WorkDetailsPage";
 // import { useDispatch } from 'react-redux';
 // import Home from './pages/Home/Home';
 // import Chats from './pages/Chats';
@@ -98,17 +100,17 @@ function App() {
                         {/* <Route path="team/invite">
                           <Route path=":code" element={<TeamInvite />} />
                         </Route> */}
-                        {/* <Route path="projects">
+                        <Route path="projects">
                           <Route path=":id" element={<ProjectDetails />} />
                         </Route>
-                        <Route path="projects/invite">
+                        {/* <Route path="projects/invite">
                           <Route path=":code" element={<ProjectInvite />} />
                         </Route> */}
     
                         <Route path="works" element={<Works />} />
-                        {/* <Route path="works">
+                        <Route path="works">
                           <Route path=":id" element={<WorkDetailsPage />} />
-                        </Route> */}
+                        </Route>
                         {/* <Route path="teams" element={<Teams />} />
                         <Route path="teams">
                           <Route path=":id" element={<Teams />} />

@@ -149,10 +149,8 @@ const Navbar = ({ menuOpen, setMenuOpen }) => {
   };
 
     useEffect(() => {
-      getNotification();
+      // getNotification();
     }, []);
-
-    console.log(notifications);
 
   return (
     <>

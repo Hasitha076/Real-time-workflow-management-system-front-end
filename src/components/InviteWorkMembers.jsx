@@ -1,10 +1,9 @@
-import { CloseRounded, SearchOutlined, SendRounded } from "@mui/icons-material";
+import { CloseRounded } from "@mui/icons-material";
 import { Modal } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Avatar } from "@mui/material";
 import { useSelector } from "react-redux";
-// import { inviteTeamMembers, inviteProjectMembers, searchUsers } from "../api/index";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -231,37 +230,33 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
 `;
 
-const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
+const InviteWorkMembers = ({ setInvitePopup, id, teamInvite, data, projectCollaboratorIds, projectTeamIds, workCollaborators, workTeams }) => {
 
-  const [message, setMessage] = React.useState("");
+  const [message, setMessage] = useState("");
   const { currentUser } = useSelector((state) => state.user);
-  const token = localStorage.getItem("token");
-
-  const [role, setRole] = React.useState("Member");
-  const [access, setAccess] = React.useState("View Only");
-  const [Loading, setLoading] = React.useState(false);
-  
-  
-
-    // const [inputs, setInputs] = useState({ 
-    //     collaboratorIds: [],
-    //     teamIds: []
-    //   });
+  const [Loading, setLoading] = useState(false);  
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState([]);
+  const [availableusers, setAvailableUsers] = useState([]);
+  const [availableTeams, setAvailableTeams] = useState([]);
+  const dispatch = useDispatch();
 
   const UpdateProjectCollaborators = async () => {
     setLoading(true);
 
-      if(true){
-        await axios.put(`http://localhost:8083/api/v1/project/updateCollaborators/${id}`, {
+      if(selectedUsers.length > 0 || selectedTeam.length > 0){
+        await axios.put(`http://localhost:8086/api/v1/work/updateCollaborators/${id}`, {
           collaboratorIds: selectedUsers.map((user) => user.id),
           teamIds: selectedTeam.map((team) => team.id)
         })
           .then(() => {
+            // setSelectedUsers([]);
+            // setSelectedTeam([]);
             setLoading(true);
             setInvitePopup(false);
             dispatch(
               openSnackbar({
-                message: "Project collaborators updated successfully",
+                message: "Work collaborators updated successfully",
                 type: "success",
               })
             );
@@ -287,53 +282,10 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
     
   };
 
-  // const handleInvite = async (user) => {
-  //   setLoading(true);
-  //   const User = {
-  //     id: user._id,
-  //     name: user.name,
-  //     email: user.email,
-  //     role: role,
-  //     access: access,
-  //   };
-  //   console.log(User);
-  //   if (teamInvite) {
-  //     inviteTeamMembers(id, User, token)
-  //       .then((res) => {
-  //         console.log(res);
-  //         if (res.status === 200)
-  //           dispatch(openSnackbar({ message: `Invitation sent to ${user.name}`, type: "success" }));
-  //         setLoading(false);
-  //       })
-  //       .catch((err) => {
-  //         dispatch(openSnackbar({ message: err.message, type: "error" }));
-  //         setLoading(false);
-  //         console.log(err);
-  //       });
-  //   } else {
-  //     console.log("project");
-  //     inviteProjectMembers(id, User, token)
-  //       .then((res) => {
-  //         if (res.status === 200)
-  //           dispatch(openSnackbar({ message: `Invitation sent to ${user.name}`, type: "success" }));
-  //         setLoading(false);
-  //       })
-  //       .catch((err) => {
-  //         console.log(err);
-  //         dispatch(openSnackbar({ message: err.message, type: "error" }));
-  //         setLoading(false);
-  //       });
-  //   }
-  // };
-
-  const dispatch = useDispatch();
-
-  const [availableusers, setAvailableUsers] = useState([]);
-  const [availableTeams, setAvailableTeams] = useState([]);
-
   const getAvailableUsers = async () => {
     await axios.get("http://localhost:8081/api/v1/user/getAllUsers")
     .then((res) => {
+    
       setAvailableUsers(res.data);
     })
     .catch((err) => {
@@ -352,44 +304,44 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
       getAvailableUsers();
       getAvailableTeams();
     }, []);
-
-    const [selectedUsers, setSelectedUsers] = useState([]);
-    const [selectedTeam, setSelectedTeam] = useState([]);
+    
 
     useEffect(() => {
 
-      // user
-      if (data?.collaboratorIds && availableusers.length > 0) {
-        const matchingUsers = availableusers.filter((user) =>
-          data.collaboratorIds.includes(user.userId)
+    
+      if (data?.collaboratorIds && workCollaborators.length > 0) {
+        const matchingUsers = workCollaborators.filter((user) =>
+            data.collaboratorIds.includes(user.id)
         ).map((user) => ({
-          id: user.userId,
-          name: user.userName,
+          id: user.id,
+          name: user.name,
           email: user.email,
         }));
     
         setSelectedUsers(matchingUsers);
       }
 
-      // team
-      if (data?.teamIds && availableTeams.length > 0) {
-        const matchingTeams = availableTeams.filter((team) =>
-          data.teamIds.includes(team.teamId)
+    
+      if (data?.teamIds && workTeams.length > 0) {
+        const matchingTeams = workTeams.filter((team) =>
+          data.teamIds.includes(team.id)
         ).map((team) => ({
-          id: team.teamId,
-          name: team.teamName
+          id: team.id,
+          name: team.name
         }));
     
         setSelectedTeam(matchingTeams);
       }
-    }, [data, availableusers, availableTeams]); // Dependencies to re-run the effect
-    
-    
+
+      
+    }, [data, workCollaborators, workTeams]);
+        
+   
 
        //Add members from selected users
   const handleSelect = (user) => {
     const User = {
-      id: user.userId,
+      id: user.id,
       name: user.name,
       email: user.email,
     };
@@ -397,8 +349,8 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
     if (selectedUsers.find((u) => u.id === User.id)) {
     } else {
       setSelectedUsers([...selectedUsers, {
-        id: user.userId,
-        name: user.userName,
+        id: user.id,
+        name: user.name,
         email: user.email,
       }]);
     }
@@ -407,34 +359,39 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
     //Add team from selected teams
   const handleSelectTeam = (team) => {
     const Team = {
-      id: team.teamId,
-      name: team.teamName
+      id: team.id,
+      name: team.name
     };
     if (selectedTeam.find((t) => t.id === Team.teamId)) {
     } else {
       setSelectedTeam([...selectedTeam, {
-        id: team.teamId,
-        name: team.teamName
+        id: team.id,
+        name: team.name
       }]);
     }
   };
 
   //remove members from selected users
   const handleRemove = (user) => {
-    setSelectedUsers(selectedUsers.filter((u) => u.id !== user.userId));
+    setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
   };
 
     //remove teams from selected users
   const handleRemoveTeam = (team) => {
-    setSelectedTeam(selectedTeam.filter((t) => t.id !== team.teamId));
+    setSelectedTeam(selectedTeam.filter((t) => t.id !== team.id));
   };
-
-  console.log(data);
   
+    
+  console.log(id);
+  console.log("In work: ",data);
+  console.log(data.collaboratorIds);
+  console.log(data.teamIds);
   console.log(selectedUsers);
   console.log(selectedTeam);
-  
-
+  console.log("Work Collaborators: ",workCollaborators);
+  console.log("Work Teams: ",workTeams);
+  console.log("Project Collaborators: ",projectCollaboratorIds);
+  console.log("Project Teams: ",projectTeamIds);
 
   return (
     <Modal open={true} onClose={() => setInvitePopup(false)}>
@@ -456,16 +413,16 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
           <AddMember>
 
             <UsersList>
-              {availableusers.map((user) => (
+              {workCollaborators.map((user) => (
                 <MemberCard>
                   <UserData>
                     <Avatar
                       sx={{ width: "34px", height: "34px" }}
                     >
-                      {user.userName.charAt(0)}
+                      {user.name.charAt(0)}
                     </Avatar>
                     <Details>
-                      <Name>{user.userName}</Name>
+                      <Name>{user.name}</Name>
                       <EmailId>{user.email}</EmailId>
                     </Details>
                   </UserData>
@@ -474,13 +431,13 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
 
                   </Flex>
                   {
-                    !selectedUsers.find((u) => u.id === user.userId) && 
+                    !selectedUsers.find((u) => u.id === user.id) && 
                     <InviteButton onClick={() => handleSelect(user)}>
                     Add
                     </InviteButton>
                   }
                   {
-                    selectedUsers.find((u) => u.id === user.userId) && 
+                    selectedUsers.find((u) => u.id === user.id) && 
                     <InviteButton onClick={() => handleRemove(user)}>
                     Remove
                   </InviteButton>
@@ -497,24 +454,24 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
           <AddMember>
 
           <UsersList>
-            {availableTeams.map((team) => (
+            {workTeams.map((team) => (
                 <MemberCard key={team.teamId}>
                   <UserData>
                     <Avatar sx={{ width: "34px", height: "34px" }}>
-                      {team.teamName.charAt(0)}
+                    {team.name.charAt(0)}
                     </Avatar>
                     <Details>
-                      <Name>{team.teamName}</Name>
+                      <Name>{team.name}</Name>
                     </Details>
                   </UserData>
                   {
-                    !selectedTeam.find((t) => t.id === team.teamId) && 
+                    !selectedTeam.find((t) => t.id === team.id) && 
                     <InviteButton onClick={() => handleSelectTeam(team)}>
                     Add
                     </InviteButton>
                   }
                   {
-                    selectedTeam.find((t) => t.id === team.teamId) && 
+                    selectedTeam.find((t) => t.id === team.id) && 
                     <InviteButton onClick={() => handleRemoveTeam(team)}>
                     Remove
                   </InviteButton>
@@ -549,4 +506,4 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
   );
 };
 
-export default InviteMembers;
+export default InviteWorkMembers;
