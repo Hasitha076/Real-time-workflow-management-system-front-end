@@ -1,5 +1,6 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import snackbarReducer from "./snackbarSlice";
+import userReducer from "./userSlice";
 import {
   persistStore,
   persistReducer
@@ -13,6 +14,7 @@ const persistConfig = {
 };
 
 const rootReducer = combineReducers({
+  user: userReducer,
   snackbar: snackbarReducer,
 });
 

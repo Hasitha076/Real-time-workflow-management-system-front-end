@@ -133,6 +133,7 @@ const IcoBtn = styled(IconButton)`
 
 const Card = ({ status, work }) => {
   
+  const [color, setColor] = useState("primary");
   const [task, setTask] = useState([]);
   const [completed, setCompleted] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -159,7 +160,6 @@ const Card = ({ status, work }) => {
   console.log(task);
   
 
-  //check the no of tasks completed in the work and set the progress
   useEffect(() => {
     let count = 0;
     let Members = [];
@@ -173,7 +173,6 @@ const Card = ({ status, work }) => {
     setProgress(completed);
   }, [task]);
 
-  //get the members of the work from all the tasks and add it in members array withb the image and name
 
   return (
     <Link to={`/works/${work.workId}`} style={{ textDecoration: "none" }}>

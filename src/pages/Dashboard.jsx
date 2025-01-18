@@ -9,6 +9,9 @@ import { useDispatch } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import axios from "axios";
+import ProjectCard from "../components/Card";
+import WorkCards from "../components/WorkCards";
+import { statuses, data, tagColors } from "../data/data";
 
 const Container = Styled.div`
   overflow-y: visible !important;
@@ -333,7 +336,7 @@ const Dashboard = () => {
                   <SectionTitle>Recent Projects</SectionTitle>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="0px 16px">
-                      {/* {
+                      {
                         projects
                           .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
                           .filter((item, index) => index < 6)
@@ -347,7 +350,7 @@ const Dashboard = () => {
                               tagColor={tagColors[3]}
                             />
                           ))
-                      } */}
+                      }
                     </Masonry>
                   </ResponsiveMasonry>
                 </RecentProjects>
@@ -356,13 +359,13 @@ const Dashboard = () => {
                   <SectionTitle>Recent Works</SectionTitle>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="10px 16px">
-                      {/* {
+                      {
                         works
                           .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
                           .filter((item, index) => index < 6)
                           .slice(0, 4)
                           .map((work, id) => (
-                            <Card
+                            <WorkCards
                               key={id}
                               work={work}
                               index={id}
@@ -370,7 +373,7 @@ const Dashboard = () => {
                               tagColor={tagColors[3]}
                             />
                           ))
-                      } */}
+                      }
                     </Masonry>
                   </ResponsiveMasonry>
                 </RecentWorks>

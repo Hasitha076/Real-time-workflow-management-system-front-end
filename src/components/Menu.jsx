@@ -200,7 +200,7 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
         >
           <Item>
             <ReceiptLongIcon />
-            Your Works
+            Works
           </Item>
         </Link>
         <Link
@@ -209,7 +209,7 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
         >
           <Item>
             <GroupsIcon />
-            Your Teams
+            Teams
           </Item>
         </Link>
         <Link

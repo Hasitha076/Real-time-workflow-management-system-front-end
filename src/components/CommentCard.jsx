@@ -1,0 +1,197 @@
+import React, { useState } from "react";
+import { Avatar, Box, Button, Menu, MenuItem, IconButton } from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import styled from "styled-components";
+
+const OutlinedBox = styled.div`
+  min-height: 100px;
+  width: 100%;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid ${({ theme }) => theme.soft2};
+  color: ${({ theme }) => theme.soft2};
+  ${({ googleButton, theme }) =>
+    googleButton &&
+    `
+    user-select: none; 
+  gap: 16px;`}
+  ${({ button, theme }) =>
+    button &&
+    `
+    user-select: none; 
+  border: none;
+    font-weight: 600;
+    font-size: 16px;
+    background: ${theme.soft};
+    color:'${theme.soft2}';`}
+    ${({ activeButton, theme }) =>
+    activeButton &&
+    `
+    user-select: none; 
+  border: none;
+    background: ${theme.primary};
+    color: white;`}
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 15px;
+`;
+
+
+const Description = styled.textarea`
+  width: 100%;
+  border: none;
+  font-size: 14px;
+  border-radius: 3px;
+  background-color: transparent;
+  outline: none;
+  color: ${({ theme }) => theme.textSoft};
+`;
+
+const CommentButton = styled.button`
+  background-color: ${({ theme }) => theme.primary};
+  color: #fff;
+  margin-top: 10px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: ${({ theme }) => theme.primary + "cc"};
+  }
+`
+
+const ButtonGroup = styled.button`
+    display: flex;
+    gap: 10px;
+    background-color: transparent;
+    border: none;
+`
+
+const CommentCard = ({ item, allTaskMembers }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [editCommentIndex, setEditCommentIndex] = useState(null); // Track which comment is being edited
+  const [editedComment, setEditedComment] = useState("");
+  const [showAllComments, setShowAllComments] = useState(false); // Toggle for "View More"
+
+
+  const handleComment = () => {
+    // Logic to add a comment
+
+  }
+
+
+  const handleMenuOpen = (event, index) => {
+    setAnchorEl(event.currentTarget);
+    // setEditCommentIndex(index);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleEditComment = (index) => {
+    setEditedComment(item.comments[index]);
+    setEditCommentIndex(index);
+    handleMenuClose();
+  };
+
+  const handleDeleteComment = (index) => {
+    // Logic to delete the comment
+    console.log(`Delete comment at index ${index}`);
+    handleMenuClose();
+  };
+
+  const handleCommentUpdate = () => {
+    // Logic to update the comment
+    console.log(`Updated comment: ${editedComment}`);
+    setEditCommentIndex(null); // Exit edit mode
+  };
+
+  // Determine comments to display
+  const displayedComments = showAllComments ? item.comments : [item.comments[item.comments.length - 1]];
+
+  return (
+    <Box>
+        {/* View More / View Less Button */}
+      {item.comments.length > 1 && (
+        <Button
+          size="small"
+          onClick={() => setShowAllComments(!showAllComments)}
+          sx={{ marginTop: "10px", textTransform: "none" }}
+        >
+          {showAllComments ? "View Less" : `View More (${item.comments.length - 1} more)`}
+        </Button>
+      )}
+      {item.comments.length != 0 && displayedComments.map((comment, index) => (
+        <Box
+          key={index}
+          sx={{ display: "flex", flexDirection: "row", alignItems: 'center', gap: "10px", paddingTop: "10px" }}
+        >
+          {allTaskMembers.slice(0, 1).map((member, memberIndex) => (
+            <Avatar
+              key={memberIndex}
+              sx={{
+                marginRight: "5px",
+                width: "26px",
+                height: "26px",
+                fontSize: "16px",
+              }}
+            >
+              {member.name.charAt(0)}
+            </Avatar>
+          ))}
+          {editCommentIndex === index ? (
+            <Box style={{
+                width: "100%",
+                display:" flex",
+                justifyContent: "center",
+                flexDirection: "column",
+                alignItems: "flex-end"
+
+            }}>
+            <OutlinedBox style={{ marginTop: "6px", width: '-webkit-fill-available' }}>
+                <Description
+                    placeholder="Add a comment"
+                    name="description"
+                    rows={5}
+                    value={comment}
+                //   onChange={(e) => setComment(e.target.value)}
+                />
+                
+            </OutlinedBox>
+            <ButtonGroup>
+                <CommentButton onClick={() => handleComment()}>Close</CommentButton>
+                <CommentButton onClick={() => handleComment()}>Update</CommentButton>
+            </ButtonGroup>
+            </Box>
+          ) : (
+            <p style={{ margin: "0", padding: "0 5px" }}>{comment}</p>
+          )}
+          {/* {editCommentIndex === null && (
+            <IconButton
+            size="small"
+            onClick={(event) => handleMenuOpen(event, index)}
+          >
+            <MoreVertIcon />
+          </IconButton>
+          )} */}
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuItem onClick={() => handleEditComment(index)}>Edit Comment</MenuItem>
+            <MenuItem onClick={() => handleDeleteComment(index)}>Delete Comment</MenuItem>
+          </Menu>
+        </Box>
+      ))}
+      
+    </Box>
+  );
+};
+
+export default CommentCard;
