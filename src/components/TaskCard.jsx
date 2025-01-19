@@ -360,8 +360,9 @@ const TaskCard = ({item,index,members, teams}) => {
           </top>
           <Desc>{item.description}</Desc>
           <Tags>
-              {item.tags.map((tag) => (
+              {item.tags.map((tag, index) => (
                 <Tag
+                key={index}
                   tagColor={tagColors[Math.floor(Math.random() * tagColors.length)]}
                 >
                   {tag}

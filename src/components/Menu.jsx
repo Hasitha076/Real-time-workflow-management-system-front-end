@@ -15,7 +15,7 @@ import {
 import GroupsIcon from '@mui/icons-material/Groups';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import LogoIcon from "../Images/logo.jpg";
+import LogoIcon from "../Images/logo.png";
 import { useDispatch } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import axios from "axios";
@@ -171,7 +171,7 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
         <Link to="/" style={{ textDecoration: "none", color: "inherit", alignItems: 'center',display: 'flex' }}>
           <Logo>
             <Image src={LogoIcon} />
-            WORKFLOW
+            SmartFlow
           </Logo>
         </Link>
         <Close>

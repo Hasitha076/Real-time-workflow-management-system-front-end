@@ -16,12 +16,13 @@ import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import InviteMembers from "../components/InviteMembers";
 import AddWork from "../components/AddWork";
-import WorkDetails from "../components/WorkDetails";
+import WorkDetails from "../pages/WorkDetailsPage";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 
 const Container = styled.div`
   padding: 14px 14px;
   display: flex;
+  justify-content: center;
   flex: 1;
   gap: 20px;
   @media screen and (max-width: 480px) {

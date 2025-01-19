@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
@@ -15,7 +15,7 @@ import {
 import { tagColors } from "../data/data";
 import WorkCards from "../components/WorkCards";
 import MemberCard from "../components/MemberCard";
-import { CircularProgress, IconButton } from "@mui/material";
+import { Card, CircularProgress, IconButton } from "@mui/material";
 import axios from "axios";
 import Avatar from "@mui/material/Avatar";
 import { openSnackbar } from "../redux/snackbarSlice";
@@ -27,6 +27,7 @@ import UpdateProject from "../components/UpdateProject";
 import DeletePopup from "../components/DeletePopup";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ProjectCard from "../components/Card";
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -150,6 +151,10 @@ const Work = styled.div`
   flex: 1.6;
 `;
 
+const Project = styled.div`
+  flex: 1.6;
+`;
+
 const Allignment = styled.div`
   display: flex;
   flex-direction: row;
@@ -227,11 +232,10 @@ const Span = styled.span`
   margin-left: 8px;
 `;
 
-const Wrapper = styled.div`
-  padding: 12px 0px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  grid-gap: 12px;
+const CardWrapper = styled.div`
+  display: flex;
+flex-direction: column;
+flex: 1;
 `;
 
 const AddNewButton = styled.div`
@@ -255,7 +259,7 @@ const IcoBtn = styled(IconButton)`
 `;
 
 const Extra = styled.div`
-  flex: 1;
+  flex: 0.6;
 `;
 
 const SubCards = styled.div`
@@ -291,37 +295,20 @@ const SubCardsTitle = styled.div`
   -webkit-box-orient: vertical;
 `;
 
-const Tools = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding: 8px 8px;
-`;
-
-const Ideas = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding: 8px 8px;
-`;
-
-const ProjectDetails = () => {
+const TeamDetails = () => {
   const { id } = useParams();
   const [item, setItems] = useState([]);
   const [projectCollaborators, setProjectCollaborators] = useState([]);
   const [projectTeams, setProjectTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [invitePopup, setInvitePopup] = useState(false);
-  const [created, setCreated] = useState(false);
   const [currentWork, setCurrentWork] = useState({});
   const [openWork, setOpenWork] = useState(false);
   const [collaborators, setCollaborators] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [teams, setTeams] = useState([]);
   const [works, setWorks] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [alignment, setAlignment] = useState(true);
   
   //use state enum to check for which updation
@@ -332,8 +319,8 @@ const ProjectDetails = () => {
 
   const dispatch = useDispatch();
 
-  const getproject = async (id) => {
-    await axios.get(`http://localhost:8083/api/v1/project/getProject/${id}`)
+  const getTeam = async (id) => {
+    await axios.get(`http://localhost:8085/api/v1/team/getTeam/${id}`)
       .then((res) => {
         setItems(res.data);
         setProjectCollaborators(res.data.collaboratorIds);
@@ -351,6 +338,9 @@ const ProjectDetails = () => {
         );
       });
   };
+
+  console.log(item);
+  
 
   const getCollaborators = async () => {
     await axios.get(`http://localhost:8081/api/v1/user/getAllUsers`)
@@ -372,37 +362,125 @@ const ProjectDetails = () => {
       });
   };
 
-  const getWorks = async () => {
-    await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${id}`)
-    .then((res) => {
-      console.log(res.data);
-      
-        if(res.data !== null){
-          setWorks(res.data);
-        } else {
-          setWorks([]);
-        }
+  const getTasks = async () => {
+    await axios.get(`http://localhost:8082/api/v1/task/getAllTasks`)
+      .then((res) => {
+        setTasks(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
+  const getWorks = async () => {
+    await axios.get(`http://localhost:8086/api/v1/work/getWorksByTeamId/${id}`)
+    .then((res) => {
+      setWorks(res.data);
     })
     .catch((err) => {
       console.log(err);
     });
   }
+
+  console.log(works);
+
+  const getProjects = async () => {
+    await axios.get(`http://localhost:8083/api/v1/project/getProjectsByTeamId/${id}`)
+    .then((res) => {
+        setProjects(res.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
+
+  console.log(works);
+  console.log(projects);
   
-  useEffect(() => {
-    getCollaborators();
-    getTeams();
-    getWorks();
-  }, [item, id]);
   
 
-  console.log(id);
-  console.log(collaborators);
-  console.log(teams);
-  console.log(works);
-  console.log(projectCollaborators);
-  console.log(projectTeams);
+  const getProjectCollaborators = async (projectId) => {
+    
+    await axios.get(`http://localhost:8083/api/v1/project/getProject/${projectId}`)
+      .then((res) => {       
+        setProjectTeams(res.data.teamIds);
+        setProjectCollaborators(res.data.collaboratorIds);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  useEffect(() => {
+    const updateData = async () => {
+      await Promise.all([getCollaborators(), getTeams(), getProjects(), getWorks(), getTasks()]);
+      if (item?.projectId) {
+        await getProjectCollaborators(item.projectId);
+      }
+    };
   
+    updateData();
+  }, [item?.projectId]);
+
+  
+//   const matchingWorkCollaborators = useMemo(() => {
+//     if (item?.collaboratorIds && collaborators.length > 0) {
+//       return collaborators
+//         .filter((user) => projectCollaborators.includes(user.userId))
+//         .map((user) => ({
+//           id: user.userId,
+//           name: user.userName,
+//           email: user.email,
+//         }));
+//     }
+//     return [];
+//   }, [item, collaborators, projectCollaborators]);
+
+//   const matchingTaskCollaborators = useMemo(() => {
+//     if (item?.collaboratorIds && collaborators.length > 0) {
+//       return collaborators
+//         .filter((user) => workCollaboratorIds.includes(user.userId))
+//         .map((user) => ({
+//           id: user.userId,
+//           name: user.userName,
+//           email: user.email,
+//         }));
+//     }
+//     return [];
+//   }, [item, collaborators, workCollaboratorIds]);
+
+//   const matchingWorkTeams = useMemo(() => {
+//     if (item?.teamIds && teams.length > 0) {
+//       return teams
+//         .filter((team) => projectTeams.includes(team.teamId))
+//         .map((team) => ({
+//           id: team.teamId,
+//           name: team.teamName,
+//         }));
+//     }
+//     return [];
+//   }, [item, teams, projectTeams]);
+
+//   const matchingTaskTeams = useMemo(() => {
+//     if (item?.teamIds && teams.length > 0) {
+//       return teams
+//         .filter((team) => workTeamIds.includes(team.teamId))
+//         .map((team) => ({
+//           id: team.teamId,
+//           name: team.teamName,
+//         }));
+//     }
+//     return [];
+//   }, [item, teams, workTeamIds]);
+
+//   useEffect(() => {
+//     setWorkCollaborators(matchingWorkCollaborators);
+//     setTaskCollaborators(matchingTaskCollaborators);
+//     setWorkTeams(matchingWorkTeams);
+//     setTaskTeams(matchingTaskTeams);
+    
+//   }, [matchingWorkCollaborators, matchingTaskCollaborators, matchingWorkTeams, matchingTaskTeams]);
+
 
   const openWorkDetails = (work) => {
     setCurrentWork(work);
@@ -411,15 +489,14 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    getproject(id); 
-    // getProjectWorks(id);
-  }, [openWork, openUpdate, invitePopup, id]);
+    getTeam(id); 
+  }, [openWork, openUpdate, invitePopup]);
 
 
   return (
     <Container>
-      {openWork && <WorkDetails setOpenWork={setOpenWork} work={currentWork} />}
-      {openUpdate.state && <UpdateProject openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} type={openUpdate.type} />}
+      {/* {openWork && <WorkDetails setOpenWork={setOpenWork} work={currentWork} />} */}
+      {/* {openUpdate.state && <UpdateProject openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} type={openUpdate.type} />} */}
       {openDelete.state && <DeletePopup openDelete={openDelete} setOpenDelete={setOpenDelete} />}
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: '12px 0px',height: '300px' }}>
@@ -428,10 +505,10 @@ const ProjectDetails = () => {
       ) : (
         <>
           <Header>
-            <Title>{item.projectName}</Title>
-            <Desc>{item.projectDescription}</Desc>
-            <Tags>
-              {item.tags.map((tag) => (
+            <Title>{item.teamName}</Title>
+            <Desc>{item.teamDescription}</Desc>
+            {/* <Tags>
+              {teams.tags.map((tag) => (
                 <Tag
                   tagColor={
                     tagColors[Math.floor(Math.random() * tagColors.length)]
@@ -440,8 +517,8 @@ const ProjectDetails = () => {
                   {tag}
                 </Tag>
               ))}
-            </Tags>
-            <Members>
+            </Tags> */}
+            {/* <Members>
               {item.memberIcons.length > 0 ? <AvatarGroup>
                 {item.memberIcons.map((member) => (
                   <Avatar
@@ -455,7 +532,7 @@ const ProjectDetails = () => {
                 <PersonAdd sx={{ fontSize: "12px" }} />
                 Invite
               </InviteButton>
-            </Members>
+            </Members> */}
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
               <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'all', data: item })}>
                 <Edit sx={{ fontSize: "20px" }} />
@@ -477,29 +554,121 @@ const ProjectDetails = () => {
             )}
           </Header>
           <Body>
+          <CardWrapper>
+          <Project>
+              <Column alignment={alignment}>
+              <ItemWrapper>
+                  <Top>
+                    <Text>
+                      <DonutLarge sx={{ color: "#1976D2", fontSize: "20px" }} />
+                      Pending Projects
+                      <Span>(
+                        {
+                          projects.length != 0 && projects.filter(
+                            (item) => item.status === "PENDING"
+                          ).length
+                        }
+                        )</Span>
+                        
+                    </Text>
+                  </Top>
+                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
+                    <Masonry gutter="14px">
+
+                    {projects.length != 0 && projects.filter((item) => item.status === "PENDING")
+                      .map((ele, idx) => (
+                        <div onClick={() => openWorkDetails(ele)}>
+                          <ProjectCard
+                            key={ele.projectId}
+                            item={ele}
+                            index={idx}
+                            status={ele.status}
+                            tagColor={tagColors[3]}
+                          />
+                        </div>
+                      ))}
+                  </Masonry>
+                  </ResponsiveMasonry>
+                </ItemWrapper>
+                <ItemWrapper>
+                  <Top>
+                    <Text>
+                      <DonutLarge sx={{ color: "#1976D2", fontSize: "20px" }} />
+                      In Progress Projects
+                      <Span>(
+                        {
+                          projects.length != 0 && projects.filter(
+                            (item) => item.status === "ON_GOING"
+                          ).length
+                        }
+                        )</Span>
+                        
+                    </Text>
+                  </Top>
+                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
+                    <Masonry gutter="14px">
+
+                    {projects.length != 0 && projects.filter((item) => item.status === "ON_GOING")
+                      .map((ele, idx) => (
+                        <div onClick={() => openWorkDetails(ele)}>
+                          <ProjectCard
+                            key={ele.projectId}
+                            item={ele}
+                            index={idx}
+                            status={ele.status}
+                            tagColor={tagColors[3]}
+                          />
+                        </div>
+                      ))}
+                  </Masonry>
+                  </ResponsiveMasonry>
+                </ItemWrapper>
+                <ItemWrapper>
+                  <Top>
+                    <Text>
+                      <CheckCircleOutlineOutlined
+                        sx={{ color: "#67BC6D", fontSize: "20px" }}
+                      />
+                      Completed Projects
+
+                      <Span>(
+                        {
+                          projects.length != 0 && projects
+                            .filter(
+                              (item) => item.status === "COMPLETED"
+                            ).length
+                        }
+                        )</Span>
+                    
+                    </Text>
+                  </Top>
+                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
+                    <Masonry gutter="14px">
+                    {projects.length != 0 && projects.filter((item) => item.status === "COMPLETED")
+                      .map((ele, idx) => (
+                        <div onClick={() => openWorkDetails(ele)}>
+                          <ProjectCard
+                            key={ele.projectId}
+                            item={ele}
+                            index={idx}
+                            status={ele.status}
+                            tagColor={tagColors[3]}
+                          />
+                        </div>
+                      ))}
+                 </Masonry>
+                 </ResponsiveMasonry>
+                </ItemWrapper>
+              </Column>
+            </Project>
+           <HrHor />
             <Work>
-              <Allignment>
-                <ToggleButton
-                  alignment={alignment}
-                  button={"row"}
-                  onClick={() => setAlignment(true)}
-                >
-                  <AlignVerticalTop sx={{ fontSize: "18px" }} />
-                </ToggleButton>
-                <ToggleButton
-                  alignment={alignment}
-                  button={"col"}
-                  onClick={() => setAlignment(false)}
-                >
-                  <AlignHorizontalLeft sx={{ fontSize: "18px" }} />
-                </ToggleButton>
-              </Allignment>
               <Column alignment={alignment}>
                 <ItemWrapper>
                   <Top>
                     <Text>
                       <DonutLarge sx={{ color: "#1976D2", fontSize: "20px" }} />
-                      In Progress
+                      In Progress Works
                       <Span>(
                         {
                           works.length != 0 && works.filter(
@@ -511,14 +680,6 @@ const ProjectDetails = () => {
                   </Top>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">
-                    <AddWork
-                      ProjectMembers={projectCollaborators}
-                      ProjectTeams={projectTeams}
-                      ProjectId={id}
-                      memberIcons={item.memberIcons}
-                      setCreated={setCreated}
-                      data={item}
-                    />
 
                     {works.length != 0 && works.filter((item) => item.status === false)
                       .map((filteredItem) => (
@@ -541,7 +702,7 @@ const ProjectDetails = () => {
                       <CheckCircleOutlineOutlined
                         sx={{ color: "#67BC6D", fontSize: "20px" }}
                       />
-                      Completed
+                      Completed Works
 
                       <Span>(
                         {
@@ -555,11 +716,11 @@ const ProjectDetails = () => {
                   </Top>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">
-                    {works.length != 0 && works.filter((item) => item.status === "Completed")
+                    {works.length != 0 && works.filter((item) => item.status === true)
                       .map((item) => (
                         <div onClick={() => openWorkDetails(item)}>
                           <WorkCards
-                            status="Completed"
+                            status={true}
                             work={item}
                           />
                         </div>
@@ -569,14 +730,12 @@ const ProjectDetails = () => {
                 </ItemWrapper>
               </Column>
             </Work>
+          </CardWrapper>
             <HrHor />
             <Extra>
               <SubCards>
                 <SubCardTop>
                   <SubCardsTitle>Members</SubCardsTitle>
-                  {/* <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'member', data: item })} >
-                    <Edit sx={{ fontSize: "16px" }} />
-                  </IcoBtn> */}
                 </SubCardTop>
                 {item.collaboratorIds.map((id) => (
                   collaborators.map((collaborator) => {
@@ -588,48 +747,6 @@ const ProjectDetails = () => {
               )}
             
               </SubCards>
-              <SubCards>
-                <SubCardTop>
-                  <SubCardsTitle>Teams</SubCardsTitle>
-                  {/* <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'member', data: item })} >
-                    <Edit sx={{ fontSize: "16px" }} />
-                  </IcoBtn> */}
-                </SubCardTop>
-                {item.teamIds.map((id) => (
-                  teams.map((team) => {
-                    if (id === team.teamId) {
-                      return <MemberCard member={team} />;
-                    }
-                  }
-                ))
-              )}
-              </SubCards>
-              {/* <SubCards>
-                <SubCardTop>
-                  <SubCardsTitle>Tools</SubCardsTitle>
-                  <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'tool', data: item })}>
-                    <Edit sx={{ fontSize: "16px" }} />
-                  </IcoBtn>
-                </SubCardTop>
-                <Tools>
-                  {item.tools.map((tool) => (
-                    <ToolsCard tool={tool} />
-                  ))}
-                </Tools>
-              </SubCards> */}
-              <SubCards>
-                <SubCardTop>
-                  <SubCardsTitle>Idea List</SubCardsTitle>
-                  <IcoBtn>
-                    <Add sx={{ fontSize: "20px" }} />
-                  </IcoBtn>
-                </SubCardTop>
-                <Ideas>
-                  {/*ideas.map((i,id) => (
-                <IdeaCard idea={i} no={id} key={id}/>
-              ))*/}
-                </Ideas>
-              </SubCards>
             </Extra>
           </Body>
         </>
@@ -638,4 +755,4 @@ const ProjectDetails = () => {
   );
 };
 
-export default ProjectDetails;
+export default TeamDetails;

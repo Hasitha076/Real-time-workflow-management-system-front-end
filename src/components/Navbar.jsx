@@ -11,7 +11,6 @@ import { useDispatch } from "react-redux";
 import Avatar from "@mui/material/Avatar";
 import AccountDialog from "./AccountDialog";
 import NotificationDialog from "./NotificationDialog";
-import { openSnackbar } from "../redux/snackbarSlice";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 

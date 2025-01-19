@@ -290,6 +290,26 @@ const Dashboard = () => {
               </StatCard>
 
               <StatCard>
+                <TotalWorks>
+                  <Title>Total Works Done</Title>
+                  <Progress>
+                    <LinearProgress
+                      sx={{ borderRadius: "10px", height: 7, width: "80%" }}
+                      variant="determinate"
+                      value={
+                        totalWorksDone === 0
+                          ? 0
+                          : (totalWorksDone / totalWorks) * 100
+                      }
+                      color={"success"}
+                    />
+                    <ProgressText>{totalWorksDone}</ProgressText>
+                  </Progress>
+                  <Desc><Span>{totalWorks - totalWorksDone}</Span> &nbsp;Works are left</Desc>
+                </TotalWorks>
+              </StatCard>
+
+              <StatCard>
                 <TaskCompleted>
                   <Title>Total Task Done</Title>
                   <Progress>
@@ -309,25 +329,6 @@ const Dashboard = () => {
                 </TaskCompleted>
               </StatCard>
 
-              <StatCard>
-                <TotalWorks>
-                  <Title>Total Works Done</Title>
-                  <Progress>
-                    <LinearProgress
-                      sx={{ borderRadius: "10px", height: 7, width: "80%" }}
-                      variant="determinate"
-                      value={
-                        totalWorksDone === 0
-                          ? 0
-                          : (totalWorksDone / totalWorks) * 100
-                      }
-                      color={"success"}
-                    />
-                    <ProgressText>{totalWorksDone}</ProgressText>
-                  </Progress>
-                  <Desc><Span>{totalWorks - totalWorksDone}</Span> &nbsp;Works are left</Desc>
-                </TotalWorks>
-              </StatCard>
             </StatsWrapper>
 
             <Box >

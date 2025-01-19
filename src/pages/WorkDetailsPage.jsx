@@ -19,7 +19,6 @@ import axios from "axios";
 import Avatar from "@mui/material/Avatar";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
-import WorkDetails from "../components/WorkDetails";
 import DeletePopup from "../components/DeletePopup";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import InviteWorkMembers from "../components/InviteWorkMembers";
@@ -327,6 +326,9 @@ const WorkDetailsPage = () => {
   const [workTeams, setWorkTeams] = useState([]);
   const [taskCollaborators, setTaskCollaborators] = useState([]);
   const [taskTeams, setTaskTeams] = useState([]);
+
+  console.log(id);
+  
   
   //hooks for updates
   //use state enum to check for which updation
@@ -345,7 +347,7 @@ const WorkDetailsPage = () => {
         setWorkTeamIds(res.data.teamIds);
       })
       .then(() => {
-        setLoading(false);
+          setLoading(false);
       })
       .catch((err) => {
         dispatch(
@@ -496,7 +498,6 @@ const WorkDetailsPage = () => {
 
   return (
     <Container>
-      {openWork && <WorkDetails setOpenWork={setOpenWork} work={currentWork} />}
       {openUpdate.state && <UpdateWork openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} type={openUpdate.type} />}
       {openDelete.state && <DeletePopup openDelete={openDelete} setOpenDelete={setOpenDelete} />}
       {loading ? (

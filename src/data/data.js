@@ -35,32 +35,4 @@ const tagColors = [
     
 ]
 
-const tools = [
-    {
-        name: "Slack",
-        icon: "https://cdn.worldvectorlogo.com/logos/slack-1.svg",
-    },
-    {
-        name: "Figma",
-        icon: "https://cdn.worldvectorlogo.com/logos/figma-1.svg",
-    },
-    {
-        name: "Adobe XD",
-        icon: "https://cdn.worldvectorlogo.com/logos/adobe-xd.svg",
-    },
-    {
-        name: "Github",
-        icon: "https://cdn.worldvectorlogo.com/logos/github-icon.svg",
-    },
-    {
-        name: "GitLab",
-        icon: "https://cdn-icons-png.flaticon.com/512/5968/5968853.png",
-    },
-    {
-        name: "Bitbucket",
-        icon: "https://cdn.worldvectorlogo.com/logos/bitbucket.svg",
-    },
-]
-
-
-export  {  statuses , tagColors, tools  };
+export  {  statuses , tagColors };

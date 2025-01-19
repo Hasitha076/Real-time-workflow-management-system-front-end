@@ -24,6 +24,8 @@ import { useSelector } from "react-redux";
 import { useEffect } from 'react';
 import ProjectDetails from "./pages/ProjectDetails";
 import WorkDetailsPage from "./pages/WorkDetailsPage";
+import Teams from "./pages/Teams";
+import TeamDetails from "./pages/TeamDetails";
 // import { useDispatch } from 'react-redux';
 // import Home from './pages/Home/Home';
 // import Chats from './pages/Chats';
@@ -111,10 +113,10 @@ function App() {
                         <Route path="works">
                           <Route path=":id" element={<WorkDetailsPage />} />
                         </Route>
-                        {/* <Route path="teams" element={<Teams />} />
+                        <Route path="teams" element={<Teams />} />
                         <Route path="teams">
-                          <Route path=":id" element={<Teams />} />
-                        </Route> */}
+                          <Route path=":id" element={<TeamDetails />} />
+                        </Route>
                         {/* <Route path="forms" element={<Forms />} />
                         <Route path="community" element={<Community />} />
                         <Route path="chats" element={<Chats />} /> */}
