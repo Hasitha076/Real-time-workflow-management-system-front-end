@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import styled from "styled-components";
 import {
+    AddTask,
   CloseRounded
 } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
@@ -218,7 +219,7 @@ const FlexDisplay = styled.div`
 `;
 
 
-const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
+const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject }) => {
   const [Loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const [backDisabled, setBackDisabled] = useState(false);
@@ -312,45 +313,45 @@ const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
     setLoading(true);
     setDisabled(true);
 
-    if (teamProject) {
+    // if (teamProject) {
       
-    } else {
-      await axios.post("http://localhost:8083/api/v1/project/createProject", {
-        projectName: inputs.projectName,
-        projectDescription: inputs.projectDescription,
-        priority: inputs.priority,
-        dueDate: inputs.dueDate,
-        tags: inputs.tags,
-        collaboratorIds: selectedUsers.map((user) => user.id),
-        teamIds: selectedTeam.map((team) => team.id)
-      })
-      .then((res) => {
-        setAvailableUsers(res.data);
-      })
-        .then((res) => {
+    // } else {
+    //   await axios.post("http://localhost:8083/api/v1/project/createProject", {
+    //     projectName: inputs.projectName,
+    //     projectDescription: inputs.projectDescription,
+    //     priority: inputs.priority,
+    //     dueDate: inputs.dueDate,
+    //     tags: inputs.tags,
+    //     collaboratorIds: selectedUsers.map((user) => user.id),
+    //     teamIds: selectedTeam.map((team) => team.id)
+    //   })
+    //   .then((res) => {
+    //     setAvailableUsers(res.data);
+    //   })
+    //     .then((res) => {
 
-          setLoading(false);
-          setNewProject(false);
-          dispatch(
-            openSnackbar({
-              message: "Project created successfully",
-              type: "success",
-            })
-          );
-        })
-        .catch((err) => {
-          console.log(err);
-          setLoading(false);
-          setDisabled(false);
-          setBackDisabled(false);
-          dispatch(
-            openSnackbar({
-              message: "Something went wrong",
-              type: "error",
-            })
-          );
-        });
-    }
+    //       setLoading(false);
+    //       setNewTaskTemplate(false);
+    //       dispatch(
+    //         openSnackbar({
+    //           message: "Project created successfully",
+    //           type: "success",
+    //         })
+    //       );
+    //     })
+    //     .catch((err) => {
+    //       console.log(err);
+    //       setLoading(false);
+    //       setDisabled(false);
+    //       setBackDisabled(false);
+    //       dispatch(
+    //         openSnackbar({
+    //           message: "Something went wrong",
+    //           type: "error",
+    //         })
+    //       );
+    //     });
+    // }
   };
 
   const getAvailableUsers = async () => {
@@ -386,7 +387,7 @@ const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
   console.log(availableTeams);
 
   return (
-    <Modal open={true} onClose={() => setNewProject(false)}>
+    <Modal open={true} onClose={() => setNewTaskTemplate(false)}>
       <Container>
         <Wrapper>
           <IconButton
@@ -397,18 +398,18 @@ const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
               cursor: "pointer",
               color: "inherit",
             }}
-            onClick={() => setNewProject(false)}
+            onClick={() => setNewTaskTemplate(false)}
           >
             <CloseRounded style={{ color: "inherit" }} />
           </IconButton>
-          <Title>Create a new project</Title>
+          <Title>Create a new task template</Title>
 
           {showAddProject && (
             <>
-              <Label>Project Details :</Label>
+              <Label>Task Details :</Label>
               <OutlinedBox style={{ marginTop: "12px" }}>
                 <TextInput
-                  placeholder="Name (Required)*"
+                  placeholder="Name"
                   type="text"
                   name="projectName"
                   value={inputs.projectName}
@@ -417,7 +418,7 @@ const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
               </OutlinedBox>
               <OutlinedBox style={{ marginTop: "6px" }}>
                 <Desc
-                  placeholder="Description (Required)* "
+                  placeholder="Description"
                   name="projectDescription"
                   rows={5}
                   value={inputs.projectDescription}
@@ -435,11 +436,11 @@ const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
                     style={{
                       width: "100%",
                       padding: "0",
-                      border: "1px solid #ccc",
+                      border: "1px solid rgb(193 199 201 / 50%)",
                       borderRadius: "4px",
                       fontSize: "16px",
                       backgroundColor: "transparent",
-                      color: "#C1C7C9",
+                      color: "rgb(193 199 201 / 50%)",
                       border: "none",
                     }}
                   >
@@ -600,4 +601,4 @@ const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
   );
 };
 
-export default AddNewProject;
+export default AddTaskTemplate;

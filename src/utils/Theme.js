@@ -18,10 +18,13 @@ export const darkTheme = {
     chat_background: "#100f17",
     send_message: "#4f34ad",
     contact_background: "#151a21",
+    update: '#ec9a16',
+    white: '#ffffff',
+    black: '#000000'
 
     /*Colors
 Swatch 1
-#030405
+#e68911
 Swatch 2
 #585759
 Swatch 3
@@ -52,5 +55,7 @@ export const lightTheme = {
     send_message: "#4f34ad",
     send_message_text_color: "#ffffff",
     contact_background: "#ffffff",
-
+    update: '#ec9a16',
+    white: '#000000',
+    black: '#ffffff'
   }

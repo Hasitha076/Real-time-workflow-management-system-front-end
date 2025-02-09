@@ -1,9 +1,10 @@
-import { CloseRounded } from "@mui/icons-material";
+import { CloseRounded, SearchOutlined, SendRounded } from "@mui/icons-material";
 import { Modal } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Avatar } from "@mui/material";
 import { useSelector } from "react-redux";
+// import { inviteTeamMembers, inviteProjectMembers, searchUsers } from "../api/index";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -36,6 +37,34 @@ const Wrapper = styled.div`
   @media (max-width: 768px) {
     width: 100%;
   }
+`;
+
+const Title = styled.div`
+  font-size: 16px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.text};
+  margin: 12px;
+`;
+
+const Search = styled.div`
+  margin: 6px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 12px;
+  color: ${({ theme }) => theme.textSoft};
+  background-color: ${({ theme }) => theme.bgDark};
+`;
+
+const Input = styled.input`
+  width: 100%;
+  border: none;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 100px;
+  background-color: transparent;
+  outline: none;
+  color: ${({ theme }) => theme.textSoft};
 `;
 
 const UsersList = styled.div`
@@ -94,6 +123,24 @@ gap: 2px;
   flex-direction: column;
   align-items: center;
 }
+`;
+
+const Access = styled.div`
+padding: 6px 10px;
+border-radius: 12px;
+display: flex;
+align-items: center;
+justify-content: center;
+background-color: ${({ theme }) => theme.bgDark};
+`;
+
+const Select = styled.select`
+  border: none;
+  font-size: 12px;
+  background-color: transparent;
+  outline: none;
+  color: ${({ theme }) => theme.text};
+  background-color: ${({ theme }) => theme.bgDark};
 `;
 
 const Role = styled.div`
@@ -186,25 +233,23 @@ const ButtonContainer = styled.div`
 
 const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = React.useState("");
   const { currentUser } = useSelector((state) => state.user);
-  const [Loading, setLoading] = useState(false);
-  
+  const [Loading, setLoading] = React.useState(false);
 
   const UpdateProjectCollaborators = async () => {
     setLoading(true);
 
       if(true){
-        await axios.put(`http://localhost:8083/api/v1/project/updateCollaborators/${id}`, {
-          collaboratorIds: selectedUsers.map((user) => user.id),
-          teamIds: selectedTeam.map((team) => team.id)
+        await axios.put(`http://localhost:8085/api/v1/team/updateCollaborators/${id}`, {
+          collaboratorIds: selectedUsers.map((user) => user.id)
         })
           .then(() => {
             setLoading(true);
             setInvitePopup(false);
             dispatch(
               openSnackbar({
-                message: "Project collaborators updated successfully",
+                message: "Team collaborators updated successfully",
                 type: "success",
               })
             );
@@ -233,7 +278,6 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
   const dispatch = useDispatch();
 
   const [availableusers, setAvailableUsers] = useState([]);
-  const [availableTeams, setAvailableTeams] = useState([]);
 
   const getAvailableUsers = async () => {
     await axios.get("http://localhost:8081/api/v1/user/getAllUsers")
@@ -245,20 +289,11 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
     });
   }
 
-  const getAvailableTeams = async () => {
-    const response = await axios.get("http://localhost:8085/api/v1/team/getAllTeams")
-    const data = response.data;
-      setAvailableTeams(data);
-
-  }
-
     useEffect(() => {
       getAvailableUsers();
-      getAvailableTeams();
     }, []);
 
     const [selectedUsers, setSelectedUsers] = useState([]);
-    const [selectedTeam, setSelectedTeam] = useState([]);
 
     useEffect(() => {
 
@@ -275,18 +310,7 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
         setSelectedUsers(matchingUsers);
       }
 
-      // team
-      if (data?.teamIds && availableTeams.length > 0) {
-        const matchingTeams = availableTeams.filter((team) =>
-          data.teamIds.includes(team.teamId)
-        ).map((team) => ({
-          id: team.teamId,
-          name: team.teamName
-        }));
-    
-        setSelectedTeam(matchingTeams);
-      }
-    }, [data, availableusers, availableTeams]); // Dependencies to re-run the effect
+    }, [data, availableusers]); // Dependencies to re-run the effect
     
     
 
@@ -308,35 +332,13 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
     }
   };
 
-    //Add team from selected teams
-  const handleSelectTeam = (team) => {
-    const Team = {
-      id: team.teamId,
-      name: team.teamName
-    };
-    if (selectedTeam.find((t) => t.id === Team.teamId)) {
-    } else {
-      setSelectedTeam([...selectedTeam, {
-        id: team.teamId,
-        name: team.teamName
-      }]);
-    }
-  };
-
   //remove members from selected users
   const handleRemove = (user) => {
     setSelectedUsers(selectedUsers.filter((u) => u.id !== user.userId));
   };
 
-    //remove teams from selected users
-  const handleRemoveTeam = (team) => {
-    setSelectedTeam(selectedTeam.filter((t) => t.id !== team.teamId));
-  };
-
   console.log(data);
-  
   console.log(selectedUsers);
-  console.log(selectedTeam);
   
 
 
@@ -355,7 +357,7 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
             }}
             onClick={() => setInvitePopup(false)}
           />
-          <Label>Add Members :</Label>
+          <Label>Update Team Members :</Label>
           
           <AddMember>
 
@@ -396,38 +398,6 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
             </UsersList>
           </AddMember>
 
-          <Label>Add Teams :</Label>
-
-          <AddMember>
-
-          <UsersList>
-            {availableTeams.map((team) => (
-                <MemberCard key={team.teamId}>
-                  <UserData>
-                    <Avatar sx={{ width: "34px", height: "34px" }}>
-                      {team.teamName.charAt(0)}
-                    </Avatar>
-                    <Details>
-                      <Name>{team.teamName}</Name>
-                    </Details>
-                  </UserData>
-                  {
-                    !selectedTeam.find((t) => t.id === team.teamId) && 
-                    <InviteButton onClick={() => handleSelectTeam(team)}>
-                    Add
-                    </InviteButton>
-                  }
-                  {
-                    selectedTeam.find((t) => t.id === team.teamId) && 
-                    <InviteButton onClick={() => handleRemoveTeam(team)}>
-                    Remove
-                  </InviteButton>
-                  }
-                </MemberCard>
-              ))}
-          </UsersList>
-
-          </AddMember>
           {message && <div style={{ color: "red" }}>{message}</div>}
 
           <ButtonContainer>

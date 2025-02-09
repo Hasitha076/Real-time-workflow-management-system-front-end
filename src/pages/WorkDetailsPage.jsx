@@ -328,6 +328,8 @@ const WorkDetailsPage = () => {
   const [taskTeams, setTaskTeams] = useState([]);
 
   console.log(id);
+  console.log(item);
+  
   
   
   //hooks for updates
@@ -335,7 +337,7 @@ const WorkDetailsPage = () => {
   const [openUpdate, setOpenUpdate] = useState({ state: false, type: "all", data: item });
 
   //use state for delete popup
-  const [openDelete, setOpenDelete] = useState({ state: false, type: "Project", data: item });
+  const [openDelete, setOpenDelete] = useState({ state: false, type: "Work", data: item });
 
   const dispatch = useDispatch();
 
@@ -350,12 +352,12 @@ const WorkDetailsPage = () => {
           setLoading(false);
       })
       .catch((err) => {
-        dispatch(
-          openSnackbar({
-            message: err.response.data.message,
-            severity: "error",
-          })
-        );
+        // dispatch(
+        //   openSnackbar({
+        //     message: err.response.data.message,
+        //     severity: "error",
+        //   })
+        // );
       });
   };
 
@@ -490,7 +492,7 @@ const WorkDetailsPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     getproject(id); 
-  }, [openWork, openUpdate, invitePopup]);
+  }, [id, openWork, openUpdate, invitePopup]);
 
   const [alignment, setAlignment] = useState(true);
 
@@ -597,7 +599,7 @@ const WorkDetailsPage = () => {
                     <AddTask
                     WorkMembers={taskCollaborators}
                       WorkTeams={taskTeams}
-                      ProjectId={id}
+                      ProjectId={item.projectId}
                       WorkId={item.workId}
                       data={item}
                     />
@@ -607,7 +609,7 @@ const WorkDetailsPage = () => {
                         // <div onClick={() => openWorkDetails(filteredItem)}>
                           <TaskCard
                             status="In Progress"
-                            projectId={id}
+                            projectId={item.projectId}
                             item={filteredItem}
                             members={collaborators}
                             teams={teams}
@@ -642,7 +644,7 @@ const WorkDetailsPage = () => {
                           <TaskCard
                             status="Completed"
                             item={filteredItem}
-                            projectId={id}
+                            projectId={item.projectId}
                             members={collaborators}
                             teams={teams}
                           />

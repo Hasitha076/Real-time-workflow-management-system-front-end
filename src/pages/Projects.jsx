@@ -10,6 +10,8 @@ import { useSelector } from "react-redux";
 import Skeleton from "@mui/material/Skeleton";
 import AddNewProject from "../components/AddNewProject";
 import { CircularProgress } from "@mui/material";
+import { useQuery, gql } from '@apollo/client'
+import { LOAD_ALL_PROJECTS } from '../GraphQL/Queries'
 
 const Container = styled.div`
   width: 100%;
@@ -89,14 +91,17 @@ const OutlinedBox = styled.div`
 
 const Projects = ({newProject,setNewProject}) => {
   const dispatch = useDispatch();
-  const [data, setData] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useSelector((state) => state.user);
 
+  // const { error, loading, data } = useQuery(LOAD_USERS);
+
   const getprojects = async () => {
+
     await axios.get("http://localhost:8083/api/v1/project/getAllProjects")
       .then((res) => {
-        setData(res.data);
+        setProjects(res.data);
         setLoading(false);
       })
       .catch((err) => {
@@ -115,7 +120,7 @@ const Projects = ({newProject,setNewProject}) => {
     window.scrollTo(0, 0);
   }, [newProject, currentUser]);
 
-  console.log(data);
+  console.log(projects);
   
 
 
@@ -132,7 +137,7 @@ const Projects = ({newProject,setNewProject}) => {
               <ItemWrapper key={index}>
                 {s.icon} {s.title}
                 <Span>
-                  ({data.filter((item) => item.status == s.status).length})
+                  ({projects.filter((item) => item.status == s.status).length})
                 </Span>
                 <Wrapper key={index}>
                   {s.status === "PENDING" && (
@@ -140,7 +145,7 @@ const Projects = ({newProject,setNewProject}) => {
                       New Project
                     </OutlinedBox>
                   )}
-                  {data
+                  {projects
                     .filter((item) => item.status == s.status)
                     .map((item, idx) => (
                       

@@ -26,14 +26,19 @@ import ProjectDetails from "./pages/ProjectDetails";
 import WorkDetailsPage from "./pages/WorkDetailsPage";
 import Teams from "./pages/Teams";
 import TeamDetails from "./pages/TeamDetails";
+import AddNewProject from "./components/AddNewProject";
+import AddNewTeam from "./components/AddNewTeam";
+import Workflow from "./pages/Workflow";
+import AddForm from "./components/AddForm";
 // import { useDispatch } from 'react-redux';
 // import Home from './pages/Home/Home';
 // import Chats from './pages/Chats';
 // import ProjectInvite from './components/ProjectInvite';
 // import TeamInvite from './components/TeamInvite';
 // import AddNewProject from './components/AddNewProject';
-// import Forms from './pages/Forms';
+import Forms from './pages/Forms';
 // import WorkDetailsPage from './pages/WorkDetailsPage';
+
 
 const Container = styled.div`
 height: 100vh;
@@ -58,7 +63,6 @@ function App() {
   const [newProject, setNewProject] = useState(false);
   const { open, message, severity } = useSelector((state) => state.snackbar);
   const [loading, setLoading] = useState(false);
-
 
   const { currentUser } = useSelector(state => state.user);
 
@@ -92,11 +96,12 @@ function App() {
                 <Main>
                   <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
                   <Wrapper>
-                    {/* {newTeam && <AddNewTeam setNewTeam={setNewTeam} />}
-                    {newProject && <AddNewProject setNewProject={setNewProject} />} */}
+                    {newTeam && <AddNewTeam setNewTeam={setNewTeam} />}
+                    {newProject && <AddNewProject setNewProject={setNewProject} />}
+                    
                     <Routes>
                       <Route >
-                        <Route exact path="/" element={<Dashboard setNewTeam={setNewTeam} setNewProject={setNewProject}/>} />
+                        <Route exact path="/" element={<Dashboard />} />
                         <Route path="projects" element={<Projects newProject={newProject} setNewProject={setNewProject}/>} />
                         
                         {/* <Route path="team/invite">
@@ -117,9 +122,11 @@ function App() {
                         <Route path="teams">
                           <Route path=":id" element={<TeamDetails />} />
                         </Route>
-                        {/* <Route path="forms" element={<Forms />} />
-                        <Route path="community" element={<Community />} />
-                        <Route path="chats" element={<Chats />} /> */}
+                        <Route path="workflow" element={<Workflow />} />
+                        <Route path="workflow">
+                          <Route path=":id" element={<Workflow />} />
+                        </Route>
+                        <Route path="forms" element={<Forms />} />
                         <Route path="*" element={<div>Not Found</div>} />
                       </Route>
                     </Routes>

@@ -1,33 +1,28 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import {
-  Add,
-  AlignHorizontalLeft,
-  AlignVerticalTop,
   CheckCircleOutlineOutlined,
   Delete,
   DonutLarge,
   Edit,
-  PersonAdd,
+  PersonAdd
 } from "@mui/icons-material";
 import { tagColors } from "../data/data";
 import WorkCards from "../components/WorkCards";
 import MemberCard from "../components/MemberCard";
-import { Card, CircularProgress, IconButton } from "@mui/material";
+import { CircularProgress, IconButton } from "@mui/material";
 import axios from "axios";
 import Avatar from "@mui/material/Avatar";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
-import InviteMembers from "../components/InviteMembers";
-import AddWork from "../components/AddWork";
-import WorkDetails from "../pages/WorkDetailsPage";
-import UpdateProject from "../components/UpdateProject";
+import InviteTeamMembers from "../components/InviteTeamMembers";
 import DeletePopup from "../components/DeletePopup";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ProjectCard from "../components/Card";
+import UpdateTeam from "../components/UpdateTeam";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -35,7 +30,6 @@ const Container = styled.div`
     padding: 10px 10px;
   }
 `;
-
 const Header = styled.div``;
 
 const Column = styled.div`
@@ -312,10 +306,10 @@ const TeamDetails = () => {
   const [alignment, setAlignment] = useState(true);
   
   //use state enum to check for which updation
-  const [openUpdate, setOpenUpdate] = useState({ state: false, type: "all", data: item });
+  const [openUpdate, setOpenUpdate] = useState({ state: false, type: "Team", data: item });
 
   //use state for delete popup
-  const [openDelete, setOpenDelete] = useState({ state: false, type: "Project", data: item });
+  const [openDelete, setOpenDelete] = useState({ state: false, type: "Team", data: item });
 
   const dispatch = useDispatch();
 
@@ -382,8 +376,6 @@ const TeamDetails = () => {
     });
   }
 
-  console.log(works);
-
   const getProjects = async () => {
     await axios.get(`http://localhost:8083/api/v1/project/getProjectsByTeamId/${id}`)
     .then((res) => {
@@ -393,11 +385,6 @@ const TeamDetails = () => {
       console.log(err);
     });
   }
-
-  console.log(works);
-  console.log(projects);
-  
-  
 
   const getProjectCollaborators = async (projectId) => {
     
@@ -422,65 +409,6 @@ const TeamDetails = () => {
     updateData();
   }, [item?.projectId]);
 
-  
-//   const matchingWorkCollaborators = useMemo(() => {
-//     if (item?.collaboratorIds && collaborators.length > 0) {
-//       return collaborators
-//         .filter((user) => projectCollaborators.includes(user.userId))
-//         .map((user) => ({
-//           id: user.userId,
-//           name: user.userName,
-//           email: user.email,
-//         }));
-//     }
-//     return [];
-//   }, [item, collaborators, projectCollaborators]);
-
-//   const matchingTaskCollaborators = useMemo(() => {
-//     if (item?.collaboratorIds && collaborators.length > 0) {
-//       return collaborators
-//         .filter((user) => workCollaboratorIds.includes(user.userId))
-//         .map((user) => ({
-//           id: user.userId,
-//           name: user.userName,
-//           email: user.email,
-//         }));
-//     }
-//     return [];
-//   }, [item, collaborators, workCollaboratorIds]);
-
-//   const matchingWorkTeams = useMemo(() => {
-//     if (item?.teamIds && teams.length > 0) {
-//       return teams
-//         .filter((team) => projectTeams.includes(team.teamId))
-//         .map((team) => ({
-//           id: team.teamId,
-//           name: team.teamName,
-//         }));
-//     }
-//     return [];
-//   }, [item, teams, projectTeams]);
-
-//   const matchingTaskTeams = useMemo(() => {
-//     if (item?.teamIds && teams.length > 0) {
-//       return teams
-//         .filter((team) => workTeamIds.includes(team.teamId))
-//         .map((team) => ({
-//           id: team.teamId,
-//           name: team.teamName,
-//         }));
-//     }
-//     return [];
-//   }, [item, teams, workTeamIds]);
-
-//   useEffect(() => {
-//     setWorkCollaborators(matchingWorkCollaborators);
-//     setTaskCollaborators(matchingTaskCollaborators);
-//     setWorkTeams(matchingWorkTeams);
-//     setTaskTeams(matchingTaskTeams);
-    
-//   }, [matchingWorkCollaborators, matchingTaskCollaborators, matchingWorkTeams, matchingTaskTeams]);
-
 
   const openWorkDetails = (work) => {
     setCurrentWork(work);
@@ -495,8 +423,7 @@ const TeamDetails = () => {
 
   return (
     <Container>
-      {/* {openWork && <WorkDetails setOpenWork={setOpenWork} work={currentWork} />} */}
-      {/* {openUpdate.state && <UpdateProject openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} type={openUpdate.type} />} */}
+      {openUpdate.state && <UpdateTeam openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} type={openUpdate.type} />}
       {openDelete.state && <DeletePopup openDelete={openDelete} setOpenDelete={setOpenDelete} />}
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: '12px 0px',height: '300px' }}>
@@ -507,8 +434,8 @@ const TeamDetails = () => {
           <Header>
             <Title>{item.teamName}</Title>
             <Desc>{item.teamDescription}</Desc>
-            {/* <Tags>
-              {teams.tags.map((tag) => (
+            <Tags>
+              {item.tags.map((tag) => (
                 <Tag
                   tagColor={
                     tagColors[Math.floor(Math.random() * tagColors.length)]
@@ -517,14 +444,15 @@ const TeamDetails = () => {
                   {tag}
                 </Tag>
               ))}
-            </Tags> */}
-            {/* <Members>
-              {item.memberIcons.length > 0 ? <AvatarGroup>
-                {item.memberIcons.map((member) => (
+            </Tags>
+            <Members>
+              {item.collaboratorIds.length > 0 ? <AvatarGroup>
+                {item.collaboratorIds.map((member) => (
                   <Avatar
                     sx={{ marginRight: "-12px", width: "38px", height: "38px" }}
                   >
-                    {member.charAt(0)}
+                    {/* {member.charAt(0)} */}
+                    {member}
                   </Avatar>
                 ))}
               </AvatarGroup>  : <Avatar sx={{ backgroundColor: 'transparent', border: '1px dashed #fff' }}><AccountCircleIcon/></Avatar>}
@@ -532,19 +460,19 @@ const TeamDetails = () => {
                 <PersonAdd sx={{ fontSize: "12px" }} />
                 Invite
               </InviteButton>
-            </Members> */}
+            </Members>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-              <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'all', data: item })}>
+              <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'Team', data: item })}>
                 <Edit sx={{ fontSize: "20px" }} />
               </IcoBtn>
-              <IcoBtn onClick={() => setOpenDelete({ state: true, type: 'Project', name: item.projectName, id: item.projectId })}>
+              <IcoBtn onClick={() => setOpenDelete({ state: true, type: 'Team', name: item.teamName, id: item.teamId })}>
                 <Delete sx={{ fontSize: "20px" }} />
               </IcoBtn>
             </div>
 
             <Hr />
             {invitePopup && (
-              <InviteMembers
+              <InviteTeamMembers
                 setInvitePopup={setInvitePopup}
                 id={id}
                 teamInvite={false}

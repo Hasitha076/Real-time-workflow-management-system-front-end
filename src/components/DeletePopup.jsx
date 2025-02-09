@@ -136,7 +136,24 @@ const DeletePopup = ({ openDelete, setOpenDelete }) => {
   }
 
   const DeleteTeam = async () => {
+    await axios.delete(`http://localhost:8085/api/v1/team/deleteTeam/${openDelete.id}`)
+    .then((res) => {
+      console.log(res);
+      dispatch(openSnackbar
+        ({
+          message: "Team deleted successfully",
+          type: "success",
+        }));
 
+      handleDeleteSuccess(`/teams`);
+    }
+    ).catch((err) => {
+      dispatch(openSnackbar
+        ({
+          message: err.message,
+          type: "error",
+        }));
+    })
   }
 
   const deleteWork = async () => {

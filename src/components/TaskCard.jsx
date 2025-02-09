@@ -13,7 +13,7 @@ import {
 import Checkbox from '@mui/material/Checkbox';
 import InputIcon from '@mui/icons-material/Input';
 import CloseIcon from '@mui/icons-material/Close';
-import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
@@ -352,7 +352,7 @@ const TaskCard = ({item,index,members, teams}) => {
   const DrawerList = (
     <DrawerContainer>
       <IcoBtn onClick={toggleDrawer(false)}>
-        <KeyboardDoubleArrowLeftIcon/>
+        <KeyboardDoubleArrowRightIcon/>
       </IcoBtn>
       <Box sx={{ width: 500 }} role="presentation">
           <top>
@@ -558,7 +558,7 @@ const TaskCard = ({item,index,members, teams}) => {
               </AvatarGroup>
             </Bottom>
 
-            <Drawer open={open} onClose={toggleDrawer(false)} >
+            <Drawer anchor="right" open={open} onClose={toggleDrawer(false)} >
               {DrawerList}
             </Drawer>
           </Container>

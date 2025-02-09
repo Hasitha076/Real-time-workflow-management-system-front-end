@@ -347,14 +347,13 @@ const AddTask = ({ WorkMembers, ProjectId, WorkId, WorkTeams, data }) => {
   //create new work card
   const createWorkCard = async (ProjectId, WorkId) => {
  
-
     let newTaskCard = {
       taskName,
       description,
       tags: tags.split(","),
       priority,
       projectId: ProjectId,
-      workId: ProjectId,
+      workId: WorkId,
       dueDate,
       collaboratorIds: selectedUsers.map((user) => user.id),
       teamIds: selectedTeam.map((team) => team.id)
@@ -439,7 +438,6 @@ const AddTask = ({ WorkMembers, ProjectId, WorkId, WorkTeams, data }) => {
   };
 
 
-  console.log(data);
   console.log(data);
   console.log(selectedUsers);
   console.log(selectedTeam);
