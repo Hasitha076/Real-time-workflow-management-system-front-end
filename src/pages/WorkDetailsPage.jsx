@@ -25,6 +25,13 @@ import InviteWorkMembers from "../components/InviteWorkMembers";
 import UpdateWork from "../components/UpdateWork";
 import AddTask from "../components/AddTask";
 import TaskCard from "../components/TaskCard";
+import QueueIcon from '@mui/icons-material/Queue';
+import { Button, Divider } from "@mui/material";
+import AddTaskIcon from '@mui/icons-material/AddTask';
+
+import { Menu, MenuItem } from "@mui/material";
+import AddNewProject from "../components/AddNewProject";
+import AddNewTask from "../components/AddNewTask";
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -43,6 +50,39 @@ const Column = styled.div`
     margin: 6px 0px;
     flex-direction: column;
   }
+`;
+
+const Heading = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: 30px;
+  margin-bottom: 4px;
+`;
+
+const SubTitle = styled.div`
+  font-size: 24px;
+  @media screen and (max-width: 480px) {
+    font-size: 20px;
+  }
+  font-weight: 500;
+  color: ${({ theme }) => theme.text};
+  flex: 7;
+  line-height: 1.5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+`;
+
+const DropdownText = styled.div`
+  font-size: 18px;
+  font-weight: 700;
+  color: ${({ theme }) => theme.soft2};
+  padding: 10px 10px;
 `;
 
 const Title = styled.div`
@@ -326,10 +366,21 @@ const WorkDetailsPage = () => {
   const [workTeams, setWorkTeams] = useState([]);
   const [taskCollaborators, setTaskCollaborators] = useState([]);
   const [taskTeams, setTaskTeams] = useState([]);
+  const [newTask, setNewTask] = useState(false);
 
   console.log(id);
   console.log(item);
   
+      const [anchorEl, setAnchorEl] = useState(null);
+      const openDropdown = Boolean(anchorEl);
+    
+      const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+      };
+    
+      const handleClose = () => {
+        setAnchorEl(null);
+      };
   
   
   //hooks for updates
@@ -581,6 +632,57 @@ const WorkDetailsPage = () => {
               </Allignment>
               <Column alignment={alignment}>
                 <ItemWrapper>
+                <Heading>
+                    <SubTitle>
+                      All Tasks
+                    </SubTitle>
+
+                  <Button
+                      sx={{
+                        borderRadius: "10px",
+                        border: "1px solid rgb(205 50 198)",
+                        color: "rgb(205 50 198)",
+                        cursor: "pointer",
+                        fontSize: "12px",
+                        display: "flex",
+                        gap: "5px",
+                        "&:hover": {
+                          backgroundColor: "rgb(205 50 198)",
+                          color: "white",
+                        },
+                      }}
+                      onClick={handleClick} // Open dropdown on click
+                    >
+                    <QueueIcon sx={{ fontSize: "15px" }} />
+                    Add New Task
+                  </Button>
+
+                  {/* Dropdown Menu */}
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={openDropdown}
+                    onClose={handleClose}
+                    anchorOrigin={{
+                      vertical: "bottom",
+                      horizontal: "left",
+                    }}
+                    transformOrigin={{
+                      vertical: "top",
+                      horizontal: "left",
+                    }}
+                    style={{ marginTop: "10px", width: "100%" }}
+                  >
+                    <MenuItem onClick={() => {setNewTask(true); handleClose()}}>Black Task</MenuItem>
+                    <Divider />
+                    <DropdownText> Task Templates</DropdownText>
+                    <MenuItem onClick={handleClose}>
+                      <AddTaskIcon /> Task Template 1
+                    </MenuItem>
+                    <MenuItem onClick={handleClose}>
+                      <AddTaskIcon /> Task Template 2
+                    </MenuItem>
+                  </Menu>
+                  </Heading>
                   <Top>
                     <Text>
                       <DonutLarge sx={{ color: "#1976D2", fontSize: "20px" }} />
@@ -596,13 +698,13 @@ const WorkDetailsPage = () => {
                   </Top>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">
-                    <AddTask
+                    {/* <AddTask
                     WorkMembers={taskCollaborators}
                       WorkTeams={taskTeams}
                       ProjectId={item.projectId}
                       WorkId={item.workId}
                       data={item}
-                    />
+                    /> */}
 
                     {tasks?.filter((task) => task.status === false && task.workId === item.workId)
                       .map((filteredItem) => (
@@ -704,6 +806,16 @@ const WorkDetailsPage = () => {
           </Body>
         </>
       )}
+
+      {newTask && <AddNewTask 
+        setNewTask={setNewTask} 
+        WorkMembers={taskCollaborators}
+        WorkTeams={taskTeams}
+        ProjectId={item.projectId}
+        WorkId={item.workId}
+        data={item}
+        
+        />}
     </Container>
   );
 };

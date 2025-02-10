@@ -402,29 +402,6 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
 
   //create new work card
   const createWorkCard = async (ProjectId) => {
-    //check if all the tasks are filled
-    // let check = task.find((item) => !item.task || !item.start_date);
-    // if (check) {
-    //   alert("Please fill all the tasks");
-    //   return;
-    // }
-    //check if all the members are added
-    // let checkMember = task.find((item) => item.members.length === 0);
-    // if (checkMember) {
-    //   alert("Please add members to all the tasks");
-    //   return;
-    // }
-
-    //create new work card with the members id only
-    // let newTask = task.map((item) => {
-    //   let members = item.members.map((member) => member.id);
-    //   return {
-    //     task: item.task,
-    //     start_date: item.start_date,
-    //     end_date: item.end_date,
-    //     members,
-    //   };
-    // });
 
     let newWorkCard = {
       workName,

@@ -497,7 +497,7 @@ const TaskCard = ({item,index,members, teams}) => {
               {item.priority === "HIGH" &&
                 <>
                 <PrivacyTipRounded sx={{ 'font-size': '18px' }} style={{ 'color': 'red' }} />
-                <h6 style={{ paddingLeft: "5px" }} >URGENT</h6>
+                <h6 style={{ paddingLeft: "5px", margin: "0" }} >URGENT</h6>
                 </>
               }
              

@@ -309,6 +309,17 @@ const ProjectDetails = () => {
 
     const navigate = useNavigate();
 
+    const [anchorEl, setAnchorEl] = useState(null);
+    const openDropdown = Boolean(anchorEl);
+  
+    const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+  
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+
   const getproject = async (id) => {
     await axios.get(`http://localhost:8083/api/v1/project/getProject/${id}`)
       .then((res) => {
@@ -497,6 +508,9 @@ const ProjectDetails = () => {
   );
 
 
+  
+
+
   return (
     <Container>
       {openWork && <WorkDetails setOpenWork={setOpenWork} work={currentWork} />}
@@ -596,7 +610,9 @@ const ProjectDetails = () => {
             <Work>
               
               <Column alignment={alignment}>
+              
                 <ItemWrapper>
+                  
                   <Top>
                     <Text>
                       <DonutLarge sx={{ color: "#1976D2", fontSize: "20px" }} />
@@ -609,6 +625,7 @@ const ProjectDetails = () => {
                         }
                         )</Span>
                     </Text>
+                    
                   </Top>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">

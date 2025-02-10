@@ -43,13 +43,13 @@ const Column = styled.div`
 `;
 
 const Title = styled.div`
-  font-size: 24px;
+  font-size: 30px;
   @media screen and (max-width: 480px) {
     font-size: 20px;
   }
+  padding-bottom: 10px;
   font-weight: 500;
   color: ${({ theme }) => theme.text};
-  margin-top: 6px;
   flex: 7;
   line-height: 1.5;
   overflow: hidden;
@@ -486,6 +486,7 @@ const TeamDetails = () => {
           <Project>
               <Column alignment={alignment}>
               <ItemWrapper>
+              <Title>All Projects</Title>
                   <Top>
                     <Text>
                       <DonutLarge sx={{ color: "#1976D2", fontSize: "20px" }} />
@@ -593,6 +594,7 @@ const TeamDetails = () => {
             <Work>
               <Column alignment={alignment}>
                 <ItemWrapper>
+                <Title>All Works</Title>
                   <Top>
                     <Text>
                       <DonutLarge sx={{ color: "#1976D2", fontSize: "20px" }} />
