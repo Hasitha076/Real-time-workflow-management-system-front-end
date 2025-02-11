@@ -42,6 +42,11 @@ const Container = styled.div`
 
 const Header = styled.div``;
 
+const Options = styled(MenuItem)`
+  display: flex;
+  gap: 10px;
+`
+
 const Column = styled.div`
   display: flex;
   flex-direction: column;
@@ -367,6 +372,7 @@ const WorkDetailsPage = () => {
   const [taskCollaborators, setTaskCollaborators] = useState([]);
   const [taskTeams, setTaskTeams] = useState([]);
   const [newTask, setNewTask] = useState(false);
+  const [taskAdd, setTaskAdd] = useState(false);
 
   console.log(id);
   console.log(item);
@@ -381,6 +387,13 @@ const WorkDetailsPage = () => {
       const handleClose = () => {
         setAnchorEl(null);
       };
+
+      useEffect(() => {
+        if (taskAdd) {
+          getTasks();
+          setTaskAdd(false);
+        }
+      }, [taskAdd]);
   
   
   //hooks for updates
@@ -672,15 +685,15 @@ const WorkDetailsPage = () => {
                     }}
                     style={{ marginTop: "10px", width: "100%" }}
                   >
-                    <MenuItem onClick={() => {setNewTask(true); handleClose()}}>Black Task</MenuItem>
+                    <Options onClick={() => {setNewTask(true); handleClose()}}>Black Task</Options>
                     <Divider />
                     <DropdownText> Task Templates</DropdownText>
-                    <MenuItem onClick={handleClose}>
+                    <Options onClick={handleClose}>
                       <AddTaskIcon /> Task Template 1
-                    </MenuItem>
-                    <MenuItem onClick={handleClose}>
+                    </Options>
+                    <Options onClick={handleClose}>
                       <AddTaskIcon /> Task Template 2
-                    </MenuItem>
+                    </Options>
                   </Menu>
                   </Heading>
                   <Top>
@@ -698,30 +711,24 @@ const WorkDetailsPage = () => {
                   </Top>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">
-                    {/* <AddTask
-                    WorkMembers={taskCollaborators}
-                      WorkTeams={taskTeams}
-                      ProjectId={item.projectId}
-                      WorkId={item.workId}
-                      data={item}
-                    /> */}
 
                     {tasks?.filter((task) => task.status === false && task.workId === item.workId)
                       .map((filteredItem) => (
-                        // <div onClick={() => openWorkDetails(filteredItem)}>
                           <TaskCard
                             status="In Progress"
                             projectId={item.projectId}
                             item={filteredItem}
                             members={collaborators}
                             teams={teams}
+                            setTaskAdd={setTaskAdd}
+                            work={item}
+                            tasks={tasks}
                           />
-                        // </div>
                       ))}
                   </Masonry>
                   </ResponsiveMasonry>
                 </ItemWrapper>
-                <ItemWrapper>
+                {/* <ItemWrapper>
                   <Top>
                     <Text>
                       <CheckCircleOutlineOutlined
@@ -742,19 +749,18 @@ const WorkDetailsPage = () => {
                     <Masonry gutter="14px">
                     {tasks?.filter((task) => task.status === true && task.workId === item.workId)
                       .map((filteredItem) => (
-                        // <div onClick={() => openWorkDetails(item)}>
                           <TaskCard
                             status="Completed"
                             item={filteredItem}
                             projectId={item.projectId}
                             members={collaborators}
                             teams={teams}
+                            setTaskAdd={setTaskAdd}
                           />
-                        // </div>
                       ))}
                  </Masonry>
                  </ResponsiveMasonry>
-                </ItemWrapper>
+                </ItemWrapper> */}
               </Column>
             </Work>
             <HrHor />
@@ -793,15 +799,6 @@ const WorkDetailsPage = () => {
               )}
               </SubCards>
               
-              <SubCards>
-                <SubCardTop>
-                  <SubCardsTitle>Idea List</SubCardsTitle>
-                  <IcoBtn>
-                    <Add sx={{ fontSize: "20px" }} />
-                  </IcoBtn>
-                </SubCardTop>
-             
-              </SubCards>
             </Extra>
           </Body>
         </>
@@ -814,6 +811,8 @@ const WorkDetailsPage = () => {
         ProjectId={item.projectId}
         WorkId={item.workId}
         data={item}
+        setTaskAdd={setTaskAdd}
+        tasks={tasks}
         
         />}
     </Container>

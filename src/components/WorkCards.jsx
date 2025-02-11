@@ -209,15 +209,15 @@ const Card = ({ status, work }) => {
       </Tags>
       <Progress>
         <Text>
-          Tasks Completed
+          Incompleted Tasks 
           <Span>
-            {completed} / {task.length}
+            {task.length}
           </Span>
         </Text>
         <LinearProgress
           sx={{ borderRadius: "10px", height: 3 }}
           variant="determinate"
-          value={(completed / task.length) * 100}
+          value={(task.length) * 10}
           color={color}
         />
       </Progress>

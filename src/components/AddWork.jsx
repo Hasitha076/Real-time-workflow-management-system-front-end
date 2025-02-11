@@ -323,7 +323,7 @@ const OutlinedButtonBox = styled.div`
   }
 `;
 
-const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIcons, data }) => {
+const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIcons, data, setWorkAdded }) => {
   const dispatch = useDispatch();
 
   const [step, setStep] = useState(0);
@@ -421,7 +421,7 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
       .then(() => {
         setLoading(false);
         emptyForm();
-
+        setWorkAdded(true);
         dispatch(
           openSnackbar({
             message: "Created a work card Successfully",

@@ -218,7 +218,7 @@ const FlexDisplay = styled.div`
 `;
 
 
-const AddNewTask = ({ setNewTask, WorkMembers, WorkTeams, ProjectId, WorkId, data }) => {
+const AddNewTask = ({ setNewTask, WorkMembers, WorkTeams, ProjectId, WorkId, data, setTaskAdd, tasks }) => {
   const dispatch = useDispatch();
   const [step, setStep] = useState(0);
     const [disabled, setDisabled] = useState(true);
@@ -272,12 +272,28 @@ const AddNewTask = ({ setNewTask, WorkMembers, WorkTeams, ProjectId, WorkId, dat
       teamIds: selectedTeam.map((team) => team.id)
     };
 
-    
     await axios.post("http://localhost:8082/api/v1/task/createTask", newTaskCard)
       .then(() => {
         setLoading(false);
         emptyForm();
         setNewTask(false);
+        setTaskAdd(true);
+
+        axios.put(`http://localhost:8086/api/v1/work/updateWork`, {
+            workId: data.workId, 
+            workName: data.workName, 
+            description: data.description, 
+            priority: data.priority,
+            projectId: data.projectId,
+            dueDate: data.dueDate,
+            collaboratorIds: data.collaboratorIds,
+            teamIds: data.teamIds,
+            memberIcons: data.memberIcons,
+            status: false,
+            tags: data.tags
+        });
+
+
         dispatch(
           openSnackbar({
             message: "Created a task card Successfully",

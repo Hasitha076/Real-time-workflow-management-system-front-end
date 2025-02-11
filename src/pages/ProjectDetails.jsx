@@ -294,6 +294,7 @@ const ProjectDetails = () => {
   const [open, setOpen] = useState(false);
     const [newForm, setNewForm] = useState(false);
   const [newTaskTemplate, setNewTaskTemplate] = useState(false);
+  const [workAdded, setWorkAdded] = useState(false);
   
   //use state enum to check for which updation
   const [openUpdate, setOpenUpdate] = useState({ state: false, type: "all", data: item });
@@ -306,6 +307,13 @@ const ProjectDetails = () => {
     const toggleDrawer = (newOpen) => () => {
       setOpen(newOpen);
     };
+
+    useEffect(() => {
+      if (workAdded) {
+        getWorks();
+        setWorkAdded(false);
+      }
+    }, [workAdded]);
 
     const navigate = useNavigate();
 
@@ -636,6 +644,7 @@ const ProjectDetails = () => {
                       memberIcons={item.memberIcons}
                       setCreated={setCreated}
                       data={item}
+                      setWorkAdded={setWorkAdded}
                     />
 
                     {works.length != 0 && works.filter((item) => item.status === false)
@@ -673,7 +682,7 @@ const ProjectDetails = () => {
                   </Top>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">
-                    {works.length != 0 && works.filter((item) => item.status === "Completed")
+                    {works.length != 0 && works.filter((item) => item.status === true)
                       .map((item) => (
                         <div onClick={() => openWorkDetails(item)}>
                           <WorkCards
