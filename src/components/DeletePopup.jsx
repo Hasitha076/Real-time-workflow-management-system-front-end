@@ -6,6 +6,8 @@ import styled from 'styled-components'
 import { useDispatch } from 'react-redux';
 import { openSnackbar } from '../redux/snackbarSlice';
 import axios from 'axios';
+import { useMutation } from '@apollo/client';
+import { DELETE_PROJECT } from '../GraphQL/Queries';
 
 
 const Container = styled.div`
@@ -93,6 +95,8 @@ const DeletePopup = ({ openDelete, setOpenDelete }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const [deleteProject] = useMutation(DELETE_PROJECT);
+
   useEffect(() => {
     if (name === openDelete.name) {
       setDisabled(false);
@@ -115,7 +119,8 @@ const DeletePopup = ({ openDelete, setOpenDelete }) => {
   }
 
   const DeleteProject = async () => {
-    await axios.delete(`http://localhost:8083/api/v1/project/deleteProject/${openDelete.id}`)
+
+      await deleteProject({ variables: { id: parseInt(openDelete.id) } })
       .then((res) => {
         console.log(res);
         dispatch(openSnackbar

@@ -22,6 +22,8 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
 import { Avatar, CircularProgress } from "@mui/material";
+import { LOAD_ALL_PROJECTS } from "../GraphQL/Queries";
+import { useQuery } from "@apollo/client";
 
 const Container = styled.div`
   flex: 1.3;
@@ -125,8 +127,9 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
 
   const [team, setTeams] = useState([]);
   const { currentUser } = useSelector(state => state.user);
- const [recentProjects, setRecentProjects] = useState([]);
+    const [recentProjects, setRecentProjects] = useState([]);
 
+   const { loading, error, data } = useQuery(LOAD_ALL_PROJECTS);
   
 
   const getteams = async () => {
@@ -143,27 +146,21 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
   };
 
   const getAllProjects = async () => {
-    setProjectsLoading(true);
-    await axios.get(`http://localhost:8083/api/v1/project/getAllProjects`)
-      .then((res) => {
-        const sortedData = res.data.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-        setRecentProjects(sortedData);
-        setProjectsLoading(false);
-      })
-      .catch((err) => {
-        dispatch(openSnackbar({ message: err.message, type: "error" }));
-        if (err.response.status === 401 || err.response.status === 402) logoutUser();
-      });
-  };
+        setProjectsLoading(true);
+        
+    const sortedData = [...(data?.getAllProjects || [])].sort(
+        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+    );
 
-  console.log(team);
-  console.log(recentProjects);
-  
+    setRecentProjects(sortedData);
+    setProjectsLoading(false);
+
+  };
 
   useEffect(() => {
     getteams();
     getAllProjects();
-  }, [currentUser]);
+  }, [currentUser, loading]);
 
   return (
     <Container setMenuOpen={setMenuOpen} >
@@ -266,9 +263,7 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
             <CircularProgress size='24px' />
           </div>
         ) : (<>
-          {recentProjects
-          
-            .slice(0, 5).map((project, i) => (
+          {recentProjects?.slice(0, 5).map((project, i) => (
             <Link
               to={`/projects/${project.projectId}`}
               style={{ textDecoration: "none", color: "inherit" }}

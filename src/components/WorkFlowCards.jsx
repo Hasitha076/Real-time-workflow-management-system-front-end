@@ -89,7 +89,7 @@ const Bottom = styled.div`
   text-align: left;
 `;
 
-const WorkFlowCards = ({ status, work, setInviteMemberPopup, setInviteTeamPopup }) => {
+const WorkFlowCards = ({ status, work, setInviteMemberPopup, setInviteTeamPopup, setWorkDetails }) => {
   
   const [color, setColor] = useState("primary");
   const [task, setTask] = useState([]);
@@ -148,13 +148,13 @@ const WorkFlowCards = ({ status, work, setInviteMemberPopup, setInviteTeamPopup 
         </Text>
       </Progress>
       <Bottom>
-        <Button style={{ border: '1px dashed #fff', padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} onClick={() => setInviteMemberPopup(true)}>
+        <Button style={{ border: '1px dashed #fff', padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} onClick={() => {setInviteMemberPopup(true); setWorkDetails(work)}}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: 'flex-start', gap: "8px" }} >
                 <PersonAddIcon sx={{ fontSize: "15px", color: "#757575" }} />
                 <TaskText>Set Assignee</TaskText>
             </div>
         </Button>
-        <Button style={{ border: '1px dashed #fff', padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }}onClick={() => setInviteTeamPopup(true)}>
+        <Button style={{ border: '1px dashed #fff', padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }}onClick={() => {setInviteTeamPopup(true); setWorkDetails(work)}}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: 'flex-start', gap: "8px" }}>
                 <GroupAddIcon sx={{ fontSize: "15px", color: "#757575" }} />
                 <TaskText>Set Teams</TaskText>

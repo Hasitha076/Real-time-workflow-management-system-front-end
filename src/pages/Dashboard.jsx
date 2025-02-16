@@ -12,6 +12,8 @@ import axios from "axios";
 import ProjectCard from "../components/Card";
 import WorkCards from "../components/WorkCards";
 import { statuses, data, tagColors } from "../data/data";
+import { LOAD_ALL_PROJECTS } from "../GraphQL/Queries";
+import { useQuery } from "@apollo/client";
 
 const Container = Styled.div`
   overflow-y: visible !important;
@@ -175,35 +177,27 @@ const Dashboard = () => {
   const [totalWorks, setTotalWorks] = useState(0);
   const [totalTasksDone, setTotalTasksDone] = useState(0);
   const [totalWorksDone, setTotalWorksDone] = useState(0);
-  const [loading, setLoading] = useState(true);
 
-
+  const { loading, error, data } = useQuery(LOAD_ALL_PROJECTS);
+  
   const getprojects = async () => {
-    setLoading(true);
-    await axios.get("http://localhost:8083/api/v1/project/getAllProjects")
-      .then((res) => {
-        setProjects(res.data);
-       
-        setTotalProjectsDone(res.data.filter((project) => project.status === "COMPLETED").length);
-        setTotalProjects(res.data.length);
-      })
-      .catch((err) => {
-        setLoading(false);
-        dispatch(
-          openSnackbar({
-            message: err.response.data.message,
-            severity: "error",
-          })
-        );
-      });
+
+    if (!data || !data.getAllProjects) return; // Ensure data exists before using it
+    setProjects(data.getAllProjects);
+    setTotalProjectsDone(
+      data.getAllProjects.filter((project) => project.status === "COMPLETED").length
+    );
+    setTotalProjects(data.getAllProjects.length);
+
   };
+  
 
   const getTasks = async () => {
-    setLoading(true);
+
     await axios.get("http://localhost:8082/api/v1/task/getAllTasks")
       .then((res) => {
         setTasks(res.data);
-        setLoading(false);
+        
 
         setTotalTasks(res.data.length);
         setTotalTasksDone(res.data.filter((task) => task.status === true).length);
@@ -215,7 +209,7 @@ const Dashboard = () => {
             severity: "error",
           })
         );
-        setLoading(false);
+        
       });
   };
 
@@ -223,37 +217,24 @@ const Dashboard = () => {
     await axios.get(`http://localhost:8086/api/v1/work/getAllWorks`)
       .then((res) => {
         setWorks(res.data);
-        setLoading(false);
+        
 
         setTotalWorks(res.data.length);
         setTotalWorksDone(res.data.filter((work) => work.status === true).length);
       })
       .catch((err) => {
         console.log(err);
-        setLoading(false);
+        
       });
   }
-
-  console.log(projects);
-  console.log(works);
-  console.log(tasks);
   
-  console.log(totalProjects);
-  console.log(totalWorks);
-  console.log(totalTasks);
-  
-  console.log(totalProjectsDone);
-  console.log(totalWorksDone);
-  console.log(totalTasksDone);
-  
-
   useEffect(() => {
     getprojects();
     getTasks();
     getAllWorks();
 
     window.scrollTo(0, 0);
-  }, []);
+  }, [loading]);
 
 
   return (
@@ -337,21 +318,20 @@ const Dashboard = () => {
                   <SectionTitle>Recent Projects</SectionTitle>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="0px 16px">
-                      {
-                        projects
-                          .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-                          .filter((item, index) => index < 6)
-                          .slice(0, 4)
-                          .map((project, id) => (
-                            <ProjectCard
-                              key={id}
-                              item={project}
-                              index={id}
-                              status={project.status}
-                              tagColor={tagColors[3]}
-                            />
-                          ))
-                      }
+                    {
+                    [...(projects || [])] // Clone the array to avoid mutating the original
+                        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)) // Sort based on updatedAt
+                        .slice(0, 4) // Get only the first 4 items
+                        .map((project, id) => (
+                        <ProjectCard
+                            key={id}
+                            item={project}
+                            index={id}
+                            status={project.status}
+                            tagColor={tagColors[3]}
+                        />
+                        ))
+                    }
                     </Masonry>
                   </ResponsiveMasonry>
                 </RecentProjects>

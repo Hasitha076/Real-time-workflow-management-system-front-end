@@ -5,12 +5,9 @@ import styled from "styled-components";
 import Item from "../components/Card";
 import { statuses, tagColors } from "../data/data";
 import { useDispatch } from "react-redux";
-import { openSnackbar } from "../redux/snackbarSlice";
 import { useSelector } from "react-redux";
-import Skeleton from "@mui/material/Skeleton";
-import AddNewProject from "../components/AddNewProject";
 import { CircularProgress } from "@mui/material";
-import { useQuery, gql } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { LOAD_ALL_PROJECTS } from '../GraphQL/Queries'
 
 const Container = styled.div`
@@ -92,33 +89,22 @@ const OutlinedBox = styled.div`
 const Projects = ({newProject,setNewProject}) => {
   const dispatch = useDispatch();
   const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [Loading, setLoading] = useState(true);
   const { currentUser } = useSelector((state) => state.user);
 
-  // const { error, loading, data } = useQuery(LOAD_USERS);
-
+  const { loading, error, data: allProjects } = useQuery(LOAD_ALL_PROJECTS);
+  
   const getprojects = async () => {
 
-    await axios.get("http://localhost:8083/api/v1/project/getAllProjects")
-      .then((res) => {
-        setProjects(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        dispatch(
-          openSnackbar({
-            message: err.response.data.message,
-            severity: "error",
-          })
-        );
-      });
+    if(!loading) {
+      setProjects(allProjects.getAllProjects);
+    }
   };
 
   useEffect(() => {
     getprojects();
     window.scrollTo(0, 0);
-  }, [newProject, currentUser]);
+  }, [newProject, currentUser, loading]);
 
   console.log(projects);
   

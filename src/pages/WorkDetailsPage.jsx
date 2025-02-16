@@ -367,12 +367,14 @@ const WorkDetailsPage = () => {
   const [teams, setTeams] = useState([]);
   const [works, setWorks] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [taskTemplates, setTaskTemplates] = useState([]);
   const [workCollaborators, setWorkCollaborators] = useState([]);
   const [workTeams, setWorkTeams] = useState([]);
   const [taskCollaborators, setTaskCollaborators] = useState([]);
   const [taskTeams, setTaskTeams] = useState([]);
   const [newTask, setNewTask] = useState(false);
   const [taskAdd, setTaskAdd] = useState(false);
+  const [collaboratorBlock, setCollaboratorBlock] = useState({});
 
   console.log(id);
   console.log(item);
@@ -455,6 +457,16 @@ const WorkDetailsPage = () => {
       });
   };
 
+  const getTaskTemplates = async () => {
+    await axios.get(`http://localhost:8082/api/v1/task/getAllTaskTemplates`)
+      .then((res) => {
+        setTaskTemplates(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
   const getWorks = async () => {
     await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${id}`)
     .then((res) => {
@@ -479,7 +491,7 @@ const WorkDetailsPage = () => {
 
   useEffect(() => {
     const updateData = async () => {
-      await Promise.all([getCollaborators(), getTeams(), getWorks(), getTasks()]);
+      await Promise.all([getCollaborators(), getTeams(), getWorks(), getTasks(), getTaskTemplates()]);
       if (item?.projectId) {
         await getProjectCollaborators(item.projectId);
       }
@@ -560,6 +572,84 @@ const WorkDetailsPage = () => {
 
   const [alignment, setAlignment] = useState(true);
 
+  console.log(taskTemplates);
+  
+
+  //create new work card
+  const createTaskCard = async (template) => {
+    try {
+        setLoading(true);
+        let collaboratorBlock = null;
+
+        // Fetch existing collaborators block
+        try {
+            const res = await axios.get(`http://localhost:8082/api/v1/task/getCollaboratorsBlock/${item.workId}`);
+            if (res.status === 200) {
+                collaboratorBlock = res.data;
+            }
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                console.log("No collaborators block found, using template data.");
+            } else {
+                throw error; // Unexpected error
+            }
+        }
+
+        // Create new task card object
+        let newTaskCard = {
+            taskName: template.taskTemplateName,
+            description: template.taskTemplateDescription,
+            tags: template.taskTemplateTags,
+            priority: template.taskTemplatePriority,
+            projectId: template.projectId,
+            workId: item.workId,
+            dueDate: template.taskTemplateDueDate,
+            collaboratorIds: collaboratorBlock?.memberIds || template.taskTemplateCollaboratorIds,
+            teamIds: collaboratorBlock?.teamIds || template.taskTemplateTeamIds,
+        };
+
+        // Create Task Card
+        await axios.post("http://localhost:8082/api/v1/task/createTask", newTaskCard);
+
+        // Update Work
+        await axios.put(`http://localhost:8086/api/v1/work/updateWork`, {
+            workId: item.workId, 
+            workName: item.workName, 
+            description: item.description, 
+            priority: item.priority,
+            projectId: item.projectId,
+            dueDate: item.dueDate,
+            collaboratorIds: item.collaboratorIds,
+            teamIds: item.teamIds,
+            memberIcons: item.memberIcons,
+            status: false,
+            tags: item.tags
+        });
+
+        // Success Message
+        dispatch(
+            openSnackbar({
+                message: "Created a task card successfully",
+                severity: "success",
+            })
+        );
+
+    } catch (err) {
+        console.error("Error:", err);
+        dispatch(
+            openSnackbar({
+                message: err.message,
+                severity: "error",
+            })
+        );
+    } finally {
+        setLoading(false);
+        setNewTask(false);
+        setTaskAdd(true);
+    }
+};
+
+  
 
 
   return (
@@ -688,12 +778,12 @@ const WorkDetailsPage = () => {
                     <Options onClick={() => {setNewTask(true); handleClose()}}>Black Task</Options>
                     <Divider />
                     <DropdownText> Task Templates</DropdownText>
-                    <Options onClick={handleClose}>
-                      <AddTaskIcon /> Task Template 1
+                    {taskTemplates?.map((template) => (
+                      <Options onClick={() => {createTaskCard(template); handleClose()}}>
+                      <AddTaskIcon /> {template.taskTemplateName}
                     </Options>
-                    <Options onClick={handleClose}>
-                      <AddTaskIcon /> Task Template 2
-                    </Options>
+                    ))}
+                    
                   </Menu>
                   </Heading>
                   <Top>
@@ -712,7 +802,7 @@ const WorkDetailsPage = () => {
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">
 
-                    {tasks?.filter((task) => task.status === false && task.workId === item.workId)
+                    {tasks?.filter((task) => task.status === false && task.workId === item.workId && task.projectId === item.projectId)
                       .map((filteredItem) => (
                           <TaskCard
                             status="In Progress"
@@ -728,7 +818,7 @@ const WorkDetailsPage = () => {
                   </Masonry>
                   </ResponsiveMasonry>
                 </ItemWrapper>
-                {/* <ItemWrapper>
+                <ItemWrapper>
                   <Top>
                     <Text>
                       <CheckCircleOutlineOutlined
@@ -739,7 +829,7 @@ const WorkDetailsPage = () => {
                       <Span>(
                         {
                           tasks?.filter(
-                              (task) =>  task.status === true && task.workId === item.workId
+                              (task) =>  task.status === true && task.workId === item.workId && task.projectId === item.projectId
                             ).length
                         }
                         )</Span>
@@ -756,11 +846,13 @@ const WorkDetailsPage = () => {
                             members={collaborators}
                             teams={teams}
                             setTaskAdd={setTaskAdd}
+                            work={item}
+                            tasks={tasks}
                           />
                       ))}
                  </Masonry>
                  </ResponsiveMasonry>
-                </ItemWrapper> */}
+                </ItemWrapper>
               </Column>
             </Work>
             <HrHor />

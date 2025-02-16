@@ -8,6 +8,8 @@ import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import axios from "axios";
+import { useMutation } from "@apollo/client";
+import { UPDATE_COLLABORATORS } from "../GraphQL/Queries";
 
 const Container = styled.div`
   width: 100%;
@@ -189,36 +191,42 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
   const [message, setMessage] = useState("");
   const { currentUser } = useSelector((state) => state.user);
   const [Loading, setLoading] = useState(false);
+
+  const [updateCollaborators] = useMutation(UPDATE_COLLABORATORS);
   
 
   const UpdateProjectCollaborators = async () => {
     setLoading(true);
 
-      if(true){
-        await axios.put(`http://localhost:8083/api/v1/project/updateCollaborators/${id}`, {
-          collaboratorIds: selectedUsers.map((user) => user.id),
-          teamIds: selectedTeam.map((team) => team.id)
+      if(true) {
+        await updateCollaborators({
+          variables: {
+            projectId: parseInt(id),
+            input: {
+              collaboratorIds: selectedUsers.map(user => user.id),
+              teamIds: selectedTeam.map(team => team.id),
+            },
+          },
+        }).then(() => {
+          setLoading(true);
+          setInvitePopup(false);
+          dispatch(
+            openSnackbar({
+              message: "Project collaborators updated successfully",
+              type: "success",
+            })
+          );
         })
-          .then(() => {
-            setLoading(true);
-            setInvitePopup(false);
-            dispatch(
-              openSnackbar({
-                message: "Project collaborators updated successfully",
-                type: "success",
-              })
-            );
-          })
-          .catch((err) => {
-            console.log(err);
-            setLoading(false);
-            dispatch(
-              openSnackbar({
-                message: "Something went wrong",
-                type: "error",
-              })
-            );
-          });
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+          dispatch(
+            openSnackbar({
+              message: "Something went wrong",
+              type: "error",
+            })
+          );
+        });
       } else {
         dispatch(
           openSnackbar({
@@ -227,6 +235,7 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
           })
         );
       }
+      
     
   };
 

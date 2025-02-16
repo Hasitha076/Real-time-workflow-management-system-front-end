@@ -219,7 +219,7 @@ const FlexDisplay = styled.div`
 `;
 
 
-const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject }) => {
+const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId }) => {
   const [Loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const [backDisabled, setBackDisabled] = useState(false);
@@ -243,13 +243,15 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject }) => {
   const[availableUsers, setAvailableUsers] = useState([]);
   const[availableTeams, setAvailableTeams] = useState([]);
   const [inputs, setInputs] = useState({ 
-      projectName: "", 
-      projectDescription: "",
-      priority: "",
-      dueDate: "",
-      tags: "",
-      collaboratorIds: [],
-      teamIds: []
+      taskTemplateName: "",
+      taskTemplateDescription: "",
+      taskTemplateTags: "",
+      taskTemplatePriority: "",
+      projectId: "",
+      taskTemplateDueDate: "",
+      taskTemplateCollaboratorIds: [],
+      taskTemplateTeamIds: []
+
     });
 
 
@@ -301,7 +303,7 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject }) => {
 
   const handleChange = (e) => {
     setInputs((prev) => {
-      if (e.target.name === "tags") {
+      if (e.target.name === "taskTemplateTags") {
         return { ...prev, [e.target.name]: e.target.value.split(",") };
       } else {
         return { ...prev, [e.target.name]: e.target.value };
@@ -309,49 +311,47 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject }) => {
     });
   };
 
-  const CreateProject = async () => {
+  const CreateTaskTemplate = async () => {
     setLoading(true);
     setDisabled(true);
 
-    // if (teamProject) {
-      
-    // } else {
-    //   await axios.post("http://localhost:8083/api/v1/project/createProject", {
-    //     projectName: inputs.projectName,
-    //     projectDescription: inputs.projectDescription,
-    //     priority: inputs.priority,
-    //     dueDate: inputs.dueDate,
-    //     tags: inputs.tags,
-    //     collaboratorIds: selectedUsers.map((user) => user.id),
-    //     teamIds: selectedTeam.map((team) => team.id)
-    //   })
-    //   .then((res) => {
-    //     setAvailableUsers(res.data);
-    //   })
-    //     .then((res) => {
+      await axios.post("http://localhost:8082/api/v1/task/createTaskTemplate", {
 
-    //       setLoading(false);
-    //       setNewTaskTemplate(false);
-    //       dispatch(
-    //         openSnackbar({
-    //           message: "Project created successfully",
-    //           type: "success",
-    //         })
-    //       );
-    //     })
-    //     .catch((err) => {
-    //       console.log(err);
-    //       setLoading(false);
-    //       setDisabled(false);
-    //       setBackDisabled(false);
-    //       dispatch(
-    //         openSnackbar({
-    //           message: "Something went wrong",
-    //           type: "error",
-    //         })
-    //       );
-    //     });
-    // }
+        taskTemplateName: inputs.taskTemplateName,
+        taskTemplateDescription: inputs.taskTemplateDescription,
+        taskTemplateTags: inputs.taskTemplateTags,
+        taskTemplatePriority: inputs.taskTemplatePriority,
+        projectId: parseInt(projectId),
+        taskTemplateDueDate: inputs.taskTemplateDueDate,
+        taskTemplateCollaboratorIds: selectedUsers.map((user) => user.id),
+        taskTemplateTeamIds: selectedTeam.map((team) => team.id)
+      })
+      .then((res) => {
+        setAvailableUsers(res.data);
+      })
+        .then((res) => {
+
+          setLoading(false);
+          setNewTaskTemplate(false);
+          dispatch(
+            openSnackbar({
+              message: "Task template created successfully",
+              type: "success",
+            })
+          );
+        })
+        .catch((err) => {
+          console.log(err);
+          setLoading(false);
+          setDisabled(false);
+          setBackDisabled(false);
+          dispatch(
+            openSnackbar({
+              message: "Something went wrong",
+              type: "error",
+            })
+          );
+        });
   };
 
   const getAvailableUsers = async () => {
@@ -374,7 +374,7 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject }) => {
   useEffect(() => {
     getAvailableUsers();
     getAvailableTeams();
-    if (inputs.title === "" || inputs.desc === "") {
+    if (inputs.taskTemplateName === "" || inputs.taskTemplateDescription === "") {
       setDisabled(true);
     } else {
       setDisabled(false);
@@ -411,17 +411,17 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject }) => {
                 <TextInput
                   placeholder="Name"
                   type="text"
-                  name="projectName"
-                  value={inputs.projectName}
+                  name="taskTemplateName"
+                  value={inputs.taskTemplateName}
                   onChange={handleChange}
                 />
               </OutlinedBox>
               <OutlinedBox style={{ marginTop: "6px" }}>
                 <Desc
                   placeholder="Description"
-                  name="projectDescription"
+                  name="taskTemplateDescription"
                   rows={5}
-                  value={inputs.projectDescription}
+                  value={inputs.taskTemplateDescription}
                   onChange={handleChange}
                 />
               </OutlinedBox>
@@ -429,9 +429,9 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject }) => {
               <FlexDisplay style={{ marginTop: "6px" }}>
                 <OutlinedBox style={{ marginTop: "0px", width: "100%" }}>
                   <select
-                    id="priority"
-                    name="priority"
-                    value={inputs.priority}
+                    id="taskTemplatePriority"
+                    name="taskTemplatePriority"
+                    value={inputs.taskTemplatePriority}
                     onChange={handleChange}
                     style={{
                       width: "100%",
@@ -457,11 +457,11 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject }) => {
                     type="text"
                     onFocus={(e) => (e.target.type = "date")}
                     onBlur={(e) => (e.target.type = "text")}
-                    id="dueDate"
-                    name="dueDate"
+                    id="taskTemplateDueDate"
+                    name="taskTemplateDueDate"
                     style={{ fontSize: "16px" }}
                     placeholder="Due Date"
-                    value={inputs.dueDate}
+                    value={inputs.taskTemplateDueDate}
                     onChange={handleChange}
                   />
                 </OutlinedBox>
@@ -472,9 +472,9 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject }) => {
               <OutlinedBox style={{ marginTop: "6px" }}>
                 <Desc
                   placeholder="Tags: seperate by , eg- Mongo Db , React JS .."
-                  name="tags"
+                  name="taskTemplateTags"
                   rows={4}
-                  value={inputs.tags}
+                  value={inputs.taskTemplateTags}
                   onChange={handleChange}
                 />
               </OutlinedBox>
@@ -583,13 +583,13 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject }) => {
                   activeButton={!disabled}
                   style={{ marginTop: "18px", width: "100%" }}
                   onClick={() => {
-                    !disabled && CreateProject();
+                    !disabled && CreateTaskTemplate();
                   }}
                 >
                   {Loading ? (
                     <CircularProgress color="inherit" size={20} />
                   ) : (
-                    "Create Project"
+                    "Create template"
                   )}
                 </OutlinedBox>
               </ButtonContainer>

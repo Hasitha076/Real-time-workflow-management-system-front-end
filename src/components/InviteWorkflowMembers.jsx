@@ -184,51 +184,100 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
 `;
 
-const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, inviteTeamPopup, setInviteTeamPopup, id, data, member, team }) => {
+const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, inviteTeamPopup, setInviteTeamPopup, id, data, member, team, workDetails }) => {
 
   const [message, setMessage] = useState("");
   const { currentUser } = useSelector((state) => state.user);
   const [Loading, setLoading] = useState(false);
+  const [collaboratorBlock, setCollaboratorBlock] = useState({});
+  
+  console.log(workDetails);
+  console.log(collaboratorBlock);
+  
   
 
-  const UpdateProjectCollaborators = async () => {
-    setLoading(true);
+  const workCollaboratorsTemplate = async () => {
+    try {
+        setLoading(true);
 
-      if(true){
-        await axios.put(`http://localhost:8083/api/v1/project/updateCollaborators/${id}`, {
-          collaboratorIds: selectedUsers.map((user) => user.id),
-          teamIds: selectedTeam.map((team) => team.id)
-        })
-          .then(() => {
-            setLoading(true);
-            setInviteMemberPopup(false);
-            dispatch(
-              openSnackbar({
-                message: "Project collaborators updated successfully",
-                type: "success",
-              })
-            );
-          })
-          .catch((err) => {
-            console.log(err);
-            setLoading(false);
-            dispatch(
-              openSnackbar({
+        let collaboratorBlock = null;
+
+        // Fetch the existing collaborators block
+        try {
+            const res = await axios.get(`http://localhost:8082/api/v1/task/getCollaboratorsBlock/${workDetails.workId}`);
+            if (res.status === 200) {
+                collaboratorBlock = res.data;
+            }
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                console.log("No collaborators block found, creating a new one.");
+            } else {
+                throw error; // Unexpected error
+            }
+        }
+
+        // If no existing block, create a new one
+        if (!collaboratorBlock) {
+            await axios.post(`http://localhost:8082/api/v1/task/createCollaboratorsBlock`, {
+                projectId: workDetails.projectId,
+                workId: workDetails.workId,
+                memberIds: selectedUsers.map((user) => user.id),
+                teamIds: selectedTeam.map((team) => team.id)
+            }).then(() => {
+                dispatch(
+                    openSnackbar({
+                        message: "Task collaborators template created successfully",
+                        type: "success",
+                    })
+                );
+
+                setLoading(false);
+                setInviteMemberPopup(false);
+            })
+
+            
+        } else {
+            // Update the existing block
+            console.log("Updating block:", collaboratorBlock);
+            await axios.put(`http://localhost:8082/api/v1/task/updateCollaboratorsBlock`, {
+                collaboratorsBlockId: collaboratorBlock.collaboratorsBlockId,
+                projectId: collaboratorBlock.projectId,
+                workId: collaboratorBlock.workId,
+                memberIds: selectedUsers.length > 0 ? selectedUsers.map((user) => user.id) : collaboratorBlock.memberIds,
+                teamIds: selectedTeam.length > 0 ? selectedTeam.map((team) => team.id) : collaboratorBlock.teamIds
+            }).then(() => {
+                dispatch(
+                    openSnackbar({
+                        message: "Task collaborators template updated successfully",
+                        type: "success",
+                    })
+                );
+
+                setLoading(false);
+                if(selectedUsers.length > 0) {
+                    setInviteMemberPopup(false);
+                } else {
+                    setInviteTeamPopup(false);
+                }
+            })
+
+            
+        }
+
+
+    } catch (err) {
+        setLoading(false);
+        dispatch(
+            openSnackbar({
                 message: "Something went wrong",
                 type: "error",
-              })
-            );
-          });
-      } else {
-        dispatch(
-          openSnackbar({
-            message: "Select atleast one user or team",
-            type: "error",
-          })
+            })
         );
-      }
-    
-  };
+    }
+};
+
+
+
 
   const dispatch = useDispatch();
 
@@ -419,7 +468,7 @@ const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, invite
 
               style={{ width: "100%" }}
               onClick={() => {
-                UpdateProjectCollaborators();
+                workCollaboratorsTemplate();
               }}
             >
               {Loading ? (

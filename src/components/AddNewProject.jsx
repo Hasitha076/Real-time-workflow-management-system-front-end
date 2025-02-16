@@ -9,6 +9,8 @@ import { Avatar } from "@mui/material";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
+import { useMutation } from "@apollo/client";
+import { CREATE_PROJECT } from "../GraphQL/Queries";
 
 const Container = styled.div`
   width: 100%;
@@ -225,6 +227,8 @@ const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
   const [showAddProject, setShowAddProject] = useState(true);
   const [showAddMember, setShowAddMember] = useState(false);
 
+  const [createProject] = useMutation(CREATE_PROJECT);
+
   const goToAddProject = () => {
     setShowAddProject(true);
     setShowAddMember(false);
@@ -315,41 +319,45 @@ const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
     if (teamProject) {
       
     } else {
-      await axios.post("http://localhost:8083/api/v1/project/createProject", {
-        projectName: inputs.projectName,
-        projectDescription: inputs.projectDescription,
-        priority: inputs.priority,
-        dueDate: inputs.dueDate,
-        tags: inputs.tags,
-        collaboratorIds: selectedUsers.map((user) => user.id),
-        teamIds: selectedTeam.map((team) => team.id)
-      })
-      .then((res) => {
-        setAvailableUsers(res.data);
-      })
-        .then((res) => {
-
-          setLoading(false);
-          setNewProject(false);
-          dispatch(
-            openSnackbar({
-              message: "Project created successfully",
-              type: "success",
+      
+        await createProject({
+          variables: {
+            input: {
+              projectName: inputs.projectName,
+              projectDescription: inputs.projectDescription,
+              priority: inputs.priority,
+              dueDate: inputs.dueDate,
+              tags: inputs.tags,
+              collaboratorIds: selectedUsers.map((user) => user.id),
+              teamIds: selectedTeam.map((team) => team.id)
+            },
+          },
+        }).then((res) => {
+            setAvailableUsers(res.data);
+          })
+            .then((res) => {
+    
+              setLoading(false);
+              setNewProject(false);
+              dispatch(
+                openSnackbar({
+                  message: "Project created successfully",
+                  type: "success",
+                })
+              );
             })
-          );
-        })
-        .catch((err) => {
-          console.log(err);
-          setLoading(false);
-          setDisabled(false);
-          setBackDisabled(false);
-          dispatch(
-            openSnackbar({
-              message: "Something went wrong",
-              type: "error",
-            })
-          );
-        });
+            .catch((err) => {
+              console.log(err);
+              setLoading(false);
+              setDisabled(false);
+              setBackDisabled(false);
+              dispatch(
+                openSnackbar({
+                  message: "Something went wrong",
+                  type: "error",
+                })
+              );
+            });
     }
   };
 

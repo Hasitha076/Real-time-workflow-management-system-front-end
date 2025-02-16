@@ -26,6 +26,8 @@ import WorkFlowMainCard from "../components/WorkFlowMainCard";
 import AddForm from "../components/AddForm";
 import InviteWorkflowMembers from "../components/InviteWorkflowMembers";
 import AddTaskTemplate from "../components/AddTaskTemplate";
+import { useQuery } from "@apollo/client";
+import { LOAD_PROJECT_BY_ID } from "../GraphQL/Queries";
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -228,7 +230,6 @@ const Workflow = () => {
   const [item, setItems] = useState([]);
   const [projectCollaborators, setProjectCollaborators] = useState([]);
   const [projectTeams, setProjectTeams] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [inviteMemberPopup, setInviteMemberPopup] = useState(false);
   const [inviteTeamPopup, setInviteTeamPopup] = useState(false);
   const [created, setCreated] = useState(false);
@@ -241,6 +242,13 @@ const Workflow = () => {
   const [open, setOpen] = useState(false);
   const [newForm, setNewForm] = useState(false);
 const [newTaskTemplate, setNewTaskTemplate] = useState(false);
+    const [workDetails, setWorkDetails] = useState({});
+
+  const { loading, error, data } = useQuery(LOAD_PROJECT_BY_ID, {
+    variables: { id: parseInt(id) },  // Ensure ID is an integer
+    skip: !id,  // Avoid sending query if ID is undefined
+    fetchPolicy: "cache-and-network" // Ensures fresh data is fetched
+  });
   
   //use state enum to check for which updation
   const [openUpdate, setOpenUpdate] = useState({ state: false, type: "all", data: item });
@@ -256,24 +264,33 @@ const [newTaskTemplate, setNewTaskTemplate] = useState(false);
 
     const navigate = useNavigate();
 
+        useEffect(() => {
+          
+          if (!loading && data?.getProject) {
+            setItems((prev) => ({ ...prev, ...data.getProject }));
+            setProjectCollaborators((prev) => [...data.getProject.collaboratorIds || []]);
+            setProjectTeams((prev) => [...data.getProject.teamIds || []]);
+          }
+        }, [loading, data]);
+
   const getproject = async (id) => {
-    await axios.get(`http://localhost:8083/api/v1/project/getProject/${id}`)
-      .then((res) => {
-        setItems(res.data);
-        setProjectCollaborators(res.data.collaboratorIds);
-        setProjectTeams(res.data.teamIds);
-      })
-      .then(() => {
-        setLoading(false);
-      })
-      .catch((err) => {
-        dispatch(
-          openSnackbar({
-            message: err.response.data.message,
-            severity: "error",
-          })
-        );
-      });
+    // await axios.get(`http://localhost:8083/api/v1/project/getProject/${id}`)
+    //   .then((res) => {
+    //     setItems(res.data);
+    //     setProjectCollaborators(res.data.collaboratorIds);
+    //     setProjectTeams(res.data.teamIds);
+    //   })
+    //   .then(() => {
+    //     setLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     dispatch(
+    //       openSnackbar({
+    //         message: err.response.data.message,
+    //         severity: "error",
+    //       })
+    //     );
+    //   });
   };
 
   const getCollaborators = async () => {
@@ -321,6 +338,7 @@ const [newTaskTemplate, setNewTaskTemplate] = useState(false);
   
 
   console.log(id);
+    console.log(item);
   console.log(collaborators);
   console.log(teams);
   console.log(works);
@@ -498,8 +516,9 @@ const [newTaskTemplate, setNewTaskTemplate] = useState(false);
                 setInviteMemberPopup={setInviteMemberPopup}
                 id={id}
                 teamInvite={false}
-                setLoading={setLoading}
+                // setLoading={setLoading}
                 data={item}
+                workDetails={workDetails}
               />
             )}
 
@@ -509,8 +528,9 @@ const [newTaskTemplate, setNewTaskTemplate] = useState(false);
                 setInviteTeamPopup={setInviteTeamPopup}
                 id={id}
                 teamInvite={false}
-                setLoading={setLoading}
+                // setLoading={setLoading}
                 data={item}
+                workDetails={workDetails}
               />
             )}
           </Header>
@@ -539,6 +559,7 @@ const [newTaskTemplate, setNewTaskTemplate] = useState(false);
                             ProjectTeams={projectTeams}
                             setInviteMemberPopup={setInviteMemberPopup}
                             setInviteTeamPopup={setInviteTeamPopup}
+                            setWorkDetails={setWorkDetails}
                           />
                         </div>
                       ))}
@@ -565,7 +586,7 @@ const [newTaskTemplate, setNewTaskTemplate] = useState(false);
         </Drawer>
 
         {newForm && <AddForm setNewForm={setNewForm} />}
-        {newTaskTemplate && <AddTaskTemplate setNewTaskTemplate={setNewTaskTemplate} />}
+        {newTaskTemplate && <AddTaskTemplate setNewTaskTemplate={setNewTaskTemplate} projectId={item.projectId} />}
     </Container>
   );
 };

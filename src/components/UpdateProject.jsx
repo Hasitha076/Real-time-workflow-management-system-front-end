@@ -9,6 +9,8 @@ import { useSelector } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
+import { useMutation } from "@apollo/client";
+import { UPDATE_PROJECT } from "../GraphQL/Queries";
 
 
 const Container = styled.div`
@@ -260,13 +262,14 @@ const FlexDisplay = styled.div`
 `;
 
 const UpdateProject = ({ openUpdate, setOpenUpdate }) => {
-    console.log(openUpdate.data);
     const [Loading, setLoading] = useState(false);
     const [disabled, setDisabled] = useState(true);
     const [backDisabled, setBackDisabled] = useState(false);
 
     const [showAddProject, setShowAddProject] = useState(true);
     const [showAddMember, setShowAddMember] = useState(false);
+
+    const [updateProject] = useMutation(UPDATE_PROJECT);
 
 
     const goToAddProject = () => {
@@ -291,25 +294,26 @@ const UpdateProject = ({ openUpdate, setOpenUpdate }) => {
 
     //add member part
 
-    const [search, setSearch] = React.useState("");
-    const [users, setUsers] = React.useState([]);
+    const [search, setSearch] = useState("");
+    const [users, setUsers] = useState([]);
     const { currentUser } = useSelector((state) => state.user);
     const [role, setRole] = useState("");
     const [access, setAccess] = useState("");
-    const [selectedUsers, setSelectedUsers] = React.useState([]);
-    const [inputs, setInputs] = useState({ 
-        projectId: openUpdate.data.projectId, 
-        projectName: openUpdate.data.projectName, 
-        projectDescription: openUpdate.data.projectDescription, 
-        priority: openUpdate.data.priority, 
-        tags: openUpdate.data.tags, 
-        collaboratorIds: openUpdate.data.collaboratorIds, 
-        status: openUpdate.data.status,
-        dueDate: openUpdate.data.dueDate,
-        teamIds: openUpdate.data.teamIds, 
-        members: openUpdate.data.memberIcons });
+    const [selectedUsers, setSelectedUsers] = useState([]);
+    const [inputs, setInputs] = useState(
+        { 
+            projectId: openUpdate.data.projectId, 
+            projectName: openUpdate.data.projectName, 
+            projectDescription: openUpdate.data.projectDescription, 
+            priority: openUpdate.data.priority, 
+            tags: openUpdate.data.tags, 
+            collaboratorIds: openUpdate.data.collaboratorIds, 
+            status: openUpdate.data.status,
+            dueDate: openUpdate.data.dueDate,
+            teamIds: openUpdate.data.teamIds, 
+            members: openUpdate.data.memberIcons
+         });
 
-        console.log(inputs);
 
     const handleSelect = (user) => {
         const User = {
@@ -354,19 +358,58 @@ const UpdateProject = ({ openUpdate, setOpenUpdate }) => {
         setDisabled(true);
         setBackDisabled(true);
 
-        await axios.put(`http://localhost:8083/api/v1/project/updateProject`, {
-            projectId: inputs.projectId, 
-            projectName: inputs.projectName, 
-            projectDescription: inputs.projectDescription, 
-            priority: inputs.priority, 
-            tags: inputs.tags, 
-            status: inputs.status,
-            dueDate: inputs.dueDate,
-            collaboratorIds: inputs.collaboratorIds, 
-            teamIds: inputs.teamIds, 
-            members: inputs.memberIcons
-        })
-            .then((res) => {
+        // await axios.put(`http://localhost:8083/api/v1/project/updateProject`, {
+        //     projectId: inputs.projectId, 
+        //     projectName: inputs.projectName, 
+        //     projectDescription: inputs.projectDescription, 
+        //     priority: inputs.priority, 
+        //     tags: inputs.tags, 
+        //     status: inputs.status,
+        //     dueDate: inputs.dueDate,
+        //     collaboratorIds: inputs.collaboratorIds, 
+        //     teamIds: inputs.teamIds, 
+        //     members: inputs.memberIcons
+        // })
+        //     .then((res) => {
+        //         setLoading(false);
+        //         setOpenUpdate({ ...openUpdate, state: false });
+        //         dispatch(
+        //             openSnackbar({
+        //                 message: "Project updated successfully",
+        //                 type: "success",
+        //             })
+        //         );
+        //     })
+        //     .catch((err) => {
+        //         console.log(err);
+        //         setLoading(false);
+        //         setDisabled(false);
+        //         setBackDisabled(false);
+        //         dispatch(
+        //             openSnackbar({
+        //                 message: err.message,
+        //                 type: "error",
+        //             })
+        //         );
+        //     });
+
+
+            await updateProject({
+                variables: {
+                  input: {
+                    projectId: inputs.projectId, 
+                    projectName: inputs.projectName, 
+                    projectDescription: inputs.projectDescription, 
+                    priority: inputs.priority, 
+                    tags: inputs.tags, 
+                    status: inputs.status,
+                    dueDate: inputs.dueDate,
+                    collaboratorIds: inputs.collaboratorIds, 
+                    teamIds: inputs.teamIds, 
+                    members: inputs.memberIcons
+                  },
+                },
+              }).then((res) => {
                 setLoading(false);
                 setOpenUpdate({ ...openUpdate, state: false });
                 dispatch(

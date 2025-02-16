@@ -209,6 +209,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks}) => {
   const [allTaskMembers, setAllTaskMembers] = useState([]);
   const [comment, setComment] = useState([]);
   const commentData = [];
+  const [tasksData, setTasksData] = useState([]);
 
   console.log("works: ", work);
   console.log("tasks: ", tasks);
@@ -247,168 +248,63 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks}) => {
   
   
         }, [item, members, teams, item]);
-  
-        console.log("TaskCard taskCollaborators: ", taskCollaborators);
-        console.log("TaskCard taskTeams: ", taskTeams);
-        console.log("TaskCard allTaskMembers: ", allTaskMembers);
+
+        const updateWorkStatus = async () => {
+          await axios.get(`http://localhost:8082/api/v1/task/getTasksByWorkId/${work.workId}`)
+          .then((res) => {
+            console.log("res.data: ", res.data);
+            if(res.data > 0) {
+              setTasksData(res.data);
+            }
+            if (res.data.length === 0 || res.data.every((task) => task.status == true)) {         
+              axios.put(`http://localhost:8086/api/v1/work/updateWorkStatus`, {
+                workId: work.workId,
+                status: true
+              });
+            }
+          }).catch((err) => {
+            console.log(err);
+            
+          })
+        }
+        console.log("TaskCard tasksData: ", tasksData);
+        
         
         
         const changeStateFunction = async (status) => {
-          console.log("clicked ===> ", item.taskId);
-
+          setCompleted(status);
           setTimeout(() => {
-            setCompleted(status);
             setTaskAdd(true)
-
-            if (tasks.some((task) => task.workId !== work.workId)) {
-              axios.put(`http://localhost:8086/api/v1/work/updateWork`, {
-                  workId: work.workId, 
-                  workName: work.workName, 
-                  description: work.description, 
-                  priority: work.priority,
-                  projectId: work.projectId,
-                  dueDate: work.dueDate,
-                  collaboratorIds: work.collaboratorIds,
-                  teamIds: work.teamIds,
-                  memberIcons: work.memberIcons,
-                  status: true,
-                  tags: work.tags
-              });
-          }
-          
-
           }, 1000)
-          console.log(item.comments.length);
-          
-
-          // if(item.comments.length === 0) {
-          //   await axios.put(`http://localhost:8082/api/v1/task/updateTask`, {
-          //     taskId: item.taskId,
-          //     taskName: item.taskName,
-          //     description: item.description,
-          //     assigneeId: item.assigneeId,
-          //     priority: item.priority,
-          //     dueDate: item.dueDate,
-          //     projectId: item.projectId,
-          //     collaboratorIds: item.collaboratorIds,
-          //     teamIds: item.teamIds,
-          //     memberIcons: item.memberIcons,
-          //     tags: item.tags,
-          //     workId: item.workId,
-          //     comments: null,
-          //     status: status
-          //   })
-          //   .then((res) => {
-          //     console.log(res.data);
-          //   })
-          // } else {
-          //   await axios.put(`http://localhost:8082/api/v1/task/updateTask`, {
-          //     taskId: item.taskId,
-          //     taskName: item.taskName,
-          //     description: item.description,
-          //     assigneeId: item.assigneeId,
-          //     priority: item.priority,
-          //     dueDate: item.dueDate,
-          //     projectId: item.projectId,
-          //     collaboratorIds: item.collaboratorIds,
-          //     teamIds: item.teamIds,
-          //     memberIcons: item.memberIcons,
-          //     tags: item.tags,
-          //     workId: item.workId,
-          //     comments: item.comments,
-          //     status: status
-          //   })
-          //   .then((res) => {
-          //     console.log(res.data);
-          //   })
-          // }
+        
 
           if(status === true) {
             if(item.comments.length === 0) {
-              await axios.put(`http://localhost:8082/api/v1/task/updateTask`, {
-                taskId: item.taskId,
-                taskName: item.taskName,
-                description: item.description,
-                assigneeId: item.assigneeId,
-                priority: item.priority,
-                dueDate: item.dueDate,
-                projectId: item.projectId,
-                collaboratorIds: item.collaboratorIds,
-                teamIds: item.teamIds,
-                memberIcons: item.memberIcons,
-                tags: item.tags,
-                workId: item.workId + 1,
-                comments: null,
-                status: !status
-              })
+              await axios.put(`http://localhost:8082/api/v1/task/changeTaskStatus/${item.taskId}`)
               .then((res) => {
                 console.log(res.data);
               })
             } else {
-              await axios.put(`http://localhost:8082/api/v1/task/updateTask`, {
-                taskId: item.taskId,
-                taskName: item.taskName,
-                description: item.description,
-                assigneeId: item.assigneeId,
-                priority: item.priority,
-                dueDate: item.dueDate,
-                projectId: item.projectId,
-                collaboratorIds: item.collaboratorIds,
-                teamIds: item.teamIds,
-                memberIcons: item.memberIcons,
-                tags: item.tags,
-                workId: item.workId + 1,
-                comments: item.comments,
-                status: !status
-              })
+              await axios.put(`http://localhost:8082/api/v1/task/changeTaskStatus/${item.taskId}`)
               .then((res) => {
                 console.log(res.data);
               })
             }
           } else {
             if(item.comments.length === 0) {
-              await axios.put(`http://localhost:8082/api/v1/task/updateTask`, {
-                taskId: item.taskId,
-                taskName: item.taskName,
-                description: item.description,
-                assigneeId: item.assigneeId,
-                priority: item.priority,
-                dueDate: item.dueDate,
-                projectId: item.projectId,
-                collaboratorIds: item.collaboratorIds,
-                teamIds: item.teamIds,
-                memberIcons: item.memberIcons,
-                tags: item.tags,
-                workId: item.workId - 1,
-                comments: null,
-                status: !status
-              })
+              await axios.put(`http://localhost:8082/api/v1/task/changeTaskStatus/${item.taskId}`)
               .then((res) => {
                 console.log(res.data);
               })
             } else {
-              await axios.put(`http://localhost:8082/api/v1/task/updateTask`, {
-                taskId: item.taskId,
-                taskName: item.taskName,
-                description: item.description,
-                assigneeId: item.assigneeId,
-                priority: item.priority,
-                dueDate: item.dueDate,
-                projectId: item.projectId,
-                collaboratorIds: item.collaboratorIds,
-                teamIds: item.teamIds,
-                memberIcons: item.memberIcons,
-                tags: item.tags,
-                workId: item.workId - 1,
-                comments: item.comments,
-                status: !status
-              })
+              await axios.put(`http://localhost:8082/api/v1/task/changeTaskStatus/${item.taskId}`)
               .then((res) => {
                 console.log(res.data);
               })
             }
           }
         
+          updateWorkStatus()
         }
 
   useEffect(() => {
@@ -594,11 +490,8 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks}) => {
     {item && (
             <Container className={"item"}>
             <Top>
-            {item.status === true ? (
-              <Checkbox checked={!completed} style={{ borderRadius: '100px', padding: '0', color: completed ? 'orange' : 'green'  }} onClick={() => changeStateFunction(completed)} /> 
-            ) : (
+
               <Checkbox checked={completed} style={{ borderRadius: '100px', padding: '0', color: completed ? 'green' : 'orange'  }} onClick={() => changeStateFunction(!completed)} /> 
-            )}
 
             <Title>{item.taskName}</Title>
               {item.priority === "HIGH" &&

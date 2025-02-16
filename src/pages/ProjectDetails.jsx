@@ -38,6 +38,8 @@ import Divider from '@mui/material/Divider';
 import { useNavigate } from "react-router-dom";
 import AddTaskTemplate from "../components/AddTaskTemplate";
 import AddForm from "../components/AddForm";
+import { LOAD_PROJECT_BY_ID } from "../GraphQL/Queries";
+import { useQuery } from "@apollo/client";
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -279,10 +281,9 @@ const DrawerContainer = styled.div`
 
 const ProjectDetails = () => {
   const { id } = useParams();
-  const [item, setItems] = useState([]);
+  const [item, setItems] = useState(null);
   const [projectCollaborators, setProjectCollaborators] = useState([]);
   const [projectTeams, setProjectTeams] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [invitePopup, setInvitePopup] = useState(false);
   const [created, setCreated] = useState(false);
   const [currentWork, setCurrentWork] = useState({});
@@ -295,6 +296,14 @@ const ProjectDetails = () => {
     const [newForm, setNewForm] = useState(false);
   const [newTaskTemplate, setNewTaskTemplate] = useState(false);
   const [workAdded, setWorkAdded] = useState(false);
+  const [workUpdated, setWorkUpdated] = useState(false);
+
+  const { loading, error, data } = useQuery(LOAD_PROJECT_BY_ID, {
+    variables: { id: parseInt(id) },  // Ensure ID is an integer
+    skip: !id,  // Avoid sending query if ID is undefined
+    fetchPolicy: "cache-and-network" // Ensures fresh data is fetched
+  });
+  
   
   //use state enum to check for which updation
   const [openUpdate, setOpenUpdate] = useState({ state: false, type: "all", data: item });
@@ -303,7 +312,7 @@ const ProjectDetails = () => {
   const [openDelete, setOpenDelete] = useState({ state: false, type: "Project", data: item });
 
   const dispatch = useDispatch();
-  
+
     const toggleDrawer = (newOpen) => () => {
       setOpen(newOpen);
     };
@@ -328,25 +337,16 @@ const ProjectDetails = () => {
       setAnchorEl(null);
     };
 
-  const getproject = async (id) => {
-    await axios.get(`http://localhost:8083/api/v1/project/getProject/${id}`)
-      .then((res) => {
-        setItems(res.data);
-        setProjectCollaborators(res.data.collaboratorIds);
-        setProjectTeams(res.data.teamIds);
-      })
-      .then(() => {
-        setLoading(false);
-      })
-      .catch((err) => {
-        dispatch(
-          openSnackbar({
-            message: err.response.data.message,
-            severity: "error",
-          })
-        );
-      });
-  };
+
+    useEffect(() => {
+      
+      if (!loading && data?.getProject) {
+        setItems((prev) => ({ ...prev, ...data.getProject }));
+        setProjectCollaborators((prev) => [...data.getProject.collaboratorIds || []]);
+        setProjectTeams((prev) => [...data.getProject.teamIds || []]);
+      }
+    }, [loading, data]);
+    
 
   const getCollaborators = async () => {
     await axios.get(`http://localhost:8081/api/v1/user/getAllUsers`)
@@ -389,15 +389,10 @@ const ProjectDetails = () => {
     getCollaborators();
     getTeams();
     getWorks();
-  }, [item, id]);
+  }, [item, id, created, workUpdated]);
   
 
-  console.log(id);
-  console.log(collaborators);
-  console.log(teams);
-  console.log(works);
-  console.log(projectCollaborators);
-  console.log(projectTeams);
+  console.log(item);
   
 
   const openWorkDetails = (work) => {
@@ -407,9 +402,8 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    getproject(id); 
     // getProjectWorks(id);
-  }, [openWork, openUpdate, invitePopup, id]);
+  }, [openWork, openUpdate, invitePopup, id, loading]);
 
 
   const DrawerList = (
@@ -531,10 +525,10 @@ const ProjectDetails = () => {
       ) : (
         <>
           <Header>
-            <Title>{item.projectName}</Title>
-            <Desc>{item.projectDescription}</Desc>
+            <Title>{item?.projectName}</Title>
+            <Desc>{item?.projectDescription}</Desc>
             <Tags>
-              {item.tags.map((tag) => (
+              {item?.tags.map((tag) => (
                 <Tag
                   tagColor={
                     tagColors[Math.floor(Math.random() * tagColors.length)]
@@ -545,8 +539,8 @@ const ProjectDetails = () => {
               ))}
             </Tags>
             <Members>
-              {item.memberIcons.length > 0 ? <AvatarGroup>
-                {item.memberIcons.map((member) => (
+              {item?.memberIcons.length > 0 ? <AvatarGroup>
+                {item?.memberIcons.map((member) => (
                   <Avatar
                     sx={{ marginRight: "-12px", width: "38px", height: "38px" }}
                   >
@@ -597,7 +591,7 @@ const ProjectDetails = () => {
               <IcoBtn style={{ border: '1px solid orange' }} onClick={() => setOpenUpdate({ state: true, type: 'all', data: item })}>
                 <Edit sx={{ fontSize: "20px" }} />
               </IcoBtn>
-              <IcoBtn style={{ border: '1px solid red' }} onClick={() => setOpenDelete({ state: true, type: 'Project', name: item.projectName, id: item.projectId })}>
+              <IcoBtn style={{ border: '1px solid red' }} onClick={() => setOpenDelete({ state: true, type: 'Project', name: item?.projectName, id: item.projectId })}>
                 <Delete sx={{ fontSize: "20px" }} />
               </IcoBtn>
               
@@ -609,7 +603,6 @@ const ProjectDetails = () => {
                 setInvitePopup={setInvitePopup}
                 id={id}
                 teamInvite={false}
-                setLoading={setLoading}
                 data={item}
               />
             )}
@@ -641,7 +634,7 @@ const ProjectDetails = () => {
                       ProjectMembers={projectCollaborators}
                       ProjectTeams={projectTeams}
                       ProjectId={id}
-                      memberIcons={item.memberIcons}
+                      memberIcons={item?.memberIcons}
                       setCreated={setCreated}
                       data={item}
                       setWorkAdded={setWorkAdded}
@@ -656,6 +649,7 @@ const ProjectDetails = () => {
                             projectId={id}
                             ProjectMembers={projectCollaborators}
                             ProjectTeams={projectTeams}
+                            setWorkUpdated={setWorkUpdated}
                           />
                         </div>
                       ))}
@@ -702,7 +696,7 @@ const ProjectDetails = () => {
                 <SubCardTop>
                   <SubCardsTitle>Members</SubCardsTitle>
                 </SubCardTop>
-                {item.collaboratorIds.map((id) => (
+                {item?.collaboratorIds.map((id) => (
                   collaborators.map((collaborator) => {
                     if (id === collaborator.userId) {
                       return <MemberCard member={collaborator} />;
@@ -716,7 +710,7 @@ const ProjectDetails = () => {
                 <SubCardTop>
                   <SubCardsTitle>Teams</SubCardsTitle>
                 </SubCardTop>
-                {item.teamIds.map((id) => (
+                {item?.teamIds.map((id) => (
                   teams.map((team) => {
                     if (id === team.teamId) {
                       return <MemberCard member={team} />;

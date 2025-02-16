@@ -131,30 +131,60 @@ const IcoBtn = styled(IconButton)`
   color: ${({ theme }) => theme.textSoft} !important;
 `;
 
-const Card = ({ status, work }) => {
+const Card = ({ status, work, setWorkUpdated }) => {
   
   const [color, setColor] = useState("primary");
   const [task, setTask] = useState([]);
   const [completed, setCompleted] = useState(0);
   const [progress, setProgress] = useState(0);
 
-  const getTasks = async (work) => {
+  const getTasks = async () => {
     await axios.get(`http://localhost:8082/api/v1/task/getTasksByProjectId/${work.projectId}`)
     .then((res) => {
       console.log(res.data);
       
       const filterData = res.data.filter((item) => item.workId === work.workId);
       setTask(filterData);
+
     })
     .catch((err) => {
       console.log(err);
     });
   }
 
+  const updateWorkStatus = async () => {
+    await axios.get(`http://localhost:8082/api/v1/task/getTasksByWorkId/${work.workId}`)
+    .then((res) => {
+      if (res.data.length > 0) {
+        
+        axios.put(`http://localhost:8086/api/v1/work/updateWork`, {
+          workId: work.workId,
+          workName: work.workName,
+          description: work.description,
+          priority: work.priority,
+          projectId: work.projectId,
+          dueDate: work.dueDate,
+          collaboratorIds: work.collaboratorIds,
+          teamIds: work.teamIds,
+          memberIcons: work.memberIcons,
+          status: false,
+          tags: work.tags
+        });
+
+        setWorkUpdated(true);
+      } 
+    }).catch((err) => {
+      console.log(err);
+      
+    })
+  }
 
   useEffect(() => {
-    getTasks(work);
-  }, [work]);
+    if(work.status === true) {
+      updateWorkStatus();
+    }
+    getTasks();
+  }, []);
 
   console.log(work);
   console.log(task);
@@ -211,13 +241,13 @@ const Card = ({ status, work }) => {
         <Text>
           Incompleted Tasks 
           <Span>
-            {task.length}
+            {task.length - completed}
           </Span>
         </Text>
         <LinearProgress
           sx={{ borderRadius: "10px", height: 3 }}
           variant="determinate"
-          value={(task.length) * 10}
+          value={(task.length) * 1}
           color={color}
         />
       </Progress>
