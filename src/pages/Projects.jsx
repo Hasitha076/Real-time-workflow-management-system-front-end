@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { CircularProgress } from "@mui/material";
 import { useQuery } from '@apollo/client'
 import { LOAD_ALL_PROJECTS } from '../GraphQL/Queries'
+import { data } from "react-router-dom";
 
 const Container = styled.div`
   width: 100%;
@@ -86,68 +87,63 @@ const OutlinedBox = styled.div`
   }
 `;
 
-const Projects = ({newProject,setNewProject}) => {
+const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated}) => {
   const dispatch = useDispatch();
   const [projects, setProjects] = useState([]);
-  const [Loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const { currentUser } = useSelector((state) => state.user);
 
-  const { loading, error, data: allProjects } = useQuery(LOAD_ALL_PROJECTS);
-  
-  const getprojects = async () => {
+  const { loading: Loading, error, data: allProjects, refetch } = useQuery(LOAD_ALL_PROJECTS);
 
-    if(!loading) {
-      setProjects(allProjects.getAllProjects);
-    }
+  const getprojects = async () => {
+    if (!allProjects || !allProjects.getAllProjects) return;
+    setProjects(allProjects.getAllProjects);
+    setLoading(false);
   };
 
   useEffect(() => {
     getprojects();
     window.scrollTo(0, 0);
-  }, [newProject, currentUser, loading]);
+    
+    if (projectCreated) {
+      refetch().then(() => {
+        getprojects();
+        setProjectCreated(false);
+      });
+    }
+  }, [newProject, currentUser, projectCreated, Loading, data]);
 
-  console.log(projects);
-  
-
+  useEffect(() => {
+      refetch()
+      getprojects();
+  }, []);
 
   return (
     <Container>
       {loading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: '12px 0px', height: '300px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', height: '300px' }}>
           <CircularProgress />
         </div>
       ) : (
         <Column>
-          {statuses.map((s, index) => {
-            return (
-              <ItemWrapper key={index}>
-                {s.icon} {s.title}
-                <Span>
-                  ({projects.filter((item) => item.status == s.status).length})
-                </Span>
-                <Wrapper key={index}>
-                  {s.status === "PENDING" && (
-                    <OutlinedBox button={true} activeButton={false} onClick={() => setNewProject(true)}>
-                      New Project
-                    </OutlinedBox>
-                  )}
-                  {projects
-                    .filter((item) => item.status == s.status)
-                    .map((item, idx) => (
-                      
-                      <Item
-                        key={item.projectId}
-                        item={item}
-                        index={idx}
-                        status={item.status}
-                        tagColor={tagColors[3]}
-                      />
-                      
-                    ))}
-                </Wrapper>
-              </ItemWrapper>
-            );
-          })}
+          {statuses.map((s, index) => (
+            <ItemWrapper key={index}>
+              {s.icon} {s.title}
+              <Span>({projects?.filter((item) => item.status === s.status).length})</Span>
+              <Wrapper>
+                {s.status === "PENDING" && (
+                  <OutlinedBox button onClick={() => setNewProject(true)}>
+                    New Project
+                  </OutlinedBox>
+                )}
+                {projects
+                  ?.filter((item) => item.status === s.status)
+                  .map((item, idx) => (
+                    <Item key={item.projectId} item={item} index={idx} status={item.status} tagColor={tagColors[3]} />
+                  ))}
+              </Wrapper>
+            </ItemWrapper>
+          ))}
         </Column>
       )}
     </Container>

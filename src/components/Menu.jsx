@@ -238,7 +238,7 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
         ) : (<>
           {team.slice(0, 3).map((team, i) => (
             <Link
-              to={`/teams/${team._id}`}
+              to={`/teams/${team.teamId}`}
               style={{ textDecoration: "none", color: "inherit" }}
             >
               <Item>

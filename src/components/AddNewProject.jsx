@@ -220,7 +220,7 @@ const FlexDisplay = styled.div`
 `;
 
 
-const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
+const AddNewProject = ({ setNewProject, teamId, teamProject, setProjectCreated }) => {
   const [Loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const [backDisabled, setBackDisabled] = useState(false);
@@ -339,6 +339,7 @@ const AddNewProject = ({ setNewProject, teamId, teamProject }) => {
     
               setLoading(false);
               setNewProject(false);
+              setProjectCreated(true);
               dispatch(
                 openSnackbar({
                   message: "Project created successfully",

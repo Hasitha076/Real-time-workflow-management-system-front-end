@@ -23,6 +23,8 @@ import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import ProjectCard from "../components/Card";
 import UpdateTeam from "../components/UpdateTeam";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { LOAD_PROJECTS_BY_TEAM_ID } from "../GraphQL/Queries";
+import { useQuery } from "@apollo/client";
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -334,6 +336,10 @@ const TeamDetails = () => {
   };
 
   console.log(item);
+  const { loading: Loading, error, data, refetch } = useQuery(LOAD_PROJECTS_BY_TEAM_ID, {
+    variables: { teamId: parseInt(item.teamId) },  // Ensure ID is an integer
+    fetchPolicy: "cache-and-network" // Ensures fresh data is fetched
+  });
   
 
   const getCollaborators = async () => {
@@ -376,15 +382,13 @@ const TeamDetails = () => {
     });
   }
 
-  const getProjects = async () => {
-    await axios.get(`http://localhost:8083/api/v1/project/getProjectsByTeamId/${id}`)
-    .then((res) => {
-        setProjects(res.data);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  }
+      useEffect(() => {
+        
+        if (data?.getProjectsByTeamId) {
+          setProjects(data.getProjectsByTeamId);
+        }
+      }, [Loading, data]);
+
 
   const getProjectCollaborators = async (projectId) => {
     
@@ -400,7 +404,7 @@ const TeamDetails = () => {
 
   useEffect(() => {
     const updateData = async () => {
-      await Promise.all([getCollaborators(), getTeams(), getProjects(), getWorks(), getTasks()]);
+      await Promise.all([getCollaborators(), getTeams(), getWorks(), getTasks()]);
       if (item?.projectId) {
         await getProjectCollaborators(item.projectId);
       }
@@ -418,7 +422,10 @@ const TeamDetails = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     getTeam(id); 
-  }, [openWork, openUpdate, invitePopup]);
+  }, [openWork, openUpdate, invitePopup, id]);
+
+  console.log(item);
+  
 
 
   return (
@@ -445,15 +452,23 @@ const TeamDetails = () => {
                 </Tag>
               ))}
             </Tags>
+  
             <Members>
               {item.collaboratorIds.length > 0 ? <AvatarGroup>
                 {item.collaboratorIds.map((member) => (
-                  <Avatar
-                    sx={{ marginRight: "-12px", width: "38px", height: "38px" }}
-                  >
-                    {/* {member.charAt(0)} */}
-                    {member}
-                  </Avatar>
+                    collaborators.map((collaborator) => {
+                        if (member === collaborator.userId) {
+                            return <Avatar
+                            sx={{
+                                marginRight: "-12px",
+                                width: "38px",
+                                height: "38px",
+                            }}
+                            >
+                            {collaborator.userName.charAt(0)}
+                            </Avatar>;
+                        }
+                    })
                 ))}
               </AvatarGroup>  : <Avatar sx={{ backgroundColor: 'transparent', border: '1px dashed #fff' }}><AccountCircleIcon/></Avatar>}
               <InviteButton onClick={() => setInvitePopup(true)}>
@@ -493,7 +508,7 @@ const TeamDetails = () => {
                       Pending Projects
                       <Span>(
                         {
-                          projects.length != 0 && projects.filter(
+                          projects.length != 0 && projects?.filter(
                             (item) => item.status === "PENDING"
                           ).length
                         }
@@ -504,7 +519,7 @@ const TeamDetails = () => {
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">
 
-                    {projects.length != 0 && projects.filter((item) => item.status === "PENDING")
+                    {projects?.length != 0 && projects.filter((item) => item.status === "PENDING")
                       .map((ele, idx) => (
                         <div onClick={() => openWorkDetails(ele)}>
                           <ProjectCard
@@ -526,7 +541,7 @@ const TeamDetails = () => {
                       In Progress Projects
                       <Span>(
                         {
-                          projects.length != 0 && projects.filter(
+                          projects?.length != 0 && projects?.filter(
                             (item) => item.status === "ON_GOING"
                           ).length
                         }
@@ -537,7 +552,7 @@ const TeamDetails = () => {
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">
 
-                    {projects.length != 0 && projects.filter((item) => item.status === "ON_GOING")
+                    {projects?.length != 0 && projects?.filter((item) => item.status === "ON_GOING")
                       .map((ele, idx) => (
                         <div onClick={() => openWorkDetails(ele)}>
                           <ProjectCard
@@ -562,8 +577,7 @@ const TeamDetails = () => {
 
                       <Span>(
                         {
-                          projects.length != 0 && projects
-                            .filter(
+                          projects?.length != 0 && projects?.filter(
                               (item) => item.status === "COMPLETED"
                             ).length
                         }
@@ -573,7 +587,7 @@ const TeamDetails = () => {
                   </Top>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">
-                    {projects.length != 0 && projects.filter((item) => item.status === "COMPLETED")
+                    {projects?.length != 0 && projects?.filter((item) => item.status === "COMPLETED")
                       .map((ele, idx) => (
                         <div onClick={() => openWorkDetails(ele)}>
                           <ProjectCard

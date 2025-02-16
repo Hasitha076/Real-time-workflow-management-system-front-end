@@ -32,6 +32,8 @@ import AddTaskIcon from '@mui/icons-material/AddTask';
 import { Menu, MenuItem } from "@mui/material";
 import AddNewProject from "../components/AddNewProject";
 import AddNewTask from "../components/AddNewTask";
+import { LOAD_PROJECT_BY_ID } from "../GraphQL/Queries";
+import { useQuery } from "@apollo/client";
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -375,9 +377,6 @@ const WorkDetailsPage = () => {
   const [newTask, setNewTask] = useState(false);
   const [taskAdd, setTaskAdd] = useState(false);
   const [collaboratorBlock, setCollaboratorBlock] = useState({});
-
-  console.log(id);
-  console.log(item);
   
       const [anchorEl, setAnchorEl] = useState(null);
       const openDropdown = Boolean(anchorEl);
@@ -418,14 +417,20 @@ const WorkDetailsPage = () => {
           setLoading(false);
       })
       .catch((err) => {
-        // dispatch(
-        //   openSnackbar({
-        //     message: err.response.data.message,
-        //     severity: "error",
-        //   })
-        // );
+        dispatch(
+          openSnackbar({
+            message: err.response.data.message,
+            severity: "error",
+          })
+        );
       });
   };
+
+  const { error, data } = useQuery(LOAD_PROJECT_BY_ID, {
+    variables: { id: parseInt(item.projectId) },  // Ensure ID is an integer
+    skip: !id,  // Avoid sending query if ID is undefined
+    fetchPolicy: "cache-and-network" // Ensures fresh data is fetched
+  });
 
   const getCollaborators = async () => {
     await axios.get(`http://localhost:8081/api/v1/user/getAllUsers`)
@@ -457,8 +462,18 @@ const WorkDetailsPage = () => {
       });
   };
 
+  const getWorks = async () => {
+    await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${id}`)
+    .then((res) => {    
+      setWorks(res.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }
+
   const getTaskTemplates = async () => {
-    await axios.get(`http://localhost:8082/api/v1/task/getAllTaskTemplates`)
+    await axios.get(`http://localhost:8082/api/v1/task/getTaskTemplatesByProjectId/${item.projectId}`)
       .then((res) => {
         setTaskTemplates(res.data);
       })
@@ -467,38 +482,25 @@ const WorkDetailsPage = () => {
       });
   };
 
-  const getWorks = async () => {
-    await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${id}`)
-    .then((res) => {
-      setWorks(res.data);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  }
 
-  const getProjectCollaborators = async (projectId) => {
+  useEffect(() => {
     
-    await axios.get(`http://localhost:8083/api/v1/project/getProject/${projectId}`)
-      .then((res) => {       
-        setProjectTeams(res.data.teamIds);
-        setProjectCollaborators(res.data.collaboratorIds);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
+    if (data?.getProject) {
+      setProjectCollaborators((prev) => [...data.getProject.collaboratorIds || []]);
+      setProjectTeams((prev) => [...data.getProject.teamIds || []]);
+    }
+  }, [loading, data]);
 
   useEffect(() => {
     const updateData = async () => {
       await Promise.all([getCollaborators(), getTeams(), getWorks(), getTasks(), getTaskTemplates()]);
       if (item?.projectId) {
-        await getProjectCollaborators(item.projectId);
+        
       }
     };
   
     updateData();
-  }, [item?.projectId]);
+  }, [item?.projectId, id]);
 
   
   const matchingWorkCollaborators = useMemo(() => {
@@ -573,6 +575,11 @@ const WorkDetailsPage = () => {
   const [alignment, setAlignment] = useState(true);
 
   console.log(taskTemplates);
+  console.log(projectCollaborators);
+  console.log(projectTeams);
+  console.log(works);
+  
+  
   
 
   //create new work card

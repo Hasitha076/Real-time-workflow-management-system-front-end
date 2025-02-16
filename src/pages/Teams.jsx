@@ -86,9 +86,6 @@ const Teams = () => {
           <Column>
 
               <ItemWrapper>
-              {/* <OutlinedBox button={true} activeButton={false} onClick={() => setNewProject(true)}>
-                      New Team
-                    </OutlinedBox> */}
                 <Wrapper>
                
                     {teams.map((item, idx) => (

@@ -241,7 +241,8 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
     setLoading(true);
 
       if(true){
-        await axios.put(`http://localhost:8085/api/v1/team/updateCollaborators/${id}`, {
+        await axios.put(`http://localhost:8085/api/v1/team/updateTeam`, {
+            teamId: id,
           collaboratorIds: selectedUsers.map((user) => user.id)
         })
           .then(() => {

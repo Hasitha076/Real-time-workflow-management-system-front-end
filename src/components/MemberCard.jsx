@@ -63,14 +63,14 @@ const MemberCard = ({ member }) => {
   return (
     <Container>
       <Wrapper>
-        {member.userName ? <Avatar sx={{width: '34px', height: '34px'}}>{member.userName.charAt(0)}</Avatar> : <Avatar sx={{width: '34px', height: '34px'}}>{member.teamName.charAt(0)}</Avatar>}
+        {member?.userName ? <Avatar sx={{width: '34px', height: '34px'}}>{member?.userName.charAt(0)}</Avatar> : <Avatar sx={{width: '34px', height: '34px'}}>{member.teamName.charAt(0)}</Avatar>}
         <Details>
-          {member.userName ? <Name>{member.userName}</Name> : <Name>{member.teamName}</Name>}
-          {member.email && <EmailId>{member.email}</EmailId>}
+          {member?.userName ? <Name>{member.userName}</Name> : <Name>{member.teamName}</Name>}
+          {member?.email && <EmailId>{member.email}</EmailId>}
         </Details>
 
       </Wrapper>
-      {member.role && <Access>{member.role}</Access>}
+      {member?.role && <Access>{member.role}</Access>}
     </Container>
   );
 };

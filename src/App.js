@@ -63,6 +63,7 @@ function App() {
   const [newProject, setNewProject] = useState(false);
   const { open, message, severity } = useSelector((state) => state.snackbar);
   const [loading, setLoading] = useState(false);
+  const [projectCreated, setProjectCreated] = useState(false);
 
   const { currentUser } = useSelector(state => state.user);
 
@@ -97,12 +98,12 @@ function App() {
                   <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
                   <Wrapper>
                     {newTeam && <AddNewTeam setNewTeam={setNewTeam} />}
-                    {newProject && <AddNewProject setNewProject={setNewProject} />}
+                    {newProject && <AddNewProject setNewProject={setNewProject} setProjectCreated={setProjectCreated} />}
                     
                     <Routes>
                       <Route >
                         <Route exact path="/" element={<Dashboard />} />
-                        <Route path="projects" element={<Projects newProject={newProject} setNewProject={setNewProject}/>} />
+                        <Route path="projects" element={<Projects newProject={newProject} setNewProject={setNewProject} projectCreated={projectCreated} setProjectCreated={setProjectCreated} />} />
                         
                         {/* <Route path="team/invite">
                           <Route path=":code" element={<TeamInvite />} />

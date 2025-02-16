@@ -186,11 +186,11 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
 `;
 
-const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
+const InviteMembers = ({ setInvitePopup, id, teamInvite, data, setCollaboratorUpdated }) => {
 
   const [message, setMessage] = useState("");
   const { currentUser } = useSelector((state) => state.user);
-  const [Loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   const [updateCollaborators] = useMutation(UPDATE_COLLABORATORS);
   
@@ -208,7 +208,8 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
             },
           },
         }).then(() => {
-          setLoading(true);
+          setLoading(false);
+          setCollaboratorUpdated(true)
           setInvitePopup(false);
           dispatch(
             openSnackbar({
@@ -315,6 +316,7 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
         email: user.email,
       }]);
     }
+
   };
 
     //Add team from selected teams
@@ -330,6 +332,7 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
         name: team.teamName
       }]);
     }
+
   };
 
   //remove members from selected users
@@ -341,13 +344,6 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
   const handleRemoveTeam = (team) => {
     setSelectedTeam(selectedTeam.filter((t) => t.id !== team.teamId));
   };
-
-  console.log(data);
-  
-  console.log(selectedUsers);
-  console.log(selectedTeam);
-  
-
 
   return (
     <Modal open={true} onClose={() => setInvitePopup(false)}>
@@ -448,7 +444,7 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
                 UpdateProjectCollaborators();
               }}
             >
-              {Loading ? (
+              {loading ? (
                 <CircularProgress color="inherit" size={20} />
               ) : (
                 "Add collaborators"

@@ -291,14 +291,16 @@ const ProjectDetails = () => {
   const [collaborators, setCollaborators] = useState([]);
   const [teams, setTeams] = useState([]);
   const [works, setWorks] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [alignment, setAlignment] = useState(true);
   const [open, setOpen] = useState(false);
     const [newForm, setNewForm] = useState(false);
   const [newTaskTemplate, setNewTaskTemplate] = useState(false);
   const [workAdded, setWorkAdded] = useState(false);
   const [workUpdated, setWorkUpdated] = useState(false);
+  const [collaboratorUpdated, setCollaboratorUpdated] = useState(false);
 
-  const { loading, error, data } = useQuery(LOAD_PROJECT_BY_ID, {
+  const { loading: Loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
     variables: { id: parseInt(id) },  // Ensure ID is an integer
     skip: !id,  // Avoid sending query if ID is undefined
     fetchPolicy: "cache-and-network" // Ensures fresh data is fetched
@@ -321,8 +323,11 @@ const ProjectDetails = () => {
       if (workAdded) {
         getWorks();
         setWorkAdded(false);
+      } if(collaboratorUpdated) {
+        refetch()
+        setCollaboratorUpdated(false)
       }
-    }, [workAdded]);
+    }, [workAdded, collaboratorUpdated]);
 
     const navigate = useNavigate();
 
@@ -340,12 +345,14 @@ const ProjectDetails = () => {
 
     useEffect(() => {
       
-      if (!loading && data?.getProject) {
+      if (data?.getProject) {
         setItems((prev) => ({ ...prev, ...data.getProject }));
         setProjectCollaborators((prev) => [...data.getProject.collaboratorIds || []]);
-        setProjectTeams((prev) => [...data.getProject.teamIds || []]);
+        setProjectTeams((prev) => [...data.getProject.teamIds || []])
+        setLoading(false)
+        setCollaboratorUpdated(false)
       }
-    }, [loading, data]);
+    }, [Loading, data, collaboratorUpdated]);
     
 
   const getCollaborators = async () => {
@@ -389,12 +396,8 @@ const ProjectDetails = () => {
     getCollaborators();
     getTeams();
     getWorks();
-  }, [item, id, created, workUpdated]);
+  }, [item, id, created, workUpdated, loading]);
   
-
-  console.log(item);
-  
-
   const openWorkDetails = (work) => {
     setCurrentWork(work);
     setOpenWork(true);
@@ -510,9 +513,6 @@ const ProjectDetails = () => {
   );
 
 
-  
-
-
   return (
     <Container>
       {openWork && <WorkDetails setOpenWork={setOpenWork} work={currentWork} />}
@@ -604,6 +604,7 @@ const ProjectDetails = () => {
                 id={id}
                 teamInvite={false}
                 data={item}
+                setCollaboratorUpdated={setCollaboratorUpdated}
               />
             )}
           </Header>
