@@ -21,6 +21,14 @@ import Divider from '@mui/material/Divider';
 import { IconButton } from "@mui/material";
 import CommentCard from "./CommentCard";
 
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+import { useQuery } from "@apollo/client";
+import { LOAD_PROJECT_BY_ID } from "../GraphQL/Queries";
+
 const Container = styled.div`
   padding: 14px;
   text-align: left;
@@ -201,19 +209,33 @@ const CommentButton = styled.button`
   }
 `
 
-const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks}) => {
+const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEditTask}) => {
 
   const [completed, setCompleted] = useState(false);
+  const [project, setProject] = useState([]);
   const [taskCollaborators, setTaskCollaborators] = useState([]);
   const [taskTeams, setTaskTeams] = useState([]);
   const [allTaskMembers, setAllTaskMembers] = useState([]);
   const [comment, setComment] = useState([]);
   const commentData = [];
   const [tasksData, setTasksData] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(dayjs(item.dueDate));
 
   console.log("works: ", work);
   console.log("tasks: ", tasks);
   
+    const { loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
+      variables: { id: parseInt(item.projectId) },  // Ensure ID is an integer
+      skip: !item.projectId,  // Avoid sending query if ID is undefined
+      fetchPolicy: "cache-and-network" // Ensures fresh data is fetched
+    });
+
+        useEffect(() => {
+          
+          if (data?.getProject) {
+            setProject((prev) => ({ ...prev, ...data.getProject }));
+          }
+        }, [loading, data]);
   
   
         useEffect(() => {
@@ -333,7 +355,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks}) => {
       taskId: item.taskId,
       taskName: item.taskName,
       description: item.description,
-      assigneeId: item.assigneeId,
+      assignerId: item.assignerId,
       priority: item.priority,
       dueDate: item.dueDate,
       projectId: item.projectId,
@@ -352,16 +374,85 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks}) => {
   
   }
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [newName, setNewName] = useState(item.taskName);
+  const [newDesc, setNewDesc] = useState(item.description);
+
+
+  const handleDoubleClick = () => {
+    setIsEditing(true);
+  };
+  
+
+  const handleBlur = async (newValue) => {
+    const formattedDate = dayjs(newValue);
+    selectedDate ? setSelectedDate(formattedDate) : setSelectedDate(dayjs(item.dueDate));
+    setIsEditing(false);  
+    
+    await axios.put("http://localhost:8082/api/v1/task/updateTask", {
+      taskId: item.taskId,
+      taskName: newName,
+      description: newDesc,
+      assignerId: item.assignerId,
+      priority: item.priority,
+      dueDate: formattedDate.format('YYYY-MM-DD'),
+      projectId: item.projectId,
+      collaboratorIds: item.collaboratorIds,
+      teamIds: item.teamIds,
+      memberIcons: item.memberIcons,
+      tags: item.tags,
+      workId: item.workId,
+      status: completed
+    }).then((res) => {
+      console.log(res.data);
+      toggleDrawer(true);
+    }).catch((err) => {
+      console.log(err);
+    })
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleBlur();
+    }
+  };
+
+
   const DrawerList = (
-    <DrawerContainer>
-      <IcoBtn onClick={toggleDrawer(false)}>
+    <DrawerContainer style={{ backgroundColor: 'rgb(27 2 46)', color: '#fff' }}>
+      <IcoBtn onClick={() => {toggleDrawer(false); setEditTask(true);}}>
         <KeyboardDoubleArrowRightIcon/>
       </IcoBtn>
       <Box sx={{ width: 500 }} role="presentation">
           <top>
-            <h1 style={{ margin: '10px 0' }}>{item.taskName}</h1>
+          {isEditing ? (
+            <input
+                style={{ fontSize: "2em", fontWeight: "700", border: "none", outline: "none", margin: "0.67em 0", backgroundColor: 'transparent', color: '#fff' }}
+              type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              onBlur={handleBlur}
+              onKeyPress={handleKeyPress}
+              
+            />
+            ) : (
+              <h1 onDoubleClick={handleDoubleClick}>{newName}</h1>
+            )}
           </top>
-          <Desc>{item.description}</Desc>
+
+          {isEditing ? (
+            <input
+                style={{ fontSize: "14px", fontWeight: "400", border: "none", outline: "none", marginTop: "4px", backgroundColor: 'transparent', color: '#fff' }}
+              type="text"
+              value={newDesc}
+              onChange={(e) => setNewDesc(e.target.value)}
+              onBlur={handleBlur}
+              onKeyPress={handleKeyPress}
+              
+            />
+            ) : (
+              <Desc onDoubleClick={handleDoubleClick}>{newDesc}</Desc>
+            )}
           <Tags>
               {item.tags.map((tag, index) => (
                 <Tag
@@ -407,32 +498,68 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks}) => {
           <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px', paddingTop: '20px'}}>
           <h3 style={{ margin: '0' }}>Due Date: </h3> 
           <Box style={{ marginTop: "0px" }}>
-            
-            <TextInput
-              type="text"
-              onFocus={(e) => (e.target.type = "date")}
-              onBlur={(e) => (e.target.type = "text")}
-              id="dueDate"
-              name="dueDate"
-              style={{ fontSize: "16px", color: '#000' }}
-              placeholder="Due Date"
-              value={item.dueDate}
-              // onChange={handleChange}
-            />
+
+          {isEditing ? (
+  <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <DatePicker
+      value={selectedDate}
+      onChange={handleBlur}
+      format="YYYY-MM-DD"
+      minDate={dayjs()} // Restricts selection to today and future dates
+      sx={{
+        '& .MuiInputBase-root': { color: '#fff' },
+        '& .MuiInput-underline:before': { borderBottomColor: '#fff' },
+        '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottomColor: '#fff' },
+        '& .MuiInput-underline:after': { borderBottomColor: '#fff' },
+        '& .MuiSvgIcon-root': { color: '#fff' },
+        '& .css-1dune0f-MuiInputBase-input-MuiOutlinedInput-input': { width: '40%' },
+        '& .css-npzfd0-MuiFormControl-root-MuiTextField-root': { width: '70%' },
+        '& .css-jupps9-MuiInputBase-root-MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
+        '& .css-jupps9-MuiInputBase-root-MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
+      }}
+    />
+  </LocalizationProvider>
+) : (
+  <p 
+    onDoubleClick={handleDoubleClick} 
+    style={{ 
+      margin: '0', 
+      padding: '0 5px',
+      color: selectedDate
+        ? selectedDate.isSame(dayjs(), 'day')
+          ? 'green'
+          : selectedDate.isSame(dayjs().subtract(1, 'day'), 'day')
+          ? 'red'
+          : selectedDate.isSame(dayjs().add(1, 'day'), 'day')
+          ? 'orange'
+          : 'white' // Default text color
+        : 'white' // If no date is selected
+    }}
+  >
+    {selectedDate
+      ? selectedDate.isSame(dayjs(), 'day')
+        ? 'Today'
+        : selectedDate.isSame(dayjs().subtract(1, 'day'), 'day')
+        ? 'Yesterday'
+        : selectedDate.isSame(dayjs().add(1, 'day'), 'day')
+        ? 'Tomorrow'
+        : selectedDate.format('DD-MM-YYYY')
+      : 'No Date Selected'}
+  </p>
+)}
+
+
+
             </Box>
           </Box>
 
           <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px', paddingTop: '20px'}}>
           <h3 style={{ margin: '0' }}>Project: </h3> 
-          <p style={{ margin: '0', padding: '0 5px' }}>{item.projectId}</p>
+          <h3 style={{ margin: '0', padding: '0 5px' }}>#{project.projectId} - {project?.projectName}</h3>
                 
 
           </Box>
 
-          <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px', paddingTop: '20px'}}>
-            <h3 style={{ margin: '0' }}>Description: </h3> 
-                <p style={{ margin: '0', padding: '0 5px' }}>{item.description}</p>
-          </Box>
           <Divider sx={{ padding: '10px 0' }} />
 
           <Box>
@@ -558,7 +685,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks}) => {
               </AvatarGroup>
             </Bottom>
 
-            <Drawer anchor="right" open={open} onClose={toggleDrawer(false)} >
+            <Drawer anchor="right" open={open} onClose={() => {toggleDrawer(false);  setEditTask(true)} } >
               {DrawerList}
             </Drawer>
           </Container>

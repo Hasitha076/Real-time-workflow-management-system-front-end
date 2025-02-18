@@ -354,6 +354,7 @@ const UpdateWork = ({ openUpdate, setOpenUpdate }) => {
         setLoading(true);
         setDisabled(true);
         setBackDisabled(true);
+        
 
         await axios.put(`http://localhost:8086/api/v1/work/updateWork`, {
             workId: inputs.workId, 

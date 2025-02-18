@@ -736,7 +736,7 @@ const ProjectDetails = () => {
         </Drawer>
 
         {newForm && <AddForm setNewForm={setNewForm} />}
-        {newTaskTemplate && <AddTaskTemplate setNewTaskTemplate={setNewTaskTemplate} />}
+        {newTaskTemplate && <AddTaskTemplate setNewTaskTemplate={setNewTaskTemplate} projectId={item.projectId} />}
     </Container>
   );
 };

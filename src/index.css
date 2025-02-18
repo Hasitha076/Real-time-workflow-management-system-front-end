@@ -11,3 +11,8 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+.css-y7ab46-MuiPaper-root-MuiDrawer-paper {
+  background-color: rgb(27 2 46) !important;
+}

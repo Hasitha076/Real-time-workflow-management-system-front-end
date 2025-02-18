@@ -496,7 +496,7 @@ const ProjectDetails = () => {
                       </Span>
                     </Text>
                   </Top>
-                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
+                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 1, 900: 1 }}>
                     <Masonry gutter="14px">
                       {works
                         .filter((item) => item.status == true)

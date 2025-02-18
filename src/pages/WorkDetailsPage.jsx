@@ -377,6 +377,7 @@ const WorkDetailsPage = () => {
   const [newTask, setNewTask] = useState(false);
   const [taskAdd, setTaskAdd] = useState(false);
   const [collaboratorBlock, setCollaboratorBlock] = useState({});
+  const [editTask, setEditTask] = useState(false);
   
       const [anchorEl, setAnchorEl] = useState(null);
       const openDropdown = Boolean(anchorEl);
@@ -394,7 +395,11 @@ const WorkDetailsPage = () => {
           getTasks();
           setTaskAdd(false);
         }
-      }, [taskAdd]);
+        if(editTask){
+          getTasks();
+          setEditTask(false);
+        }
+      }, [taskAdd, editTask]);
   
   
   //hooks for updates
@@ -820,6 +825,7 @@ const WorkDetailsPage = () => {
                             setTaskAdd={setTaskAdd}
                             work={item}
                             tasks={tasks}
+                            setEditTask={setEditTask}
                           />
                       ))}
                   </Masonry>
