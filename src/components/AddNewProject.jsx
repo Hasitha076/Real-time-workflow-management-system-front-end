@@ -334,6 +334,8 @@ const AddNewProject = ({ setNewProject, teamId, teamProject, setProjectCreated }
           },
         }).then((res) => {
             setAvailableUsers(res.data);
+            console.log(res);
+            
           })
             .then((res) => {
     

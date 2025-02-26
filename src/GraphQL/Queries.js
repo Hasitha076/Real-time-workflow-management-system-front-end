@@ -91,6 +91,13 @@ export const UPDATE_COLLABORATORS = gql`
   }
 `;
 
+// Mutation to update collaborators
+export const UPDATE_PROJECT_STATUS = gql`
+  mutation updateProjectStatus($projectId: Int!, $input: ProjectStatusInput!) {
+    updateProjectStatus(projectId: $projectId, input: $input)
+  }
+`;
+
 // Input Type Definition for Project
 export const PROJECT_INPUT_TYPE = gql`
   input ProjectInput {

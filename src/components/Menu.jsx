@@ -15,6 +15,7 @@ import {
 import GroupsIcon from '@mui/icons-material/Groups';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import PersonIcon from '@mui/icons-material/Person';
 import LogoIcon from "../Images/logo.png";
 import { useDispatch } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
@@ -210,12 +211,12 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
           </Item>
         </Link>
         <Link
-          to="forms"
+          to="members"
           style={{ textDecoration: "none", color: "inherit" }}
         >
           <Item>
-            <Assignment />
-            Forms
+            <PersonIcon />
+            Members
           </Item>
         </Link>
         {/* <Link

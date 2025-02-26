@@ -299,6 +299,7 @@ const ProjectDetails = () => {
   const [workAdded, setWorkAdded] = useState(false);
   const [workUpdated, setWorkUpdated] = useState(false);
   const [collaboratorUpdated, setCollaboratorUpdated] = useState(false);
+  const [projectUpdated, setProjectUpdated] = useState(false);
 
   const { loading: Loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
     variables: { id: parseInt(id) },  // Ensure ID is an integer
@@ -326,8 +327,12 @@ const ProjectDetails = () => {
       } if(collaboratorUpdated) {
         refetch()
         setCollaboratorUpdated(false)
+      }if(projectUpdated) {
+        refetch()
+        setProjectUpdated(false)
       }
-    }, [workAdded, collaboratorUpdated]);
+      
+    }, [workAdded, collaboratorUpdated, projectUpdated]);
 
     const navigate = useNavigate();
 
@@ -351,8 +356,9 @@ const ProjectDetails = () => {
         setProjectTeams((prev) => [...data.getProject.teamIds || []])
         setLoading(false)
         setCollaboratorUpdated(false)
+        setProjectUpdated(false)
       }
-    }, [Loading, data, collaboratorUpdated]);
+    }, [Loading, data, collaboratorUpdated, projectUpdated]);
     
 
   const getCollaborators = async () => {
@@ -516,7 +522,7 @@ const ProjectDetails = () => {
   return (
     <Container>
       {openWork && <WorkDetails setOpenWork={setOpenWork} work={currentWork} />}
-      {openUpdate.state && <UpdateProject openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} type={openUpdate.type} />}
+      {openUpdate.state && <UpdateProject openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} type={openUpdate.type} setProjectUpdated={setProjectUpdated} />}
       {openDelete.state && <DeletePopup openDelete={openDelete} setOpenDelete={setOpenDelete} />}
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: '12px 0px',height: '300px' }}>
@@ -639,6 +645,7 @@ const ProjectDetails = () => {
                       setCreated={setCreated}
                       data={item}
                       setWorkAdded={setWorkAdded}
+                      workCount={works.length}
                     />
 
                     {works.length != 0 && works.filter((item) => item.status === false)

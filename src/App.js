@@ -37,6 +37,9 @@ import AddForm from "./components/AddForm";
 // import TeamInvite from './components/TeamInvite';
 // import AddNewProject from './components/AddNewProject';
 import Forms from './pages/Forms';
+import Home from "./pages/Home/Home";
+import Members from "./pages/Members";
+import MemberDetails from "./pages/MemberDetails";
 // import WorkDetailsPage from './pages/WorkDetailsPage';
 
 
@@ -102,6 +105,8 @@ function App() {
                     
                     <Routes>
                       <Route >
+                    
+
                         <Route exact path="/" element={<Dashboard />} />
                         <Route path="projects" element={<Projects newProject={newProject} setNewProject={setNewProject} projectCreated={projectCreated} setProjectCreated={setProjectCreated} />} />
                         
@@ -127,7 +132,10 @@ function App() {
                         <Route path="workflow">
                           <Route path=":id" element={<Workflow />} />
                         </Route>
-                        <Route path="forms" element={<Forms />} />
+                        <Route path="members" element={<Members />} />
+                        <Route path="members">
+                          <Route path=":id" element={<MemberDetails />} />
+                        </Route>
                         <Route path="*" element={<div>Not Found</div>} />
                       </Route>
                     </Routes>
@@ -139,17 +147,7 @@ function App() {
             >
 
               <Routes>
-                {/* <Route exact path="/">
-                  <Route index element={
-                    <Home />} />
-                 
-                  <Route path="team/invite">
-                    <Route path=":code" element={<TeamInvite />} />
-                  </Route>
-                  <Route path="projects/invite">
-                    <Route path=":code" element={<ProjectInvite />} />
-                  </Route>
-                </Route> */}
+                <Route path="signup" element={<Home />} />
               </Routes>
             </ThemeProvider>}
           {open && <ToastMessage open={open} message={message} severity={severity} />}

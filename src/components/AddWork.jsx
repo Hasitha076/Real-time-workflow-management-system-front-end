@@ -10,6 +10,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { useDispatch } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import axios from "axios";
+import { UPDATE_PROJECT, UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
+import { useMutation } from "@apollo/client";
 
 const Container = styled.div`
   padding: 12px 14px;
@@ -323,7 +325,7 @@ const OutlinedButtonBox = styled.div`
   }
 `;
 
-const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIcons, data, setWorkAdded }) => {
+const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIcons, data, setWorkAdded, workCount }) => {
   const dispatch = useDispatch();
 
   const [step, setStep] = useState(0);
@@ -336,7 +338,7 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
   const [priority, setPriority] = useState("");
   const [dueDate, setDueDate] = useState("");
 
-  const token = localStorage.getItem("token");
+ const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
 
   //tasks
   // const [task, setTask] = useState([
@@ -398,6 +400,26 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
   // };
 
   console.log(ProjectId);
+
+  const updateProject = async () => {
+    console.log(ProjectId);
+    
+    await updateProjectStatus({
+                    variables: {
+                      projectId: parseInt(ProjectId),
+                      input: {
+                        status: "ON_GOING"
+                      }
+                    }
+                  }).then((res) => {
+                    console.log(res);
+                    
+                })
+                .catch((err) => {
+                    console.log(err);
+                    setLoading(false);
+                });
+  };
   
 
   //create new work card
@@ -422,6 +444,7 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
         setLoading(false);
         emptyForm();
         setWorkAdded(true);
+        updateProject();
         dispatch(
           openSnackbar({
             message: "Created a work card Successfully",

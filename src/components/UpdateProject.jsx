@@ -261,7 +261,7 @@ const FlexDisplay = styled.div`
   justify-content: space-between;
 `;
 
-const UpdateProject = ({ openUpdate, setOpenUpdate }) => {
+const UpdateProject = ({ openUpdate, setOpenUpdate, setProjectUpdated }) => {
     const [Loading, setLoading] = useState(false);
     const [disabled, setDisabled] = useState(true);
     const [backDisabled, setBackDisabled] = useState(false);
@@ -412,6 +412,7 @@ const UpdateProject = ({ openUpdate, setOpenUpdate }) => {
               }).then((res) => {
                 setLoading(false);
                 setOpenUpdate({ ...openUpdate, state: false });
+                setProjectUpdated(true);
                 dispatch(
                     openSnackbar({
                         message: "Project updated successfully",

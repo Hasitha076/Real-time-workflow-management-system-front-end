@@ -111,6 +111,7 @@ const Navbar = ({ menuOpen, setMenuOpen }) => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
 
+console.log(currentUser);
 
 
   //Open the account dialog
@@ -163,7 +164,7 @@ const Navbar = ({ menuOpen, setMenuOpen }) => {
             <SearchIcon style={{ marginRight: "20px", marginLeft: "20px" }} />
           </Search>
           <User>
-            {currentUser ? (
+            {!currentUser ? (
               <>
                 <IcoButton aria-describedby={id} onClick={() => navigate('/chats')}>
                   <Badge color="primary">
@@ -187,11 +188,12 @@ const Navbar = ({ menuOpen, setMenuOpen }) => {
                     }}
                   >
                     <Avatar
-                      src={currentUser.img}
-                      alt={currentUser.name}
+                      // src={currentUser.charAt(0)}
+                      // alt={currentUser.name}
                       sx={{ width: 34, height: 34 }}
                     >
-                      {currentUser.name.charAt(0)}
+                      H
+                      {/* {currentUser.name.charAt(0)} */}
                     </Avatar>
                   </Badge>
                 </IcoButton>
