@@ -403,22 +403,24 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
 
   const updateProject = async () => {
     console.log(ProjectId);
-    
-    await updateProjectStatus({
-                    variables: {
-                      projectId: parseInt(ProjectId),
-                      input: {
-                        status: "ON_GOING"
-                      }
-                    }
-                  }).then((res) => {
-                    console.log(res);
-                    
-                })
-                .catch((err) => {
-                    console.log(err);
-                    setLoading(false);
-                });
+
+    await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${ProjectId}`).then((res) => {
+      if(res.data.length > 0 || res.data.every((work) => work.status === false)) {
+        updateProjectStatus({
+          variables: {
+            projectId: parseInt(ProjectId),
+            input: {
+              status: "ON_GOING"
+            }
+          }
+        }).then((res) => {
+          console.log(res);
+        }).catch((err) => {
+            console.log(err);
+            setLoading(false);
+        });
+      } 
+    })
   };
   
 

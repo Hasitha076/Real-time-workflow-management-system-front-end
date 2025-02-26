@@ -11,7 +11,7 @@ import {format} from 'timeago.js';
 const Container = styled.div`
   padding: 14px 14px;
   text-align: left;
-  margin: 12px 0px 8px 0px;
+  margin: 0 0px 14px 0px;
   font-size: 14px;
   font-weight: 500;
   border-radius: 10px;

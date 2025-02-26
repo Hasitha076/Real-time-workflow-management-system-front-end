@@ -9,6 +9,8 @@ import { Avatar } from "@mui/material";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
+import { UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
+import { useMutation } from "@apollo/client";
 
 const Container = styled.div`
   width: 100%;
@@ -235,6 +237,8 @@ const AddNewTask = ({ setNewTask, WorkMembers, WorkTeams, ProjectId, WorkId, dat
     const [showAddTask, setShowAddTask] = useState(true);
     const [showAddMember, setShowAddMember] = useState(false);
 
+     const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
+
   const goToNextpage = () => {
     if (!taskName || !description) {
       setDisabled(true);
@@ -291,7 +295,21 @@ const AddNewTask = ({ setNewTask, WorkMembers, WorkTeams, ProjectId, WorkId, dat
             memberIcons: data.memberIcons,
             status: false,
             tags: data.tags
-        });
+        }).then(() => {
+          updateProjectStatus({
+            variables: {
+              projectId: parseInt(ProjectId),
+              input: {
+                status: "ON_GOING"
+              }
+            }
+          }).then((res) => {
+            console.log(res);
+          }).catch((err) => {
+              console.log(err);
+              setLoading(false);
+          });
+        })
 
 
         dispatch(

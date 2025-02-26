@@ -110,15 +110,9 @@ function App() {
                         <Route exact path="/" element={<Dashboard />} />
                         <Route path="projects" element={<Projects newProject={newProject} setNewProject={setNewProject} projectCreated={projectCreated} setProjectCreated={setProjectCreated} />} />
                         
-                        {/* <Route path="team/invite">
-                          <Route path=":code" element={<TeamInvite />} />
-                        </Route> */}
                         <Route path="projects">
                           <Route path=":id" element={<ProjectDetails />} />
                         </Route>
-                        {/* <Route path="projects/invite">
-                          <Route path=":code" element={<ProjectInvite />} />
-                        </Route> */}
     
                         <Route path="works" element={<Works />} />
                         <Route path="works">

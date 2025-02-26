@@ -468,7 +468,7 @@ const WorkDetailsPage = () => {
   };
 
   const getWorks = async () => {
-    await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${id}`)
+    await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${item.projectId}`)
     .then((res) => {    
       setWorks(res.data);
     })
@@ -498,9 +498,9 @@ const WorkDetailsPage = () => {
 
   useEffect(() => {
     const updateData = async () => {
-      await Promise.all([getCollaborators(), getTeams(), getWorks(), getTasks(), getTaskTemplates()]);
+      // await Promise.all([getCollaborators(), getTeams(), getWorks(), getTasks(), getTaskTemplates()]);
       if (item?.projectId) {
-        
+        await Promise.all([getCollaborators(), getTeams(), getWorks(), getTasks(), getTaskTemplates()]);
       }
     };
   
@@ -574,7 +574,9 @@ const WorkDetailsPage = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    getproject(id); 
+    if (id) {
+      getproject(id);
+    }
   }, [id, openWork, openUpdate, invitePopup]);
 
   const [alignment, setAlignment] = useState(true);

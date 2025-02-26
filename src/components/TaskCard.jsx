@@ -15,7 +15,7 @@ import InputIcon from '@mui/icons-material/Input';
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
+import {Drawer, Slide } from '@mui/material';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import { IconButton } from "@mui/material";
@@ -26,8 +26,8 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
-import { useQuery } from "@apollo/client";
-import { LOAD_PROJECT_BY_ID } from "../GraphQL/Queries";
+import { useMutation, useQuery } from "@apollo/client";
+import { LOAD_PROJECT_BY_ID, UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
 
 const Container = styled.div`
   padding: 14px;
@@ -220,6 +220,8 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
   const commentData = [];
   const [tasksData, setTasksData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(dayjs(item.dueDate));
+  
+   const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
 
   console.log("works: ", work);
   console.log("tasks: ", tasks);
@@ -282,7 +284,9 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
               axios.put(`http://localhost:8086/api/v1/work/updateWorkStatus`, {
                 workId: work.workId,
                 status: true
-              });
+              }).then(() => {
+                projectStatusUpdate();
+              })
             }
           }).catch((err) => {
             console.log(err);
@@ -290,7 +294,32 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
           })
         }
         console.log("TaskCard tasksData: ", tasksData);
-        
+
+        const projectStatusUpdate = async () => {
+          await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${work.projectId}`)
+          .then((res) => {
+            console.log("res.data: ", res.data);
+            if (!res.data?.every((work) => work.status == false)) {         
+               updateProjectStatus({
+                variables: {
+                  projectId: parseInt(work.projectId),
+                  input: {
+                    status: "COMPLETED"
+                  }
+                }
+              }).then((res) => {
+                console.log(res);
+                
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+            }
+          }).catch((err) => {
+            console.log(err);
+            
+          })
+        }
         
         
         const changeStateFunction = async (status) => {
@@ -419,7 +448,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
 
 
   const DrawerList = (
-    <DrawerContainer style={{ backgroundColor: 'rgb(27 2 46)', color: '#fff' }}>
+    <DrawerContainer>
       <IcoBtn onClick={() => {toggleDrawer(false); setEditTask(true);}}>
         <KeyboardDoubleArrowRightIcon/>
       </IcoBtn>
@@ -427,7 +456,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
           <top>
           {isEditing ? (
             <input
-                style={{ fontSize: "2em", fontWeight: "700", border: "none", outline: "none", margin: "0.67em 0", backgroundColor: 'transparent', color: '#fff' }}
+                style={{ fontSize: "2em", fontWeight: "700", border: "none", outline: "none", margin: "0.67em 0", backgroundColor: 'transparent' }}
               type="text"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
@@ -442,7 +471,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
 
           {isEditing ? (
             <input
-                style={{ fontSize: "14px", fontWeight: "400", border: "none", outline: "none", marginTop: "4px", backgroundColor: 'transparent', color: '#fff' }}
+                style={{ fontSize: "14px", fontWeight: "400", border: "none", outline: "none", marginTop: "4px", backgroundColor: 'transparent' }}
               type="text"
               value={newDesc}
               onChange={(e) => setNewDesc(e.target.value)}
@@ -500,53 +529,53 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
           <Box style={{ marginTop: "0px" }}>
 
           {isEditing ? (
-  <LocalizationProvider dateAdapter={AdapterDayjs}>
-    <DatePicker
-      value={selectedDate}
-      onChange={handleBlur}
-      format="YYYY-MM-DD"
-      minDate={dayjs()} // Restricts selection to today and future dates
-      sx={{
-        '& .MuiInputBase-root': { color: '#fff' },
-        '& .MuiInput-underline:before': { borderBottomColor: '#fff' },
-        '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottomColor: '#fff' },
-        '& .MuiInput-underline:after': { borderBottomColor: '#fff' },
-        '& .MuiSvgIcon-root': { color: '#fff' },
-        '& .css-1dune0f-MuiInputBase-input-MuiOutlinedInput-input': { width: '40%' },
-        '& .css-npzfd0-MuiFormControl-root-MuiTextField-root': { width: '70%' },
-        '& .css-jupps9-MuiInputBase-root-MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
-        '& .css-jupps9-MuiInputBase-root-MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
-      }}
-    />
-  </LocalizationProvider>
-) : (
-  <p 
-    onDoubleClick={handleDoubleClick} 
-    style={{ 
-      margin: '0', 
-      padding: '0 5px',
-      color: selectedDate
-        ? selectedDate.isSame(dayjs(), 'day')
-          ? 'green'
-          : selectedDate.isSame(dayjs().subtract(1, 'day'), 'day')
-          ? 'red'
-          : selectedDate.isSame(dayjs().add(1, 'day'), 'day')
-          ? 'orange'
-          : 'white' // Default text color
-        : 'white' // If no date is selected
-    }}
-  >
-    {selectedDate
-      ? selectedDate.isSame(dayjs(), 'day')
-        ? 'Today'
-        : selectedDate.isSame(dayjs().subtract(1, 'day'), 'day')
-        ? 'Yesterday'
-        : selectedDate.isSame(dayjs().add(1, 'day'), 'day')
-        ? 'Tomorrow'
-        : selectedDate.format('DD-MM-YYYY')
-      : 'No Date Selected'}
-  </p>
-)}
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                value={selectedDate}
+                onChange={handleBlur}
+                format="YYYY-MM-DD"
+                minDate={dayjs()} // Restricts selection to today and future dates
+                // sx={{
+                //   '& .MuiInputBase-root': { color: '#fff' },
+                //   '& .MuiInput-underline:before': { borderBottomColor: '#fff' },
+                //   '& .MuiInput-underline:hover:not(.Mui-disabled):before': { borderBottomColor: '#fff' },
+                //   '& .MuiInput-underline:after': { borderBottomColor: '#fff' },
+                //   '& .MuiSvgIcon-root': { color: '#fff' },
+                //   '& .css-1dune0f-MuiInputBase-input-MuiOutlinedInput-input': { width: '40%' },
+                //   '& .css-npzfd0-MuiFormControl-root-MuiTextField-root': { width: '70%' },
+                //   '& .css-jupps9-MuiInputBase-root-MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
+                //   '& .css-jupps9-MuiInputBase-root-MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
+                // }}
+              />
+            </LocalizationProvider>
+          ) : (
+            <p 
+              onDoubleClick={handleDoubleClick} 
+              style={{ 
+                margin: '0', 
+                padding: '0 5px',
+                color: selectedDate
+                  ? selectedDate.isSame(dayjs(), 'day')
+                    ? 'green'
+                    : selectedDate.isSame(dayjs().subtract(1, 'day'), 'day')
+                    ? 'red'
+                    : selectedDate.isSame(dayjs().add(1, 'day'), 'day')
+                    ? 'orange'
+                    : 'black' // Default text color
+                  : 'black' // If no date is selected
+              }}
+            >
+              {selectedDate
+                ? selectedDate.isSame(dayjs(), 'day')
+                  ? 'Today'
+                  : selectedDate.isSame(dayjs().subtract(1, 'day'), 'day')
+                  ? 'Yesterday'
+                  : selectedDate.isSame(dayjs().add(1, 'day'), 'day')
+                  ? 'Tomorrow'
+                  : selectedDate.format('DD-MM-YYYY')
+                : 'No Date Selected'}
+            </p>
+          )}
 
 
 
@@ -685,7 +714,13 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
               </AvatarGroup>
             </Bottom>
 
-            <Drawer anchor="right" open={open} onClose={() => {toggleDrawer(false);  setEditTask(true)} } >
+            <Drawer 
+              anchor="right" 
+              open={open} 
+              onClose={() => {toggleDrawer(false);  setEditTask(true)}}
+              TransitionComponent={Slide}
+              transitionDuration={1000}
+             >
               {DrawerList}
             </Drawer>
           </Container>

@@ -345,7 +345,7 @@ const AddTask = ({ WorkMembers, ProjectId, WorkId, WorkTeams, data }) => {
   };
   
   //create new work card
-  const createWorkCard = async (ProjectId, WorkId) => {
+  const createTaskCard = async (ProjectId, WorkId) => {
  
     let newTaskCard = {
       taskName,
@@ -675,7 +675,7 @@ const AddTask = ({ WorkMembers, ProjectId, WorkId, WorkTeams, data }) => {
               button
               activeButton
               style={{ width: "100%" }}
-              onClick={() => createWorkCard(ProjectId, WorkId)}
+              onClick={() => createTaskCard(ProjectId, WorkId)}
             >
               {loading ? <CircularProgress size={20} /> : "Create"}
             </OutlinedBox>

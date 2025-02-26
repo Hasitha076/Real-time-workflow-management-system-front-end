@@ -14,6 +14,10 @@ import WorkCards from "../components/WorkCards";
 import { statuses, data, tagColors } from "../data/data";
 import { LOAD_ALL_PROJECTS } from "../GraphQL/Queries";
 import { useQuery } from "@apollo/client";
+import { Bar, Line } from "react-chartjs-2";
+import { Chart, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend } from "chart.js";
+
+Chart.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
 
 const Container = Styled.div`
   overflow-y: visible !important;
@@ -58,6 +62,13 @@ const TopBar = Styled.div`
 const StatsWrapper = Styled.div`
   display: grid;
   grid-template-columns: repeat(3, minmax(250px, 1fr));
+  grid-gap: 15px;
+  margin: 20px 0px;
+`;
+
+const ChartBox = Styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(250px, 1fr));
   grid-gap: 15px;
   margin: 20px 0px;
 `;
@@ -148,7 +159,7 @@ const TotalWorks = Styled.div`
   padding: 8px 12px;
 `;
 
-const Title = Styled.div`
+const TitleText = Styled.div`
   width: 100%;
   height: 100%;
   text-align: left;
@@ -236,6 +247,54 @@ const Dashboard = () => {
     window.scrollTo(0, 0);
   }, [loading]);
 
+  const completedProjects = projects.filter(p => p.status === "COMPLETED").length;
+  const pendingProjects = projects.length - completedProjects;
+  const completedTasks = tasks.filter(t => t.status).length;
+  const pendingTasks = tasks.length - completedTasks;
+  const completedWorks = works.filter(w => w.status).length;
+  const pendingWorks = works.length - completedWorks;
+
+
+  const barChartData = {
+    labels: ["Projects", "Tasks", "Works"],
+    datasets: [
+      {
+        label: "Completed",
+        data: [completedProjects, completedTasks, completedWorks],
+        backgroundColor: "#4CAF50",
+      },
+      {
+        label: "Pending",
+        data: [pendingProjects, pendingTasks, pendingWorks],
+        backgroundColor: "#f0130b",
+      },
+    ],
+  };
+
+  const lineChartData = {
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    datasets: [
+      {
+        label: "Completed Projects",
+        data: Array.from({ length: 12 }, () => Math.floor(Math.random() * 10)),
+        borderColor: "#4CAF50",
+        fill: false,
+      },
+      {
+        label: "Completed Tasks",
+        data: Array.from({ length: 12 }, () => Math.floor(Math.random() * 20)),
+        borderColor: "#2196F3",
+        fill: false,
+      },
+      {
+        label: "Completed Works",
+        data: Array.from({ length: 12 }, () => Math.floor(Math.random() * 15)),
+        borderColor: "#FF9800",
+        fill: false,
+      },
+    ],
+  };
+
 
   return (
     <Container>
@@ -249,7 +308,7 @@ const Dashboard = () => {
             <StatsWrapper>
               <StatCard>
                 <TotalProjects>
-                  <Title>Total Projects Done</Title>
+                  <TitleText>Total Projects Done</TitleText>
                   <Progress>
                     <LinearProgress
                       sx={{
@@ -272,7 +331,7 @@ const Dashboard = () => {
 
               <StatCard>
                 <TotalWorks>
-                  <Title>Total Works Done</Title>
+                  <TitleText>Total Works Done</TitleText>
                   <Progress>
                     <LinearProgress
                       sx={{ borderRadius: "10px", height: 7, width: "80%" }}
@@ -292,7 +351,7 @@ const Dashboard = () => {
 
               <StatCard>
                 <TaskCompleted>
-                  <Title>Total Task Done</Title>
+                  <TitleText>Total Task Done</TitleText>
                   <Progress>
                     <LinearProgress
                       sx={{ borderRadius: "10px", height: 7, width: "80%" }}
@@ -312,11 +371,22 @@ const Dashboard = () => {
 
             </StatsWrapper>
 
+            <ChartBox>
+                <Box>
+                    <h2 style={{ marginTop: '0' }}>Project, Task, and Work Summary</h2>
+                    <Bar data={barChartData} options={{ responsive: true }} style={{ backgroundColor: 'aliceblue', padding: '10px', borderRadius: '15px' }} />
+                </Box>
+                <Box>
+                    <h2 style={{ marginTop: '0' }}>Monthly Completed Trends</h2>
+                    <Line data={lineChartData} options={{ responsive: true }} style={{ backgroundColor: 'aliceblue', padding: '10px', borderRadius: '15px' }}  />
+                </Box>
+            </ChartBox>
+
             <Box >
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
                 <RecentProjects>
                   <SectionTitle>Recent Projects</SectionTitle>
-                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
+                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 1 }}>
                     <Masonry gutter="0px 16px">
                     {
                     [...(projects || [])] // Clone the array to avoid mutating the original
@@ -338,7 +408,7 @@ const Dashboard = () => {
 
                 <RecentWorks>
                   <SectionTitle>Recent Works</SectionTitle>
-                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
+                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 1 }}>
                     <Masonry gutter="10px 16px">
                       {
                         works
@@ -360,9 +430,8 @@ const Dashboard = () => {
                 </RecentWorks>
               </Box>
 
-
             </Box>
-
+    
           </Left>
           
         </Section>

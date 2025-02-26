@@ -17,7 +17,7 @@ import axios from "axios";
 const Container = styled.div`
   padding: 14px;
   text-align: left;
-  margin: 2px 0px;
+  margin: 0 0 2px 0px;
   font-size: 16px;
   font-weight: 500;
   border-radius: 10px;
@@ -155,7 +155,7 @@ const Card = ({ status, work, setWorkUpdated }) => {
   const updateWorkStatus = async () => {
     await axios.get(`http://localhost:8082/api/v1/task/getTasksByWorkId/${work.workId}`)
     .then((res) => {
-      if (res.data.length > 0) {
+      if (res.data.length > 0 && res.data?.every((task) => task.status == false)) {
         
         axios.put(`http://localhost:8086/api/v1/work/updateWork`, {
           workId: work.workId,

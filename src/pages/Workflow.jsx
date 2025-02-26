@@ -359,7 +359,7 @@ const [newTaskTemplate, setNewTaskTemplate] = useState(false);
 
 
   const DrawerList = (
-    <DrawerContainer>
+    <DrawerContainer style={{ backgroundColor: '#f9f9f9' }}>
       <ArrowIcoBtn onClick={toggleDrawer(false)}>
         <KeyboardDoubleArrowRightIcon/>
       </ArrowIcoBtn>
