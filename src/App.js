@@ -6,6 +6,8 @@ import {
   BrowserRouter,
   Routes,
   Route,
+  useNavigate,
+  useNavigation,
 } from "react-router-dom"
 import Menu from './components/Menu';
 import Navbar from './components/Navbar';
@@ -40,6 +42,7 @@ import Forms from './pages/Forms';
 import Home from "./pages/Home/Home";
 import Members from "./pages/Members";
 import MemberDetails from "./pages/MemberDetails";
+import AddNewUser from "./components/AddNewUser";
 // import WorkDetailsPage from './pages/WorkDetailsPage';
 
 
@@ -63,15 +66,18 @@ function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [menuOpen, setMenuOpen] = useState(true);
   const [newTeam, setNewTeam] = useState(false);
+  const [newUser, setNewUser] = useState(false);
   const [newProject, setNewProject] = useState(false);
   const { open, message, severity } = useSelector((state) => state.snackbar);
   const [loading, setLoading] = useState(false);
   const [projectCreated, setProjectCreated] = useState(false);
+  const [userCreated, setUserCreated] = useState(false);
 
   const { currentUser } = useSelector(state => state.user);
+  const token = localStorage.getItem("token");
 
   console.log(currentUser);
-  
+  console.log(token);
 
 
   //set the menuOpen state to false if the screen size is less than 768px
@@ -93,21 +99,21 @@ function App() {
       <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
 
         <BrowserRouter>
-          {true ?
+          {currentUser != null || token ?
             <Container >
               {loading ? <div>Loading...</div> : <>
                 {menuOpen && <Menu setMenuOpen={setMenuOpen} setDarkMode={setDarkMode} darkMode={darkMode} setNewTeam={setNewTeam} />}
                 <Main>
-                  <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+                  <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} token={token} />
                   <Wrapper>
                     {newTeam && <AddNewTeam setNewTeam={setNewTeam} />}
                     {newProject && <AddNewProject setNewProject={setNewProject} setProjectCreated={setProjectCreated} />}
+                    {newUser && <AddNewUser setNewUser={setNewUser} setUserCreated={setUserCreated} />}
                     
                     <Routes>
                       <Route >
                     
-
-                        <Route exact path="/" element={<Dashboard />} />
+                        <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="projects" element={<Projects newProject={newProject} setNewProject={setNewProject} projectCreated={projectCreated} setProjectCreated={setProjectCreated} />} />
                         
                         <Route path="projects">
@@ -126,9 +132,9 @@ function App() {
                         <Route path="workflow">
                           <Route path=":id" element={<Workflow />} />
                         </Route>
-                        <Route path="members" element={<Members />} />
+                        <Route path="members" element={<Members setNewUser={setNewUser} userCreated={userCreated} setUserCreated={setUserCreated} />} />
                         <Route path="members">
-                          <Route path=":id" element={<MemberDetails />} />
+                          <Route path=":id" element={<MemberDetails currentUser={currentUser} />} />
                         </Route>
                         <Route path="*" element={<div>Not Found</div>} />
                       </Route>
@@ -141,7 +147,7 @@ function App() {
             >
 
               <Routes>
-                <Route path="signup" element={<Home />} />
+                <Route path="/" element={<Home />} />
               </Routes>
             </ThemeProvider>}
           {open && <ToastMessage open={open} message={message} severity={severity} />}

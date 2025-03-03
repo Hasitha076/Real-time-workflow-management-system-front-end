@@ -3,7 +3,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { tagColors } from "../data/data";
-import { CircularProgress } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import Avatar from "@mui/material/Avatar";
@@ -42,36 +42,101 @@ const ItemWrapper = styled.div`
 `;
 
 const Wrapper = styled.div`
-  padding: 12px 0px;
+  padding: 0 0px;
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 `;
 
+const OutlinedBox = styled.div`
+  min-height: 44px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid ${({ theme }) => theme.soft2};
+  color: ${({ theme }) => theme.soft2};
+  ${({ googleButton, theme }) =>
+    googleButton &&
+    `
+    user-select: none; 
+  gap: 16px;`}
+  ${({ button, theme }) =>
+    button &&
+    `
+    user-select: none; 
+  border: none;
+    font-weight: 600;
+    font-size: 16px;
+    background: ${theme.card}; `}
+    ${({ activeButton, theme }) =>
+    activeButton &&
+    `
+    user-select: none; 
+  border: none;
+    background: ${theme.primary};
+    color: white;`}
+    margin-top: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 14px;
+  &:hover {
+    transition: all 0.6s ease-in-out;
+    background: ${({ theme }) => theme.soft};
+    color: white;
+  }
+`;
 
-const Members = () => {
+
+const Members = ({setNewUser, userCreated, setUserCreated}) => {
   const { id } = useParams();
   const [item, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useSelector((state) => state.user);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')))
-
+const token = localStorage.getItem('token');
   const [users, setUsers] = useState([]);
 
-  const getAvailableTeams = async () => {
-    await axios.get("http://localhost:8081/api/v1/user/getAllUsers")
-    .then((res) => {
-        setUsers(res.data);
+  console.log(token);
+  
+
+  const getAvailableMember = async () => {
+    if (!token) {
+      console.error("JWT token is missing");
+      return;
+    } else {
+        console.log("JWT token is present");
+    }
+  
+    try {
+      const response = await axios.get("http://localhost:8081/api/v1/user/getAllUsers", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type":   "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+  
+      setUsers(response.data);
       loading(false);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+  
+  
 
   useEffect(() => {
-    getAvailableTeams();
+    getAvailableMember();
   }, []);
+
+  useEffect(() => {
+    if(userCreated) {
+        getAvailableMember();
+        setUserCreated(false);
+    }
+  }, [userCreated]);
 
   console.log(users);
 
@@ -86,6 +151,11 @@ const Members = () => {
         <>
             <Column>
               <ItemWrapper>
+                <Wrapper>
+                <OutlinedBox button onClick={() => setNewUser(true)} style={{ marginBottom: "12px" }}>
+                    New User
+                  </OutlinedBox>
+                </Wrapper>
                 <Wrapper>
                
                     {users.map((item, idx) => (

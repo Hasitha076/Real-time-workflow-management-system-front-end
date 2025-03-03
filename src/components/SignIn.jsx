@@ -18,6 +18,7 @@ import validator from "validator";
 import axios from "axios";
 
 import Google from "../Images/google.svg"
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   width: 100%;
@@ -169,6 +170,7 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
   const [resetDisabled, setResetDisabled] = useState(true);
   const [resettingPassword, setResettingPassword] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (email !== "") validateEmail();
@@ -179,10 +181,36 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
     }
   }, [email, password]);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async () => {
+    // e.preventDefault();
     if (!disabled) {
-      dispatch(loginStart());
+      // dispatch(loginStart());
+      await axios.post("http://localhost:8081/api/v1/auth/login", {
+        email: email,
+        password: password,
+      })
+        .then((res) => {
+          console.log(res.data);
+          
+          dispatch(loginSuccess(res.data));
+          dispatch(
+            openSnackbar({
+              message: "Login Successful",
+              severity: "success",
+            })
+          );
+          setSignInOpen(false);
+          navigate("/dashboard")
+        })
+        .catch((err) => {
+          dispatch(loginFailure());
+          dispatch(
+            openSnackbar({
+              message: "Invalid Credentials",
+              severity: "error",
+            })
+          );
+      })
       setDisabled(true);
       setLoading(true);
     }

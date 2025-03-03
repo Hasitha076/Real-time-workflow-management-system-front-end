@@ -300,6 +300,7 @@ const ProjectDetails = () => {
   const [workUpdated, setWorkUpdated] = useState(false);
   const [collaboratorUpdated, setCollaboratorUpdated] = useState(false);
   const [projectUpdated, setProjectUpdated] = useState(false);
+  const [icons, setIcons] = useState([]);
 
   const { loading: Loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
     variables: { id: parseInt(id) },  // Ensure ID is an integer
@@ -379,7 +380,26 @@ const ProjectDetails = () => {
       .catch((err) => {
         console.log(err);
       });
-  };
+  }; 
+
+
+  useEffect(() => {
+    if (!item) return;
+  
+    const projectCollaborators = collaborators
+      .filter((user) => item.collaboratorIds.includes(user.userId))
+      .map((user) => user.userName.charAt(0).toUpperCase());
+  
+    const projectTeams = teams
+      .filter((team) => item.teamIds.includes(team.teamId))
+      .map((team) => team.teamName.charAt(0).toUpperCase());
+  
+    setIcons([...projectCollaborators, ...projectTeams]);
+  }, [item, collaborators, teams]);
+
+ console.log(icons);
+ 
+
 
   const getWorks = async () => {
     await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${id}`)
@@ -545,12 +565,12 @@ const ProjectDetails = () => {
               ))}
             </Tags>
             <Members>
-              {item?.memberIcons.length > 0 ? <AvatarGroup>
-                {item?.memberIcons.map((member) => (
+              {icons?.length > 0 ? <AvatarGroup>
+                {icons?.map((member) => (
                   <Avatar
                     sx={{ marginRight: "-12px", width: "38px", height: "38px" }}
                   >
-                    {member.charAt(0)}
+                    {member}
                   </Avatar>
                 ))}
               </AvatarGroup>  : <Avatar sx={{ backgroundColor: 'transparent', border: '1px dashed #fff' }}><AccountCircleIcon/></Avatar>}

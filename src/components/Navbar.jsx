@@ -103,7 +103,7 @@ const User = styled.div`
 }
 `;
 
-const Navbar = ({ menuOpen, setMenuOpen }) => {
+const Navbar = ({ menuOpen, setMenuOpen, token }) => {
   const [SignUpOpen, setSignUpOpen] = useState(false);
   const [SignInOpen, setSignInOpen] = useState(false);
   const dispatch = useDispatch();
@@ -164,7 +164,7 @@ console.log(currentUser);
             <SearchIcon style={{ marginRight: "20px", marginLeft: "20px" }} />
           </Search>
           <User>
-            {!currentUser ? (
+            {currentUser ? (
               <>
                 <IcoButton aria-describedby={id} onClick={() => navigate('/chats')}>
                   <Badge color="primary">
@@ -188,12 +188,10 @@ console.log(currentUser);
                     }}
                   >
                     <Avatar
-                      // src={currentUser.charAt(0)}
-                      // alt={currentUser.name}
+                      alt={currentUser.name}
                       sx={{ width: 34, height: 34 }}
                     >
-                      H
-                      {/* {currentUser.name.charAt(0)} */}
+                      {currentUser.name != "" ? currentUser?.userName.charAt(0) : "A"}
                     </Avatar>
                   </Badge>
                 </IcoButton>
@@ -213,6 +211,7 @@ console.log(currentUser);
           id={id}
           handleClose={handleClose}
           currentUser={currentUser}
+          token={token}
         />
       )}
       {currentUser && (

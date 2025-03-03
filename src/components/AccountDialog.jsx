@@ -3,6 +3,9 @@ import React from "react";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import {useNavigate} from 'react-router-dom';
+import { logout } from "../redux/userSlice";
+import axios from "axios";
+import { openSnackbar } from "../redux/snackbarSlice";
 
 const Wrapper = styled.div`
   min-width: 200px;
@@ -70,12 +73,42 @@ const OutlinedBox = styled.div`
     }
 `;
 
-const AccountDialog = ({ open, id, anchorEl, handleClose, currentUser }) => {
+const AccountDialog = ({ open, id, anchorEl, handleClose, currentUser, token }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const logoutUser = () => {
-      navigate('/');
-    }
+    const logoutUser = async () => {
+      dispatch(logout());
+      navigate("/");
+      // try {
+      //   await axios.post("http://localhost:8081/api/v1/auth/logout",
+      //     {},  // Empty body
+      //     {
+      //       headers: {
+      //         Authorization: `Bearer ${token}`, // Send token in the header
+      //       },
+      //     }
+      //   ).then((res) => {
+      //     dispatch(logout());
+      //     dispatch(
+      //       openSnackbar({
+      //         message: "Logout Successful",
+      //         severity: "success",
+      //       })
+      //     );
+
+      //     navigate("/signup"); // Redirect to signup page
+      //   })
+  
+      // } catch (error) {
+      //   dispatch(
+      //     openSnackbar({
+      //       message: "Logout failed",
+      //       severity: "error",
+      //     })
+      //   );
+      // }
+    };
+    
   return (
     <Popover
       anchorReference="anchorPosition"
@@ -92,10 +125,9 @@ const AccountDialog = ({ open, id, anchorEl, handleClose, currentUser }) => {
         <Account>
           <Avatar
             sx={{ width: "50px", height: "50px" }}
-            src={currentUser.img}
-          >{currentUser.name.charAt(0)}</Avatar>
+          >{currentUser.name != "" ? currentUser?.userName.charAt(0) : "A"}</Avatar>
           <Details>
-            <Name>{currentUser.name}</Name>
+            <Name>{currentUser.userName}</Name>
             <Email>{currentUser.email}</Email>
           </Details>
         </Account>

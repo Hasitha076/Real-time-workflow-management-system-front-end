@@ -27,11 +27,10 @@ import { LOAD_PROJECTS_BY_TEAM_ID } from "../GraphQL/Queries";
 import { useQuery } from "@apollo/client";
 import Badge from '@mui/material/Badge';
 import Stack from '@mui/material/Stack';
+import UpdateMember from "../components/UpdateMember";
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
     '& .MuiBadge-badge': {
-      backgroundColor: '#44b700',
-      color: '#44b700',
       '&::after': {
         position: 'absolute',
         top: 0,
@@ -195,7 +194,7 @@ const IcoBtn = styled(IconButton)`
 `;
 
 
-const MemberDetails = () => {
+const MemberDetails = ({ currentUser }) => {
   const { id } = useParams();
   const [item, setItems] = useState([]);
   const [projectCollaborators, setProjectCollaborators] = useState([]);
@@ -210,19 +209,28 @@ const MemberDetails = () => {
   const [works, setWorks] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [alignment, setAlignment] = useState(true);
+  const [isUserActive, setIsUserActive] = useState(false);
+  const token = localStorage.getItem("token");
   
   //use state enum to check for which updation
-  const [openUpdate, setOpenUpdate] = useState({ state: false, type: "Team", data: item });
+  const [openUpdate, setOpenUpdate] = useState({ state: false, type: "Member", data: item });
 
   //use state for delete popup
-  const [openDelete, setOpenDelete] = useState({ state: false, type: "Team", data: item });
+  const [openDelete, setOpenDelete] = useState({ state: false, type: "Member", data: item });
 
   const dispatch = useDispatch();
 
   const getUser = async (id) => {
-    await axios.get(`http://localhost:8081/api/v1/user/getUser/${id}`)
+    await axios.get(`http://localhost:8081/api/v1/user/getUser/${id}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type":   "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+    })
       .then((res) => {
         setItems(res.data);
+        setIsUserActive(res.data.status);
         setProjectCollaborators(res.data.collaboratorIds);
         setProjectTeams(res.data.teamIds);
       })
@@ -247,7 +255,13 @@ const MemberDetails = () => {
   
 
   const getCollaborators = async () => {
-    await axios.get(`http://localhost:8081/api/v1/user/getAllUsers`)
+    await axios.get(`http://localhost:8081/api/v1/user/getAllUsers`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type":   "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+    })
       .then((res) => {
         setCollaborators(res.data);
       })
@@ -334,7 +348,7 @@ const MemberDetails = () => {
 
   return (
     <Container>
-      {openUpdate.state && <UpdateTeam openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} type={openUpdate.type} />}
+      {openUpdate.state && <UpdateMember openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} type={openUpdate.type} />}
       {openDelete.state && <DeletePopup openDelete={openDelete} setOpenDelete={setOpenDelete} />}
       {loading ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: '12px 0px',height: '300px' }}>
@@ -350,6 +364,12 @@ const MemberDetails = () => {
                     overlap="circular"
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                     variant="dot"
+                    sx={{
+                        color: isUserActive ? '#44b700' : '#eb4034',
+                        '& .MuiBadge-dot': {
+                            backgroundColor: isUserActive ? '#44b700' : '#eb4034',
+                        },
+                    }}
                 >
                     <Avatar alt="Remy Sharp">{item.userName.charAt(0)}</Avatar>
                 </StyledBadge>
@@ -367,12 +387,14 @@ const MemberDetails = () => {
                 </Tag>
                 <Email>{item.email}</Email>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-              <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'Team', data: item })}>
+              <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'Member', data: item })}>
                 <Edit sx={{ fontSize: "20px" }} />
               </IcoBtn>
-              <IcoBtn onClick={() => setOpenDelete({ state: true, type: 'Team', name: item.teamName, id: item.teamId })}>
+              {currentUser.role === "ADMIN" && (
+                <IcoBtn onClick={() => setOpenDelete({ state: true, type: 'Member', name: item.userName, id: item.userId })}>
                 <Delete sx={{ fontSize: "20px" }} />
               </IcoBtn>
+              )}
             </div>
 
             <Hr />

@@ -166,7 +166,7 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
   return (
     <Container setMenuOpen={setMenuOpen} >
       <Flex>
-        <Link to="/" style={{ textDecoration: "none", color: "inherit", alignItems: 'center',display: 'flex' }}>
+        <Link to="/dashboard" style={{ textDecoration: "none", color: "inherit", alignItems: 'center',display: 'flex' }}>
           <Logo>
             <Image src={LogoIcon} />
             SmartFlow
@@ -177,7 +177,7 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
         </Close>
       </Flex>
       <ContainerWrapper>
-        <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
+        <Link to="/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
           <Item>
             <DashboardRounded />
             Dashboard
