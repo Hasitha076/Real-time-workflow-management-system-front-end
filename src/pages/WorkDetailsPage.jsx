@@ -18,7 +18,7 @@ import { CircularProgress, IconButton } from "@mui/material";
 import axios from "axios";
 import Avatar from "@mui/material/Avatar";
 import { openSnackbar } from "../redux/snackbarSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import DeletePopup from "../components/DeletePopup";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import InviteWorkMembers from "../components/InviteWorkMembers";
@@ -378,7 +378,8 @@ const WorkDetailsPage = () => {
   const [taskAdd, setTaskAdd] = useState(false);
   const [collaboratorBlock, setCollaboratorBlock] = useState({});
   const [editTask, setEditTask] = useState(false);
-  
+  const {currentUser} = useSelector((state) => state.user);
+
       const [anchorEl, setAnchorEl] = useState(null);
       const openDropdown = Boolean(anchorEl);
     
@@ -615,6 +616,7 @@ const WorkDetailsPage = () => {
             description: template.taskTemplateDescription,
             tags: template.taskTemplateTags,
             priority: template.taskTemplatePriority,
+            assignerId: template.assignerId,
             projectId: template.projectId,
             workId: item.workId,
             dueDate: template.taskTemplateDueDate,
@@ -632,6 +634,7 @@ const WorkDetailsPage = () => {
             description: item.description, 
             priority: item.priority,
             projectId: item.projectId,
+            assignerId: item.assignerId,
             dueDate: item.dueDate,
             collaboratorIds: item.collaboratorIds,
             teamIds: item.teamIds,
@@ -920,6 +923,7 @@ const WorkDetailsPage = () => {
         data={item}
         setTaskAdd={setTaskAdd}
         tasks={tasks}
+        currentUser={currentUser}
         
         />}
     </Container>

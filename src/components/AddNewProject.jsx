@@ -7,7 +7,7 @@ import {
 } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
 import { openSnackbar } from "../redux/snackbarSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useMutation } from "@apollo/client";
 import { CREATE_PROJECT } from "../GraphQL/Queries";
@@ -226,6 +226,7 @@ const AddNewProject = ({ setNewProject, teamId, teamProject, setProjectCreated }
   const [backDisabled, setBackDisabled] = useState(false);
   const [showAddProject, setShowAddProject] = useState(true);
   const [showAddMember, setShowAddMember] = useState(false);
+  const { currentUser } = useSelector((state) => state.user);
 
   const [createProject] = useMutation(CREATE_PROJECT);
 
@@ -240,6 +241,9 @@ const AddNewProject = ({ setNewProject, teamId, teamProject, setProjectCreated }
     setShowAddMember(true);
   };
 
+  console.log(currentUser);
+  
+
   //add member part
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState([]);
@@ -248,6 +252,7 @@ const AddNewProject = ({ setNewProject, teamId, teamProject, setProjectCreated }
   const [inputs, setInputs] = useState({ 
       projectName: "", 
       projectDescription: "",
+      assignerId: currentUser.userId,
       priority: "",
       dueDate: "",
       tags: "",
@@ -325,6 +330,7 @@ const AddNewProject = ({ setNewProject, teamId, teamProject, setProjectCreated }
             input: {
               projectName: inputs.projectName,
               projectDescription: inputs.projectDescription,
+              assignerId: inputs.assignerId,
               priority: inputs.priority,
               dueDate: inputs.dueDate,
               tags: inputs.tags,

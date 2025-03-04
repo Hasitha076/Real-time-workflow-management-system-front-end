@@ -132,7 +132,7 @@ const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated})
               <Span>({projects?.filter((item) => item.status === s.status).length})</Span>
               <Wrapper>
                 {s.status === "PENDING" && (
-                  <OutlinedBox button onClick={() => setNewProject(true)} style={{ marginBottom: "12px" }}>
+                  <OutlinedBox button onClick={() => setNewProject(currentUser.role === "ADMIN" ? true : currentUser.role === "MANAGER" ? true : false)} style={{ marginBottom: "12px" }}>
                     New Project
                   </OutlinedBox>
                 )}

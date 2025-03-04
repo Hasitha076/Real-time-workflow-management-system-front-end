@@ -6,7 +6,7 @@ import { IconButton } from "@mui/material";
 import { Avatar } from "@mui/material";
 import { Modal } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import axios from "axios";
 
@@ -334,6 +334,7 @@ const AddTask = ({ WorkMembers, ProjectId, WorkId, WorkTeams, data }) => {
   const [dueDate, setDueDate] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState([]);
+  const { currentUser } = useSelector(state => state.user);
 
   const goToNextpage = () => {
     if (!taskName || !description) {
@@ -345,13 +346,14 @@ const AddTask = ({ WorkMembers, ProjectId, WorkId, WorkTeams, data }) => {
   };
   
   //create new work card
-  const createTaskCard = async (ProjectId, WorkId) => {
+  const createTaskCard = async (ProjectId, WorkId, currentUser) => {
  
     let newTaskCard = {
       taskName,
       description,
       tags: tags.split(","),
       priority,
+      assignerId: currentUser.userId,
       projectId: ProjectId,
       workId: WorkId,
       dueDate,
@@ -675,7 +677,7 @@ const AddTask = ({ WorkMembers, ProjectId, WorkId, WorkTeams, data }) => {
               button
               activeButton
               style={{ width: "100%" }}
-              onClick={() => createTaskCard(ProjectId, WorkId)}
+              onClick={() => createTaskCard(ProjectId, WorkId, currentUser)}
             >
               {loading ? <CircularProgress size={20} /> : "Create"}
             </OutlinedBox>

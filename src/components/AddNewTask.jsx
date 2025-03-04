@@ -220,7 +220,7 @@ const FlexDisplay = styled.div`
 `;
 
 
-const AddNewTask = ({ setNewTask, WorkMembers, WorkTeams, ProjectId, WorkId, data, setTaskAdd, tasks }) => {
+const AddNewTask = ({ setNewTask, WorkMembers, WorkTeams, ProjectId, WorkId, data, setTaskAdd, tasks, currentUser }) => {
   const dispatch = useDispatch();
   const [step, setStep] = useState(0);
     const [disabled, setDisabled] = useState(true);
@@ -269,6 +269,7 @@ const AddNewTask = ({ setNewTask, WorkMembers, WorkTeams, ProjectId, WorkId, dat
       description,
       tags: tags.split(","),
       priority,
+      assignerId: currentUser.userId,
       projectId: ProjectId,
       workId: WorkId,
       dueDate,

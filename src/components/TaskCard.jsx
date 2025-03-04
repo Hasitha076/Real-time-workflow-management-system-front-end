@@ -28,6 +28,8 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { useMutation, useQuery } from "@apollo/client";
 import { LOAD_PROJECT_BY_ID, UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
+import { useDispatch } from "react-redux";
+import { openSnackbar } from "../redux/snackbarSlice";
 
 const Container = styled.div`
   padding: 14px;
@@ -220,9 +222,13 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
   const commentData = [];
   const [tasksData, setTasksData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(dayjs(item.dueDate));
-  
-   const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
+  const [assigner, setAssigner] = useState([]);
+  const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
+  const token = localStorage.getItem("token");
+  const dispatch = useDispatch();
 
+  console.log("item: ", item);
+  
   console.log("works: ", work);
   console.log("tasks: ", tasks);
   
@@ -236,9 +242,37 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
           
           if (data?.getProject) {
             setProject((prev) => ({ ...prev, ...data.getProject }));
-          }
+            };
         }, [loading, data]);
-  
+
+        console.log("Project: ", project);
+        
+        const getUser = async () => {
+          await axios.get(`http://localhost:8081/api/v1/user/getUser/${item.assignerId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type":   "application/json",
+                "Access-Control-Allow-Origin": "*",
+              },
+        })
+          .then((res) => {
+            console.log("Assigner: ", res.data);
+            
+            setAssigner(res.data);
+          })
+          .catch((err) => {
+            dispatch(
+              openSnackbar({
+                message: err.response.data.message,
+                severity: "error",
+              })
+            );
+          });
+        }
+
+        useEffect(() => {
+          getUser();
+        }, [])
   
         useEffect(() => {
     
@@ -269,7 +303,6 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
           if(taskCollaborators || taskTeams) {
             setAllTaskMembers([...taskCollaborators, ...taskTeams]);
           }
-  
   
         }, [item, members, teams, item]);
 
@@ -320,6 +353,9 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
             
           })
         }
+
+        console.log("Assigner: ", assigner);
+        
         
         
         const changeStateFunction = async (status) => {
@@ -359,9 +395,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
         }
 
   useEffect(() => {
-
     console.log("Completed status updated:", completed);
-    
   }, [completed, item, comment]);
 
 
@@ -495,7 +529,19 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
           <Divider sx={{ padding: '10px 0' }} />
 
           <Box sx={{ display: 'flex', paddingTop: '20px' }}>
-          <h3 style={{ margin: '0' }}>Assignee: </h3> 
+          <h3 style={{ margin: '0' }}>Assigner: </h3> 
+          {assigner.length != 0 && (
+            <Avatar
+            sx={{
+              marginLeft: "5px",
+              width: "26px",
+              height: "26px",
+              fontSize: "16px",
+            }}
+          >
+            {assigner?.userName.charAt(0)}
+          </Avatar>
+          )}
           <AvatarGroup style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start', paddingLeft: '20px' }}>
                 {allTaskMembers.map((member) => (
                  <Box sx={{ display: 'flex', alignItems: 'center' }}>

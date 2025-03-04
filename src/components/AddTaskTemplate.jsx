@@ -8,7 +8,7 @@ import {
 } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
 import { openSnackbar } from "../redux/snackbarSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 
 const Container = styled.div`
@@ -225,6 +225,7 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId })
   const [backDisabled, setBackDisabled] = useState(false);
   const [showAddProject, setShowAddProject] = useState(true);
   const [showAddMember, setShowAddMember] = useState(false);
+  const {currentUser} = useSelector((state) => state.user);
 
   const goToAddProject = () => {
     setShowAddProject(true);
@@ -321,6 +322,7 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId })
         taskTemplateDescription: inputs.taskTemplateDescription,
         taskTemplateTags: inputs.taskTemplateTags,
         taskTemplatePriority: inputs.taskTemplatePriority,
+        assignerId: currentUser.userId,
         projectId: parseInt(projectId),
         taskTemplateDueDate: inputs.taskTemplateDueDate,
         taskTemplateCollaboratorIds: selectedUsers.map((user) => user.id),

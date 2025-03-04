@@ -344,6 +344,7 @@ const MemberDetails = ({ currentUser }) => {
 
   console.log(item);
   
+console.log(currentUser);
 
 
   return (
@@ -387,9 +388,16 @@ const MemberDetails = ({ currentUser }) => {
                 </Tag>
                 <Email>{item.email}</Email>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-              <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'Member', data: item })}>
-                <Edit sx={{ fontSize: "20px" }} />
-              </IcoBtn>
+            {currentUser.userId === item.userId ? (
+                <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'Member', data: item })}>
+                    <Edit sx={{ fontSize: "20px" }} />
+                </IcoBtn>
+            ) : currentUser.role === "ADMIN" ? (
+                <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'Member', data: item })}>
+                    <Edit sx={{ fontSize: "20px" }} />
+                </IcoBtn>
+            ) : null
+            }
               {currentUser.role === "ADMIN" && (
                 <IcoBtn onClick={() => setOpenDelete({ state: true, type: 'Member', name: item.userName, id: item.userId })}>
                 <Delete sx={{ fontSize: "20px" }} />

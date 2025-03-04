@@ -166,11 +166,6 @@ console.log(currentUser);
           <User>
             {currentUser ? (
               <>
-                <IcoButton aria-describedby={id} onClick={() => navigate('/chats')}>
-                  <Badge color="primary">
-                    <Forum />
-                  </Badge>
-                </IcoButton>
                 <IcoButton aria-describedby={id} onClick={notificationClick}>
                   <Badge badgeContent={notifications.length} color="primary">
                     <NotificationsRounded />

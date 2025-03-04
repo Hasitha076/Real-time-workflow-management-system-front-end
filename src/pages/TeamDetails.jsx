@@ -16,7 +16,7 @@ import { CircularProgress, IconButton } from "@mui/material";
 import axios from "axios";
 import Avatar from "@mui/material/Avatar";
 import { openSnackbar } from "../redux/snackbarSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import InviteTeamMembers from "../components/InviteTeamMembers";
 import DeletePopup from "../components/DeletePopup";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
@@ -306,6 +306,7 @@ const TeamDetails = () => {
   const [works, setWorks] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [alignment, setAlignment] = useState(true);
+  const { currentUser } = useSelector((state) => state.user);
   
   //use state enum to check for which updation
   const [openUpdate, setOpenUpdate] = useState({ state: false, type: "Team", data: item });
@@ -477,12 +478,23 @@ const TeamDetails = () => {
               </InviteButton>
             </Members>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-              <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'Team', data: item })}>
+            {currentUser.role === "ADMIN" ? (
+                <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'Team', data: item })}>
                 <Edit sx={{ fontSize: "20px" }} />
               </IcoBtn>
-              <IcoBtn onClick={() => setOpenDelete({ state: true, type: 'Team', name: item.teamName, id: item.teamId })}>
+            ) : currentUser.role === "MANAGER" ? (
+                <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'Team', data: item })}>
+                <Edit sx={{ fontSize: "20px" }} />
+              </IcoBtn>
+            ) : null
+        }
+              
+              {currentUser.role === "ADMIN" && (
+                <IcoBtn onClick={() => setOpenDelete({ state: true, type: 'Team', name: item.teamName, id: item.teamId })}>
                 <Delete sx={{ fontSize: "20px" }} />
               </IcoBtn>
+              )}
+              
             </div>
 
             <Hr />
