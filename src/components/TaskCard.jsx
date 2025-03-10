@@ -449,7 +449,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
 
   const handleBlur = async (newValue) => {
     const formattedDate = dayjs(newValue);
-    selectedDate ? setSelectedDate(formattedDate) : setSelectedDate(dayjs(item.dueDate));
+    newValue ? setSelectedDate(formattedDate) : setSelectedDate(dayjs(item.dueDate));
     setIsEditing(false);  
     
     await axios.put("http://localhost:8082/api/v1/task/updateTask", {

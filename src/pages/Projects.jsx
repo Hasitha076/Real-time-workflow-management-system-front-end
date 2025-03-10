@@ -118,6 +118,9 @@ const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated})
       getprojects();
   }, []);
 
+  console.log(projects);
+  
+
   return (
     <Container>
       {loading ? (

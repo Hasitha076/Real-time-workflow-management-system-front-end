@@ -335,6 +335,7 @@ const AddTask = ({ WorkMembers, ProjectId, WorkId, WorkTeams, data }) => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState([]);
   const { currentUser } = useSelector(state => state.user);
+  const token = localStorage.getItem("token");
 
   const goToNextpage = () => {
     if (!taskName || !description) {
@@ -362,7 +363,15 @@ const AddTask = ({ WorkMembers, ProjectId, WorkId, WorkTeams, data }) => {
     };
 
     
-    await axios.post("http://localhost:8082/api/v1/task/createTask", newTaskCard)
+    await axios.post("http://localhost:8082/api/v1/task/createTask", newTaskCard,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Ensure token is included
+          "Content-Type": "application/json",
+        },
+        withCredentials: true, // Important for session-based auth
+      }
+    )
       .then(() => {
         setLoading(false);
         emptyForm();

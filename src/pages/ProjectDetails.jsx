@@ -301,6 +301,7 @@ const ProjectDetails = () => {
   const [collaboratorUpdated, setCollaboratorUpdated] = useState(false);
   const [projectUpdated, setProjectUpdated] = useState(false);
   const [icons, setIcons] = useState([]);
+  const token = localStorage.getItem("token");
 
   const { loading: Loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
     variables: { id: parseInt(id) },  // Ensure ID is an integer
@@ -398,25 +399,20 @@ const ProjectDetails = () => {
   }, [item, collaborators, teams]);
 
  console.log(icons);
- 
 
 
   const getWorks = async () => {
-    await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${id}`)
-    .then((res) => {
-      console.log(res.data);
-      
-        if(res.data !== null){
-          setWorks(res.data);
-        } else {
-          setWorks([]);
-        }
-
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  }
+    try {
+      const response = await axios.get(
+        `http://localhost:8086/api/v1/work/getWorksByProjectId/${id}`
+      );
+      console.log(response.data);
+      setWorks(response.data);
+    } catch (error) {
+      console.error("Error fetching works:", error);
+    }
+  };
+  
   
   useEffect(() => {
     getCollaborators();

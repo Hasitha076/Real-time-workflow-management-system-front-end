@@ -1,11 +1,12 @@
 import { Avatar, Popover } from "@mui/material";
 import React from "react";
 import styled from "styled-components";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {useNavigate} from 'react-router-dom';
 import { logout } from "../redux/userSlice";
 import axios from "axios";
 import { openSnackbar } from "../redux/snackbarSlice";
+import { tagColors } from "../data/data";
 
 const Wrapper = styled.div`
   min-width: 200px;
@@ -27,6 +28,7 @@ const Account = styled.div`
 const Details = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 4px;
   padding: 0px 16px 0px 0px;
 `;
@@ -73,6 +75,28 @@ const OutlinedBox = styled.div`
     }
 `;
 
+const Profile = styled.div`
+  display: inline-block;
+`
+
+const ButtonGroup = styled.div`
+  display: flex;
+  padding: 0px 16px 0 16px;
+  justify-content: space-between;
+  cursor: pointer;
+`
+
+const Tag = styled.div`
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 5px 0;
+    border-radius: 20px;
+  color: ${({ tagColor, theme }) => tagColor + theme.lightAdd};
+  background-color: ${({ tagColor, theme }) => tagColor + "10"};
+  font-size: 12px;
+  font-weight: 500;
+`;
+
 const AccountDialog = ({ open, id, anchorEl, handleClose, currentUser, token }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -108,6 +132,13 @@ const AccountDialog = ({ open, id, anchorEl, handleClose, currentUser, token }) 
       //   );
       // }
     };
+
+    console.log(currentUser);
+    
+
+    const handleProfile = () => {
+      navigate(`/members/${currentUser.userId}`);
+    };
     
   return (
     <Popover
@@ -129,12 +160,24 @@ const AccountDialog = ({ open, id, anchorEl, handleClose, currentUser, token }) 
           <Details>
             <Name>{currentUser.userName}</Name>
             <Email>{currentUser.email}</Email>
+            <Tag
+                  tagColor={
+                    tagColors[Math.floor(Math.random() * tagColors.length)]
+                  }
+                >
+                  {currentUser.role}
+                </Tag>
           </Details>
         </Account>
         <Hr />
+        <ButtonGroup>
+        <Profile>
+            <OutlinedBox onClick={handleProfile}>Go To Profile</OutlinedBox>
+          </Profile>
         <Logout>
           <OutlinedBox onClick={logoutUser}>Logout</OutlinedBox>
         </Logout>
+        </ButtonGroup>
       </Wrapper>
     </Popover>
   );
