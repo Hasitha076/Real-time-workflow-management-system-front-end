@@ -339,6 +339,7 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
   const [dueDate, setDueDate] = useState("");
 
  const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
+ const token = localStorage.getItem("token");
 
   //tasks
   // const [task, setTask] = useState([
@@ -441,7 +442,13 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
     console.log(newWorkCard);
 
     
-    await axios.post("http://localhost:8086/api/v1/work/createWork", newWorkCard)
+    await axios.post("http://localhost:8086/api/v1/work/createWork", newWorkCard, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Ensure token is included
+        "Content-Type": "application/json",
+      },
+      withCredentials: true, // Important for session-based auth
+    })
       .then(() => {
         setLoading(false);
         emptyForm();

@@ -3,7 +3,6 @@ import { useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import {
-  Add,
   AlignHorizontalLeft,
   AlignVerticalTop,
   CheckCircleOutlineOutlined,
@@ -23,17 +22,14 @@ import DeletePopup from "../components/DeletePopup";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import InviteWorkMembers from "../components/InviteWorkMembers";
 import UpdateWork from "../components/UpdateWork";
-import AddTask from "../components/AddTask";
 import TaskCard from "../components/TaskCard";
 import QueueIcon from '@mui/icons-material/Queue';
 import { Button, Divider } from "@mui/material";
 import AddTaskIcon from '@mui/icons-material/AddTask';
-
 import { Menu, MenuItem } from "@mui/material";
-import AddNewProject from "../components/AddNewProject";
 import AddNewTask from "../components/AddNewTask";
-import { LOAD_PROJECT_BY_ID } from "../GraphQL/Queries";
-import { useQuery } from "@apollo/client";
+import { LOAD_PROJECT_BY_ID, UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
+import { useMutation, useQuery } from "@apollo/client";
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -272,25 +268,6 @@ const Span = styled.span`
   margin-left: 8px;
 `;
 
-const Wrapper = styled.div`
-  padding: 12px 0px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  grid-gap: 12px;
-`;
-
-const AddNewButton = styled.div`
-  padding: 5px;
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background-color: ${({ theme }) => theme.primary + "33"};
-  color: ${({ theme }) => theme.primary};
-  cursor: pointer;
-`;
-
 const HrHor = styled.div`
   border: 0.5px solid ${({ theme }) => theme.soft + "99"};
 `;
@@ -336,25 +313,7 @@ const SubCardsTitle = styled.div`
   -webkit-box-orient: vertical;
 `;
 
-const Tools = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding: 8px 8px;
-`;
-
-const Ideas = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  padding: 8px 8px;
-`;
-
-const WorkDetailsPage = () => {
+const WorkDetailsPage = ({setUpdateWorkFromTask}) => {
   const { id } = useParams();
   const [item, setItems] = useState([]);
   const [projectCollaborators, setProjectCollaborators] = useState([]);
@@ -379,6 +338,8 @@ const WorkDetailsPage = () => {
   const [collaboratorBlock, setCollaboratorBlock] = useState({});
   const [editTask, setEditTask] = useState(false);
   const {currentUser} = useSelector((state) => state.user);
+
+  const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
 
       const [anchorEl, setAnchorEl] = useState(null);
       const openDropdown = Boolean(anchorEl);
@@ -641,7 +602,21 @@ const WorkDetailsPage = () => {
             memberIcons: item.memberIcons,
             status: false,
             tags: item.tags
-        });
+        }).then(() => {
+          updateProjectStatus({
+            variables: {
+              projectId: parseInt(item.projectId),
+              input: {
+                status: "ON_GOING"
+              }
+            }
+          }).then((res) => {
+            console.log(res);
+          }).catch((err) => {
+              console.log(err);
+              setLoading(false);
+          });
+        })
 
         // Success Message
         dispatch(
@@ -831,6 +806,10 @@ const WorkDetailsPage = () => {
                             work={item}
                             tasks={tasks}
                             setEditTask={setEditTask}
+                            workCollaborators={workCollaborators}
+                            workTeams={workTeams}
+                            setUpdateWorkFromTask={setUpdateWorkFromTask}
+                            allWorks={works}
                           />
                       ))}
                   </Masonry>
@@ -866,6 +845,10 @@ const WorkDetailsPage = () => {
                             setTaskAdd={setTaskAdd}
                             work={item}
                             tasks={tasks}
+                            workCollaborators={workCollaborators}
+                            workTeams={workTeams}
+                            setUpdateWorkFromTask={setUpdateWorkFromTask}
+                            allWorks={works}
                           />
                       ))}
                  </Masonry>

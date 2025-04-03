@@ -279,7 +279,7 @@ const DrawerContainer = styled.div`
 `;
 
 
-const ProjectDetails = () => {
+const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
   const { id } = useParams();
   const [item, setItems] = useState(null);
   const [projectCollaborators, setProjectCollaborators] = useState([]);
@@ -332,6 +332,10 @@ const ProjectDetails = () => {
       }if(projectUpdated) {
         refetch()
         setProjectUpdated(false)
+      }
+      if (updateWorkFromTask) {
+        getWorks();
+        setUpdateWorkFromTask(false);
       }
       
     }, [workAdded, collaboratorUpdated, projectUpdated]);

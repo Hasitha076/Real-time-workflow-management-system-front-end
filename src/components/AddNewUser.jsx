@@ -118,6 +118,8 @@ const AddNewUser = ({ setNewUser, setUserCreated }) => {
 
   const [createProject] = useMutation(CREATE_PROJECT);
 
+  const token = localStorage.getItem("token");
+
   const goToAddUser = () => {
     setShowAddUser(true);
   };
@@ -147,7 +149,15 @@ const AddNewUser = ({ setNewUser, setUserCreated }) => {
         email: inputs.email,
         password: inputs.password,
         role: inputs.role
-      })
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type":   "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      }
+    )
         .then(() => {
           setLoading(false);
           setNewUser(false);

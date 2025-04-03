@@ -314,6 +314,8 @@ const UpdateProject = ({ openUpdate, setOpenUpdate, setProjectUpdated }) => {
             members: openUpdate.data.memberIcons
          });
 
+         console.log("Project details: ", openUpdate.data);
+         
 
     const handleSelect = (user) => {
         const User = {
@@ -508,6 +510,31 @@ const UpdateProject = ({ openUpdate, setOpenUpdate, setProjectUpdated }) => {
                                     <option value="HIGH">High</option>
                                     <option value="MEDIUM">Medium</option>
                                     <option value="LOW">Low</option>
+                                </select>
+                                </OutlinedBox>
+                                <OutlinedBox style={{ marginTop: "0px", width: "100%" }}>
+                                <select
+                                    id="status"
+                                    name="status"
+                                    value={inputs.status}
+                                    onChange={handleChange}
+                                    style={{
+                                    width: "100%",
+                                    padding: "0",
+                                    border: "1px solid #ccc",
+                                    borderRadius: "4px",
+                                    fontSize: "16px",
+                                    backgroundColor: "transparent",
+                                    color: "#C1C7C9",
+                                    border: "none",
+                                    }}
+                                >
+                                    <option value="" disabled>
+                                    Select Status
+                                    </option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="ON_GOING">On Going</option>
+                                    <option value="COMPLETED">Complete</option>
                                 </select>
                                 </OutlinedBox>
                                 <OutlinedBox style={{ marginTop: "0px", width: "100%" }}>

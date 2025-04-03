@@ -20,7 +20,7 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import { IconButton } from "@mui/material";
 import CommentCard from "./CommentCard";
-
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -30,6 +30,8 @@ import { useMutation, useQuery } from "@apollo/client";
 import { LOAD_PROJECT_BY_ID, UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
 import { useDispatch } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 const Container = styled.div`
   padding: 14px;
@@ -211,13 +213,15 @@ const CommentButton = styled.button`
   }
 `
 
-const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEditTask}) => {
+const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEditTask, workCollaborators, workTeams, setUpdateWorkFromTask, allWorks}) => {
 
   const [completed, setCompleted] = useState(false);
   const [project, setProject] = useState([]);
   const [taskCollaborators, setTaskCollaborators] = useState([]);
   const [taskTeams, setTaskTeams] = useState([]);
   const [allTaskMembers, setAllTaskMembers] = useState([]);
+  const [allWorkMembers, setAllWorkMembers] = useState([]);
+  const [taskMembers, setTaskMembers] = useState([]);
   const [comment, setComment] = useState([]);
   const commentData = [];
   const [tasksData, setTasksData] = useState([]);
@@ -226,11 +230,6 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
   const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
   const token = localStorage.getItem("token");
   const dispatch = useDispatch();
-
-  console.log("item: ", item);
-  
-  console.log("works: ", work);
-  console.log("tasks: ", tasks);
   
     const { loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
       variables: { id: parseInt(item.projectId) },  // Ensure ID is an integer
@@ -275,7 +274,6 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
         }, [])
   
         useEffect(() => {
-    
           if (item?.collaboratorIds || members.length > 0) {
             const matchingUsers = members?.filter((user) =>
               item.collaboratorIds.includes(user.userId)
@@ -287,7 +285,6 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
         
             setTaskCollaborators(matchingUsers);
           }
-    
         
           if (item?.teamIds || teams.length > 0) {
             const matchingTeams = teams?.filter((team) =>
@@ -299,34 +296,94 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
         
             setTaskTeams(matchingTeams);
           }
+        }, [item, members, teams]);
 
-          if(taskCollaborators || taskTeams) {
-            setAllTaskMembers([...taskCollaborators, ...taskTeams]);
-          }
-  
-        }, [item, members, teams, item]);
+        useEffect(() => {
+          setAllWorkMembers([
+            ...workCollaborators.map((collaborator) => ({
+              ...collaborator,
+              type: "collaborator",
+            })),
+            ...workTeams.map((team) => ({
+              ...team,
+              type: "team",
+            })),
+          ]);
+        }, [workCollaborators, workTeams]);
+
+        useEffect(() => {
+          setTaskMembers([
+            ...taskCollaborators.map((collaborator) => ({
+              ...collaborator,
+              type: "collaborator",
+            })),
+            ...taskTeams.map((team) => ({
+              ...team,
+              type: "team",
+            })),
+          ]);
+        }, [taskCollaborators, taskTeams]);
+        
+        
+        // Separate useEffect to ensure `taskCollaborators` and `taskTeams` update before using them
+        useEffect(() => {
+          setAllTaskMembers((prev) => [...taskCollaborators, ...taskTeams]);
+        }, [taskCollaborators, taskTeams]);
+        
 
         const updateWorkStatus = async () => {
-          await axios.get(`http://localhost:8082/api/v1/task/getTasksByWorkId/${work.workId}`)
-          .then((res) => {
+          try {
+            const res = await axios.get(`http://localhost:8082/api/v1/task/getTasksByWorkId/${work.workId}`);
+            
             console.log("res.data: ", res.data);
-            if(res.data > 0) {
+            
+            if (res.data.length > 0) {
               setTasksData(res.data);
             }
-            if (res.data.length === 0 || res.data.every((task) => task.status == true)) {         
-              axios.put(`http://localhost:8086/api/v1/work/updateWorkStatus`, {
+        
+            if (res.data.length === 0 || res.data.every((task) => task.status === true)) {
+              await axios.put(`http://localhost:8086/api/v1/work/updateWorkStatus`, {
                 workId: work.workId,
                 status: true
-              }).then(() => {
-                projectStatusUpdate();
-              })
+              });
+        
+              const id = work.workId;
+              const arrayIndex = allWorks.findIndex((item) => item.workId === id);
+              
+              if (arrayIndex !== -1 && arrayIndex + 1 < allWorks.length) {
+                await axios.put(`http://localhost:8086/api/v1/work/updateWorkStatus`, {
+                  workId: parseInt(allWorks[arrayIndex + 1].workId),
+                  status: false
+                }).then((res) => {
+                  console.log("Updated work status: ", res.data);
+                })
+              } else {
+                console.warn("No next work item found in allWorks.");
+              }
+        
+              setUpdateWorkFromTask(true);
+              await projectStatusUpdate();
             }
-          }).catch((err) => {
-            console.log(err);
-            
-          })
-        }
+          } catch (err) {
+            console.error("Error updating work status:", err);
+          }
+        };
+        
         console.log("TaskCard tasksData: ", tasksData);
+        console.log("item: ", item);
+        console.log("Members: ", members);
+        console.log("Teams: ", teams);
+        console.log("Task collaborators: ", taskCollaborators);
+        console.log("Task teams: ", taskTeams);
+        console.log("All Task Members: ", allTaskMembers);
+        console.log("Work collaborators: ", workCollaborators);
+        console.log("Work teams: ", workTeams);
+        console.log("All Work Members: ", allWorkMembers);
+        console.log("Works: ", allWorks);
+        
+        
+        
+        
 
         const projectStatusUpdate = async () => {
           await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${work.projectId}`)
@@ -405,53 +462,70 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
     setOpen(newOpen);
   };
 
-  // comment
-  const handleComment = async () => {
-    console.log("Commented ===> ", item.taskId);
-    console.log("Commented ===> ", comment);
-    console.log(item);
-
-    commentData.push(comment);
-
-
-    await axios.put(`http://localhost:8082/api/v1/task/updateTask`, {
-      taskId: item.taskId,
-      taskName: item.taskName,
-      description: item.description,
-      assignerId: item.assignerId,
-      priority: item.priority,
-      dueDate: item.dueDate,
-      projectId: item.projectId,
-      collaboratorIds: item.collaboratorIds,
-      teamIds: item.teamIds,
-      memberIcons: item.memberIcons,
-      tags: item.tags,
-      workId: item.workId,
-      status: completed,
-      comments: commentData
-    })
-    .then((res) => {
-      console.log(res.data);
-      setComment("");
-    })
-  
-  }
-
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(item.taskName);
   const [newDesc, setNewDesc] = useState(item.description);
+  const [selectedMembers, setSelectedMembers] = useState([]);
+  const [newCollaborators, setNewCollaborators] = useState(item.collaboratorIds);
+  const [newTeams, setNewTeams] = useState(item.teamIds);
 
+  useEffect(() => {
+    setSelectedMembers(taskMembers ?? []);  // Ensure it's never undefined
+  }, [taskMembers]);
+
+  console.log("Selected Members: ", selectedMembers);
+  console.log("New Collaborators: ", newCollaborators);
+  console.log("New Teams: ", newTeams);
 
   const handleDoubleClick = () => {
     setIsEditing(true);
   };
+
+    // comment
+    const handleComment = async () => {
+      console.log("Commented ===> ", item.taskId);
+      console.log("Commented ===> ", comment);
+      console.log(item);
   
+      commentData.push(comment);
+  
+  
+      await axios.put(`http://localhost:8082/api/v1/task/updateTask`, {
+        taskId: item.taskId,
+        taskName: item.taskName,
+        description: item.description,
+        assignerId: item.assignerId,
+        priority: item.priority,
+        dueDate: item.dueDate,
+        projectId: item.projectId,
+        collaboratorIds: newCollaborators,
+        teamIds: newTeams,
+        memberIcons: item.memberIcons,
+        tags: item.tags,
+        workId: item.workId,
+        status: completed,
+        comments: commentData
+      })
+      .then((res) => {
+        console.log(res.data);
+        setComment("");
+      })
+    
+    }
 
   const handleBlur = async (newValue) => {
     const formattedDate = dayjs(newValue);
     newValue ? setSelectedDate(formattedDate) : setSelectedDate(dayjs(item.dueDate));
     setIsEditing(false);  
+
+    console.log("Selected Members: ", selectedMembers);
+    console.log("New Collaborators: ", newCollaborators);
+    console.log("New Teams: ", newTeams);
+    console.log(item.collaboratorIds);
+    console.log(item.teamIds);
     
+
+
     await axios.put("http://localhost:8082/api/v1/task/updateTask", {
       taskId: item.taskId,
       taskName: newName,
@@ -460,8 +534,8 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
       priority: item.priority,
       dueDate: formattedDate.format('YYYY-MM-DD'),
       projectId: item.projectId,
-      collaboratorIds: item.collaboratorIds,
-      teamIds: item.teamIds,
+      collaboratorIds: newCollaborators ? newCollaborators : [],
+      teamIds: newTeams ? newTeams : [],
       memberIcons: item.memberIcons,
       tags: item.tags,
       workId: item.workId,
@@ -480,12 +554,33 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
     }
   };
 
+  const deleteTask = async () => {
+    await axios.delete(`http://localhost:8082/api/v1/task/deleteTask/${item.taskId}`)
+    .then((res) => {
+      console.log(res.data);
+      setTaskAdd(true);
+    }).then(() => {
+      updateWorkStatus();
+    }
+    ).catch((err) => {
+      console.log(err);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+  }
+
 
   const DrawerList = (
     <DrawerContainer>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <IcoBtn onClick={() => {toggleDrawer(false); setEditTask(true);}}>
         <KeyboardDoubleArrowRightIcon/>
       </IcoBtn>
+      <IcoBtn style={{ backgroundColor: 'red' }} onClick={() => {toggleDrawer(false); deleteTask(true);}}>
+        <DeleteForeverIcon />
+      </IcoBtn>
+      </Box>
       <Box sx={{ width: 500 }} role="presentation">
           <top>
           {isEditing ? (
@@ -542,33 +637,92 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
             {assigner?.userName.charAt(0)}
           </Avatar>
           )}
-          <AvatarGroup style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start', paddingLeft: '20px' }}>
-                {allTaskMembers.map((member) => (
-                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                 <Button sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', padding: '0' }}>
-                  <Avatar
-                    sx={{
-                      marginRight: "5px",
-                      width: "26px",
-                      height: "26px",
-                      fontSize: "16px",
-                    }}
-                  >
-                    {member.name.charAt(0)}
-                  </Avatar>
-                  <h6 style={{ margin: '0' }}>{member.name}</h6>
-                
-                 </Button>
-                  <IcoBtn sx={{ padding: '5px', marginLeft: '5px' }} >
-                    <CloseIcon sx={{ fontSize: '18px' }} />
-                </IcoBtn>
-                </Box>
-                  
-                ))}
-                
-              </AvatarGroup>
           </Box>
 
+          <Box sx={{ display: 'flex', paddingTop: '20px' }}>
+          <h3 style={{ margin: '0' }}>Collaborators: </h3> 
+            <AvatarGroup style={{ display: 'flex', flexDirection: 'row', flexWrap: "wrap", gap: '10px', alignItems: 'flex-start', paddingLeft: '20px' }}>
+
+            <Autocomplete
+              multiple
+              limitTags={2}
+              id="multiple-limit-tags"
+              options={allWorkMembers ?? []}
+              getOptionLabel={(option) => option.name}
+              value={selectedMembers}
+              onChange={(event, newValue) => {
+                setSelectedMembers(newValue ? [...newValue] : selectedMembers);
+
+                console.log("New Value: ", newValue);
+                
+            
+                if(newValue.map((m) => m.type).includes("collaborator")) {
+                  // Merge existing and new collaborators
+                setNewCollaborators((prev) => [
+                  ...new Set([
+                    ...prev, // Keep existing collaborators
+                    ...newValue
+                      .filter((member) => member.type === "collaborator")
+                      .map((m) => m.id),
+                  ]),
+                ]);
+            
+                // Merge existing and new teams
+                setNewTeams((prev) => [
+                  ...new Set([
+                    ...newValue
+                      .filter((member) => member.type === "team")
+                      .map((m) => m.id),
+                  ]),
+                ]);
+                } 
+                if(newValue.map((m) => m.type).includes("team")) {
+                  // Merge existing and new collaborators
+                setNewCollaborators((prev) => [
+                  ...new Set([
+                    ...newValue
+                      .filter((member) => member.type === "collaborator")
+                      .map((m) => m.id),
+                  ]),
+                ]);
+            
+                // Merge existing and new teams
+                setNewTeams((prev) => [
+                  ...new Set([
+                    ...prev, // Keep existing teams
+                    ...newValue
+                      .filter((member) => member.type === "team")
+                      .map((m) => m.id),
+                  ]),
+                ]);
+                } 
+                if(!newValue.map((m) => m.type).includes("team") || !newValue.map((m) => m.type).includes("collaborator")) {
+                    // Merge existing and new collaborators
+                setNewCollaborators((prev) => [
+                  ...new Set([
+                    ...newValue
+                      .filter((member) => member.type === "collaborator")
+                      .map((m) => m.id),
+                  ]),
+                ]);
+            
+                // Merge existing and new teams
+                setNewTeams((prev) => [
+                  ...new Set([
+                    ...newValue
+                      .filter((member) => member.type === "team")
+                      .map((m) => m.id),
+                  ]),
+                ]);
+                }
+              }}
+              onBlur={() => handleBlur(selectedDate)}
+              renderInput={(params) => <TextField {...params} placeholder="Select members" />}
+              sx={{ width: 'auto' }}
+            />
+
+            </AvatarGroup>
+          </Box>
           
           <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px', paddingTop: '20px'}}>
           <h3 style={{ margin: '0' }}>Due Date: </h3> 

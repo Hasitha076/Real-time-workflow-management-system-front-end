@@ -153,30 +153,30 @@ const Card = ({ status, work, setWorkUpdated }) => {
   }
 
   const updateWorkStatus = async () => {
-    await axios.get(`http://localhost:8082/api/v1/task/getTasksByWorkId/${work.workId}`)
-    .then((res) => {
-      if (res.data.length > 0 && res.data?.every((task) => task.status == false)) {
+    // await axios.get(`http://localhost:8082/api/v1/task/getTasksByWorkId/${work.workId}`)
+    // .then((res) => {
+    //   if (res.data.length > 0 && res.data?.every((task) => task.status == false)) {
         
-        axios.put(`http://localhost:8086/api/v1/work/updateWork`, {
-          workId: work.workId,
-          workName: work.workName,
-          description: work.description,
-          priority: work.priority,
-          projectId: work.projectId,
-          dueDate: work.dueDate,
-          collaboratorIds: work.collaboratorIds,
-          teamIds: work.teamIds,
-          memberIcons: work.memberIcons,
-          status: false,
-          tags: work.tags
-        });
+    //     axios.put(`http://localhost:8086/api/v1/work/updateWork`, {
+    //       workId: work.workId,
+    //       workName: work.workName,
+    //       description: work.description,
+    //       priority: work.priority,
+    //       projectId: work.projectId,
+    //       dueDate: work.dueDate,
+    //       collaboratorIds: work.collaboratorIds,
+    //       teamIds: work.teamIds,
+    //       memberIcons: work.memberIcons,
+    //       status: false,
+    //       tags: work.tags
+    //     });
 
-        setWorkUpdated(true);
-      } 
-    }).catch((err) => {
-      console.log(err);
+    //     setWorkUpdated(true);
+    //   } 
+    // }).catch((err) => {
+    //   console.log(err);
       
-    })
+    // })
   }
 
   useEffect(() => {

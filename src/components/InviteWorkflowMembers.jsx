@@ -190,11 +190,23 @@ const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, invite
   const { currentUser } = useSelector((state) => state.user);
   const [Loading, setLoading] = useState(false);
   const [collaboratorBlock, setCollaboratorBlock] = useState({});
-  
+  const [definedCollaborators, setDefinedCollaborators] = useState([]);
+
   console.log(workDetails);
   console.log(collaboratorBlock);
   
-  
+
+  const getCollaboratorsBlock = async () => {
+    await axios.get(`http://localhost:8082/api/v1/task/getCollaboratorsBlock/${workDetails.workId}`)
+    .then((res) => {
+      setDefinedCollaborators(res.data);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+  useEffect(() => {
+    getCollaboratorsBlock();
+  }, []);
 
   const workCollaboratorsTemplate = async () => {
     try {
@@ -207,6 +219,7 @@ const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, invite
             const res = await axios.get(`http://localhost:8082/api/v1/task/getCollaboratorsBlock/${workDetails.workId}`);
             if (res.status === 200) {
                 collaboratorBlock = res.data;
+                console.log("Existing block found:", collaboratorBlock);
             }
         } catch (error) {
             if (error.response && error.response.status === 404) {
@@ -221,8 +234,8 @@ const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, invite
             await axios.post(`http://localhost:8082/api/v1/task/createCollaboratorsBlock`, {
                 projectId: workDetails.projectId,
                 workId: workDetails.workId,
-                memberIds: selectedUsers.map((user) => user.id),
-                teamIds: selectedTeam.map((team) => team.id)
+                memberIds: selectedUsers.length > 0 ? selectedUsers.map((user) => user.id) : [],
+                teamIds: selectedTeam.length > 0 ? selectedTeam.map((team) => team.id) : []
             }).then(() => {
                 dispatch(
                     openSnackbar({
@@ -237,15 +250,21 @@ const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, invite
 
             
         } else {
-            // Update the existing block
-            console.log("Updating block:", collaboratorBlock);
+            // Update the existing block  
+
+            console.log("Selected users: ", selectedUsers);
+            console.log("Selected teams: ", selectedTeam);
+            
+
             await axios.put(`http://localhost:8082/api/v1/task/updateCollaboratorsBlock`, {
                 collaboratorsBlockId: collaboratorBlock.collaboratorsBlockId,
                 projectId: collaboratorBlock.projectId,
                 workId: collaboratorBlock.workId,
-                memberIds: selectedUsers.length > 0 ? selectedUsers.map((user) => user.id) : collaboratorBlock.memberIds,
-                teamIds: selectedTeam.length > 0 ? selectedTeam.map((team) => team.id) : collaboratorBlock.teamIds
-            }).then(() => {
+                memberIds: selectedUsers.length > 0 ? selectedUsers.map((user) => user.id) : [],
+                teamIds: selectedTeam.length > 0 ? selectedTeam.map((team) => team.id) : []
+            }).then((res) => {
+              console.log(res.data);
+              
                 dispatch(
                     openSnackbar({
                         message: "Task collaborators template updated successfully",
@@ -254,14 +273,14 @@ const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, invite
                 );
 
                 setLoading(false);
-                if(selectedUsers.length > 0) {
+                if (selectedUsers.length > 0) {
                     setInviteMemberPopup(false);
-                } else {
+                } 
+                if (selectedTeam.length > 0) {
                     setInviteTeamPopup(false);
                 }
             })
 
-            
         }
 
 
@@ -276,6 +295,7 @@ const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, invite
     }
 };
 
+console.log("Collaborators in word: ", definedCollaborators);
 
 
 
@@ -308,6 +328,38 @@ const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, invite
 
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [selectedTeam, setSelectedTeam] = useState([]);
+
+
+    useEffect(() => {
+      if (definedCollaborators?.memberIds?.length && availableusers.length) {
+        const existingCollaborators = definedCollaborators.memberIds
+          .map((id) => availableusers.find((user) => user.userId === id))
+          .filter(Boolean) // Removes null values
+          .map((user) => ({
+            id: user.userId,
+            name: user.userName,
+            email: user.email,
+          }));
+    
+        setSelectedUsers(existingCollaborators);
+      }
+    
+      if (definedCollaborators?.teamIds?.length && availableTeams.length) {
+        const existingTeams = definedCollaborators.teamIds
+          .map((id) => availableTeams.find((team) => team.teamId === id))
+          .filter(Boolean) // Removes null values
+          .map((team) => ({
+            id: team.teamId,
+            name: team.teamName,
+          }));
+    
+        setSelectedTeam(existingTeams);
+      }
+    }, [definedCollaborators, availableusers, availableTeams]);
+    
+
+
+  
 
 
        //Add members from selected users
@@ -354,7 +406,8 @@ const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, invite
   };
 
   console.log(data);
-  
+  console.log(availableusers);
+  console.log(availableTeams);
   console.log(selectedUsers);
   console.log(selectedTeam);
   

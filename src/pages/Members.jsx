@@ -3,11 +3,9 @@ import { useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import { tagColors } from "../data/data";
-import { Button, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import Avatar from "@mui/material/Avatar";
-import TeamCards from "../components/TeamCards";
 import UserCard from "../components/UserCard";
 
 const Container = styled.div`
@@ -90,11 +88,8 @@ const OutlinedBox = styled.div`
 
 
 const Members = ({setNewUser, userCreated, setUserCreated}) => {
-  const { id } = useParams();
-  const [item, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useSelector((state) => state.user);
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')))
 const token = localStorage.getItem('token');
   const [users, setUsers] = useState([]);
 

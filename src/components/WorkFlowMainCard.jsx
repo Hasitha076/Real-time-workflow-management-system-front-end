@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import { Button } from "@mui/material";
@@ -6,6 +6,8 @@ import form from "../Images/google-forms.png";
 import taskIcon from "../Images/tasks.png";
 
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import UpdateTaskTemplate from "./UpdateTaskTemplate";
 
 const Container = styled.div`
   padding: 14px;
@@ -88,11 +90,15 @@ const Image = styled.img`
   height: 30px;
 `;
 
-const WorkFlowMainCard = ({ status, work, newForm, setNewForm, setNewTaskTemplate }) => {
+const WorkFlowMainCard = ({ status, work, newForm, setNewForm, setNewTaskTemplate, projectId, taskTemplateAdded, setTaskTemplateAdded }) => {
   
   const [task, setTask] = useState([]);
   const [completed, setCompleted] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [taskTemplates, setTaskTemplates] = useState([]);
+  const [updateTaskTemplate, setUpdateTaskTemplate] = useState(false);
+  const [templateDetails, setTemplateDetails] = useState({});
+  const [taskTemplateUpdated, setTaskTemplateUpdated] = useState(false);
 
   console.log(work);
   console.log(task);
@@ -108,7 +114,30 @@ const WorkFlowMainCard = ({ status, work, newForm, setNewForm, setNewTaskTemplat
     });
     setCompleted(count);
     setProgress(completed);
-  }, [task]);
+  }, []);
+
+  const getTaskTemplates = async () => {
+    await axios.get(`http://localhost:8082/api/v1/task/getTaskTemplatesByProjectId/${projectId}`)
+      .then((res) => {
+        setTaskTemplates(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+useEffect(() => {
+  getTaskTemplates();
+}, [projectId]);
+
+if (taskTemplateAdded) {
+  getTaskTemplates();
+  setTaskTemplateAdded(false);
+}
+if(taskTemplateUpdated) {
+  getTaskTemplates();
+  setTaskTemplateUpdated(false);
+}
 
 
   return (
@@ -129,7 +158,7 @@ const WorkFlowMainCard = ({ status, work, newForm, setNewForm, setNewTaskTemplat
                 </div>
             </div>
         </Button>
-
+        <br />
         <Button style={{ border: '1px dashed #fff', padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} onClick={() => setNewTaskTemplate(true)} >
             <div style={{ display: "flex", alignItems: "center", justifyContent: 'flex-start', gap: "8px" }}>
             <Image src={taskIcon} />
@@ -140,7 +169,23 @@ const WorkFlowMainCard = ({ status, work, newForm, setNewForm, setNewTaskTemplat
             </div>
         </Button>
 
+        {taskTemplates?.map((template) => (
+                      
+                      <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} onClick={() => {setUpdateTaskTemplate(true); setTemplateDetails(template)}} >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: 'flex-start', gap: "8px" }}>
+            <Image src={taskIcon} />
+                <div>
+                    <TaskMainText>{template.taskTemplateName}</TaskMainText>
+                </div>
+            </div>
+        </Button>
+                    ))}
+
+
       </Bottom>
+
+      {updateTaskTemplate && <UpdateTaskTemplate setTaskTemplateUpdated={setTaskTemplateUpdated} setUpdateTaskTemplate={setUpdateTaskTemplate} taskTemplate={taskTemplates} templateDetails={templateDetails} setTemplateDetails={setTemplateDetails} />}
+
     </Container>
 
   );

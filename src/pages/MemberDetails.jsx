@@ -6,23 +6,18 @@ import {
   CheckCircleOutlineOutlined,
   Delete,
   DonutLarge,
-  Edit,
-  PersonAdd
+  Edit
 } from "@mui/icons-material";
 import { tagColors } from "../data/data";
 import WorkCards from "../components/WorkCards";
-import MemberCard from "../components/MemberCard";
 import { CircularProgress, IconButton } from "@mui/material";
 import axios from "axios";
 import Avatar from "@mui/material/Avatar";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
-import InviteTeamMembers from "../components/InviteTeamMembers";
 import DeletePopup from "../components/DeletePopup";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import ProjectCard from "../components/Card";
-import UpdateTeam from "../components/UpdateTeam";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { LOAD_PROJECTS_BY_TEAM_ID } from "../GraphQL/Queries";
 import { useQuery } from "@apollo/client";
 import Badge from '@mui/material/Badge';

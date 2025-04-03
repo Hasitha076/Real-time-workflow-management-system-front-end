@@ -72,6 +72,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [projectCreated, setProjectCreated] = useState(false);
   const [userCreated, setUserCreated] = useState(false);
+  const [updateWorkFromTask, setUpdateWorkFromTask] = useState(false);
 
   const { currentUser } = useSelector(state => state.user);
   const token = localStorage.getItem("token");
@@ -117,12 +118,12 @@ function App() {
                         <Route path="projects" element={<Projects newProject={newProject} setNewProject={setNewProject} projectCreated={projectCreated} setProjectCreated={setProjectCreated} />} />
                         
                         <Route path="projects">
-                          <Route path=":id" element={<ProjectDetails />} />
+                          <Route path=":id" element={<ProjectDetails updateWorkFromTask={updateWorkFromTask} setUpdateWorkFromTask={setUpdateWorkFromTask} />} />
                         </Route>
     
                         <Route path="works" element={<Works />} />
                         <Route path="works">
-                          <Route path=":id" element={<WorkDetailsPage />} />
+                          <Route path=":id" element={<WorkDetailsPage setUpdateWorkFromTask={setUpdateWorkFromTask} />} />
                         </Route>
                         <Route path="teams" element={<Teams />} />
                         <Route path="teams">

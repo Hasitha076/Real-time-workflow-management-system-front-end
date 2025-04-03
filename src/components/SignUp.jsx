@@ -11,12 +11,14 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useTheme } from "styled-components";
 import Google from "../Images/google.svg";
-import { IconButton, Modal } from "@mui/material";
+import { IconButton, Modal, MenuItem, Select } from "@mui/material";
 import { openSnackbar } from "../redux/snackbarSlice";
+import { loginFailure, loginStart, loginSuccess } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import validator from "validator";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   width: 100%;
@@ -109,6 +111,16 @@ const TextInput = styled.input`
   color: ${({ theme }) => theme.textSoft};
 `;
 
+const SelectInput = styled(Select)`
+  width: 100%;
+  border: none;
+  font-size: 14px;
+  border-radius: 3px;
+  background-color: transparent;
+  outline: none;
+  color: ${({ theme }) => theme.textSoft};
+`;
+
 const LoginText = styled.div`
   font-size: 14px;
   font-weight: 500;
@@ -139,6 +151,7 @@ const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [selectedOption, setSelectedOption] = useState("");
   const [Loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const [emailError, setEmailError] = useState("");
@@ -149,6 +162,7 @@ const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
     password: "",
     showPassword: false,
   });
+  const navigate = useNavigate()
 
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
@@ -159,21 +173,43 @@ const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
    
   };
 
-  const handleSignUp = async (e) => {
-    e.preventDefault();
+  console.log(selectedOption);
+  
+
+  const handleSignUp = async () => {
     if (!disabled) {
-      setOtpSent(true);
+      await axios.post("http://localhost:8081/api/v1/auth/register", {
+        userName: name,
+        email: email,
+        password: password,
+        role: selectedOption,
+      })
+        .then((res) => {
+          console.log(res.data);
+          
+          dispatch(
+            openSnackbar({
+              message: "Registerd Successfully",
+              severity: "success",
+            })
+          );
+          setSignInOpen(false);
+          setSignInOpen(true);
+        })
+        .catch((err) => {
+          dispatch(loginFailure());
+          dispatch(
+            openSnackbar({
+              message: "Invalid Credentials",
+              severity: "error",
+            })
+          );
+      })
+      setDisabled(true);
+      setLoading(true);
     }
 
-    if (name === "" || email === "" || password === "") {
-      dispatch(
-        openSnackbar({
-          message: "Please fill all the fields",
-          severity: "error",
-        })
-      );
-    }
-  };
+  }
 
   useEffect(() => {
     if (email !== "") validateEmail();
@@ -324,6 +360,34 @@ const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
                   )}
                 </IconButton>
               </OutlinedBox>
+
+              <OutlinedBox>
+                  <select
+                    id="priority"
+                    name="priority"
+                    value={selectedOption}
+                    style={{
+                      width: "100%",
+                      padding: "0",
+                      border: "1px solid #ccc",
+                      borderRadius: "4px",
+                      backgroundColor: "transparent",
+                      color: "#606060",
+                      border: "none",
+                    }}
+                    onChange={(e) => setSelectedOption(e.target.value)}
+                  >
+                    <option value="" disabled>
+                      Select Role
+                    </option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="MANAGER">Manager</option>
+                    <option value="DEVELOPER">Developer</option>
+                    <option value="QA">QA</option>
+                    <option value="USER">User</option>
+                    <option value="GUEST">Guest</option>
+                  </select>
+                </OutlinedBox>
               <Error error={credentialError}>{credentialError}</Error>
               <OutlinedBox
                 button={true}

@@ -9,7 +9,6 @@ import { CircularProgress, IconButton } from "@mui/material";
 import axios from "axios";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
-import InviteMembers from "../components/InviteMembers";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import DiscountIcon from '@mui/icons-material/Discount';
@@ -100,38 +99,10 @@ const Tag = styled.div`
   font-weight: 500;
 `;
 
-const Members = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 8px 0px 0px 0px;
-`;
-
 const AvatarGroup = styled.div`
   display: flex;
   align-items: center;
   margin-right: 12px;
-`;
-
-const InviteButton = styled.button`
-  padding: 6px 14px;
-  background-color: transparent;
-  border: 1px solid ${({ theme }) => theme.primary};
-  color: ${({ theme }) => theme.primary};
-  border-radius: 3px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  margin: 0px 16px;
-  &:hover {
-    background-color: ${({ theme }) => theme.primary};
-    color: ${({ theme }) => theme.text};
-  }
 `;
 
 const Hr = styled.hr`
@@ -241,8 +212,9 @@ const Workflow = () => {
   const [alignment, setAlignment] = useState(true);
   const [open, setOpen] = useState(false);
   const [newForm, setNewForm] = useState(false);
-const [newTaskTemplate, setNewTaskTemplate] = useState(false);
-    const [workDetails, setWorkDetails] = useState({});
+  const [newTaskTemplate, setNewTaskTemplate] = useState(false);
+  const [workDetails, setWorkDetails] = useState({});
+  const [taskTemplateAdded, setTaskTemplateAdded] = useState(false);
 
   const { loading, error, data } = useQuery(LOAD_PROJECT_BY_ID, {
     variables: { id: parseInt(id) },  // Ensure ID is an integer
@@ -512,8 +484,10 @@ const [newTaskTemplate, setNewTaskTemplate] = useState(false);
             <Hr />
             {inviteMemberPopup && (
               <InviteWorkflowMembers
-              inviteMemberPopup={inviteMemberPopup}
+                inviteMemberPopup={inviteMemberPopup}
                 setInviteMemberPopup={setInviteMemberPopup}
+                inviteTeamPopup={inviteTeamPopup}
+                setInviteTeamPopup={setInviteTeamPopup}
                 id={id}
                 teamInvite={false}
                 // setLoading={setLoading}
@@ -526,6 +500,8 @@ const [newTaskTemplate, setNewTaskTemplate] = useState(false);
               <InviteWorkflowMembers
                 inviteTeamPopup={inviteTeamPopup}
                 setInviteTeamPopup={setInviteTeamPopup}
+                inviteMemberPopup={inviteMemberPopup}
+                setInviteMemberPopup={setInviteMemberPopup}
                 id={id}
                 teamInvite={false}
                 // setLoading={setLoading}
@@ -570,7 +546,7 @@ const [newTaskTemplate, setNewTaskTemplate] = useState(false);
             </Work>
             <HrHor />
             <Extra>
-                <WorkFlowMainCard projectId={id} newForm={newForm} setNewForm={setNewForm} setNewTaskTemplate={setNewTaskTemplate}/>
+                <WorkFlowMainCard projectId={id} newForm={newForm} setNewForm={setNewForm} setNewTaskTemplate={setNewTaskTemplate} taskTemplateAdded={taskTemplateAdded} setTaskTemplateAdded={setTaskTemplateAdded}/>
             </Extra>
           </Body>
         </>
@@ -586,7 +562,8 @@ const [newTaskTemplate, setNewTaskTemplate] = useState(false);
         </Drawer>
 
         {newForm && <AddForm setNewForm={setNewForm} />}
-        {newTaskTemplate && <AddTaskTemplate setNewTaskTemplate={setNewTaskTemplate} projectId={item.projectId} />}
+        {newTaskTemplate && <AddTaskTemplate setNewTaskTemplate={setNewTaskTemplate} projectId={item.projectId} setTaskTemplateAdded={setTaskTemplateAdded} />}
+        
     </Container>
   );
 };

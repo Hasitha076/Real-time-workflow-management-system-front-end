@@ -219,13 +219,17 @@ const FlexDisplay = styled.div`
 `;
 
 
-const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId, setTaskTemplateAdded }) => {
+const UpdateTaskTemplate = ({ teamId, teamProject, projectId, setTaskTemplateUpdated, setUpdateTaskTemplate, templateDetails, setTemplateDetails }) => {
   const [Loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const [backDisabled, setBackDisabled] = useState(false);
   const [showAddProject, setShowAddProject] = useState(true);
   const [showAddMember, setShowAddMember] = useState(false);
   const {currentUser} = useSelector((state) => state.user);
+
+  console.log(templateDetails);
+  console.log("Current User: ", currentUser);
+  
 
   const goToAddProject = () => {
     setShowAddProject(true);
@@ -238,22 +242,89 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId, s
     setShowAddMember(true);
   };
 
+
+
   //add member part
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState([]);
   const[availableUsers, setAvailableUsers] = useState([]);
   const[availableTeams, setAvailableTeams] = useState([]);
   const [inputs, setInputs] = useState({ 
-      taskTemplateName: "",
-      taskTemplateDescription: "",
-      taskTemplateTags: "",
-      taskTemplatePriority: "",
-      projectId: "",
-      taskTemplateDueDate: "",
-      taskTemplateCollaboratorIds: [],
-      taskTemplateTeamIds: []
+        taskTemplateId: templateDetails.taskTemplateId,
+      taskTemplateName: templateDetails.taskTemplateName,
+      taskTemplateDescription: templateDetails.taskTemplateDescription,
+      taskTemplateTags: templateDetails.taskTemplateTags,
+      taskTemplatePriority: templateDetails.taskTemplatePriority,
+      projectId: templateDetails.projectId,
+      taskTemplateDueDate: templateDetails.taskTemplateDueDate,
+      taskTemplateCollaboratorIds: templateDetails.taskTemplateCollaboratorIds,
+      taskTemplateTeamIds: templateDetails.taskTemplateTeamIds,
 
     });
+
+    const getAllUsers = async () => {
+        await axios.get("http://localhost:8081/api/v1/user/getAllUsers")
+        .then((res) => {
+          setAvailableUsers(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      }
+    
+      const getAllTeams = async () => {
+        const response = await axios.get("http://localhost:8085/api/v1/team/getAllTeams")
+        const data = response.data;
+          setAvailableTeams(data);
+    
+      }
+    
+      useEffect(() => {
+        getAllUsers();
+        getAllTeams();
+      }, [templateDetails]);
+
+
+      useEffect(() => {
+        console.log("happened");
+        
+        if (templateDetails) {
+          if (templateDetails.taskTemplateCollaboratorIds?.length && availableUsers.length) {
+            const matchingUsers = availableUsers
+            .filter((user) => templateDetails.taskTemplateCollaboratorIds.includes(user.userId))
+            .map(({ userId, userName, email }) => ({ 
+                id: userId, 
+                name: userName, 
+                email 
+            }));
+
+            console.log("Matching Users: ", matchingUsers);
+            setSelectedUsers(matchingUsers);
+
+          } else {
+            setSelectedUsers([]); // Clear selection if no matching users
+          }
+      
+          if (templateDetails.taskTemplateTeamIds?.length && availableTeams.length) {
+            const matchingTeams = availableTeams
+              .filter((team) => templateDetails.taskTemplateTeamIds.includes(team.teamId))
+              .map(({ teamId, teamName }) => ({ id: teamId, name: teamName }));
+            console.log("Matching Teams: ", matchingTeams);
+            setSelectedTeam(matchingTeams);
+          } else {
+            setSelectedTeam([]); // Clear selection if no matching teams
+          }
+        }
+      }, [templateDetails, availableUsers, availableTeams]);
+      
+
+        console.log("Available Users: ", availableUsers);
+        console.log("Available Teams: ", availableTeams);
+        console.log("Select Users: ", selectedUsers);
+        console.log("Select Teams: ", selectedTeam);
+        console.log("Template Details: ", inputs);
+        
+      
 
 
     //Add members from selected users
@@ -312,33 +383,31 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId, s
     });
   };
 
-  const CreateTaskTemplate = async () => {
+  const UpdateTaskTemplate = async () => {
     setLoading(true);
     setDisabled(true);
 
-      await axios.post("http://localhost:8082/api/v1/task/createTaskTemplate", {
-
+      await axios.put("http://localhost:8082/api/v1/task/updateTaskTemplate", {
+        taskTemplateId: inputs.taskTemplateId,
         taskTemplateName: inputs.taskTemplateName,
         taskTemplateDescription: inputs.taskTemplateDescription,
         taskTemplateTags: inputs.taskTemplateTags,
         taskTemplatePriority: inputs.taskTemplatePriority,
         assignerId: currentUser.userId,
-        projectId: parseInt(projectId),
+        projectId: parseInt(inputs.projectId),
+        taskTemplateStatus: false,
         taskTemplateDueDate: inputs.taskTemplateDueDate,
         taskTemplateCollaboratorIds: selectedUsers.map((user) => user.id),
         taskTemplateTeamIds: selectedTeam.map((team) => team.id)
       })
-      .then((res) => {
-        setAvailableUsers(res.data);
-      })
         .then((res) => {
 
           setLoading(false);
-          setNewTaskTemplate(false);
-          setTaskTemplateAdded(true);
+          setUpdateTaskTemplate(false);
+          setTaskTemplateUpdated(true);
           dispatch(
             openSnackbar({
-              message: "Task template created successfully",
+              message: "Task template update successfully",
               type: "success",
             })
           );
@@ -377,7 +446,7 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId, s
   useEffect(() => {
     getAvailableUsers();
     getAvailableTeams();
-    if (inputs.taskTemplateName === "" || inputs.taskTemplateDescription === "") {
+    if (templateDetails.taskTemplateName === "" || templateDetails.taskTemplateDescription === "") {
       setDisabled(true);
     } else {
       setDisabled(false);
@@ -390,7 +459,7 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId, s
   console.log(availableTeams);
 
   return (
-    <Modal open={true} onClose={() => setNewTaskTemplate(false)}>
+    <Modal open={true} onClose={() => setUpdateTaskTemplate(false)}>
       <Container>
         <Wrapper>
           <IconButton
@@ -401,11 +470,11 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId, s
               cursor: "pointer",
               color: "inherit",
             }}
-            onClick={() => setNewTaskTemplate(false)}
+            onClick={() => setUpdateTaskTemplate(false)}
           >
             <CloseRounded style={{ color: "inherit" }} />
           </IconButton>
-          <Title>Create a new task template</Title>
+          <Title>Update task template</Title>
 
           {showAddProject && (
             <>
@@ -586,13 +655,13 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId, s
                   activeButton={!disabled}
                   style={{ marginTop: "18px", width: "100%" }}
                   onClick={() => {
-                    !disabled && CreateTaskTemplate();
+                    !disabled && UpdateTaskTemplate();
                   }}
                 >
                   {Loading ? (
                     <CircularProgress color="inherit" size={20} />
                   ) : (
-                    "Create template"
+                    "Update template"
                   )}
                 </OutlinedBox>
               </ButtonContainer>
@@ -604,4 +673,4 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId, s
   );
 };
 
-export default AddTaskTemplate;
+export default UpdateTaskTemplate;

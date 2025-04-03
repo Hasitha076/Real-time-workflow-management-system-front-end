@@ -11,7 +11,7 @@ import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import axios from "axios";
 import ProjectCard from "../components/Card";
 import WorkCards from "../components/WorkCards";
-import { statuses, data, tagColors } from "../data/data";
+import { tagColors } from "../data/data";
 import { LOAD_ALL_PROJECTS } from "../GraphQL/Queries";
 import { useQuery } from "@apollo/client";
 import { Bar, Line } from "react-chartjs-2";
@@ -374,11 +374,11 @@ const Dashboard = () => {
             <ChartBox>
                 <Box>
                     <h2 style={{ marginTop: '0' }}>Project, Task, and Work Summary</h2>
-                    <Bar data={barChartData} options={{ responsive: true }} style={{ backgroundColor: 'aliceblue', padding: '10px', borderRadius: '15px' }} />
+                    <Bar data={barChartData} options={{ responsive: true }} style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '15px' }} />
                 </Box>
                 <Box>
                     <h2 style={{ marginTop: '0' }}>Monthly Completed Trends</h2>
-                    <Line data={lineChartData} options={{ responsive: true }} style={{ backgroundColor: 'aliceblue', padding: '10px', borderRadius: '15px' }}  />
+                    <Line data={lineChartData} options={{ responsive: true }} style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '15px' }}  />
                 </Box>
             </ChartBox>
 

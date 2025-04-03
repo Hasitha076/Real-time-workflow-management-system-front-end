@@ -6,7 +6,6 @@ import { tagColors } from "../data/data";
 import { CircularProgress } from "@mui/material";
 import axios from "axios";
 import { useSelector } from "react-redux";
-import Avatar from "@mui/material/Avatar";
 import TeamCards from "../components/TeamCards";
 
 const Container = styled.div`
