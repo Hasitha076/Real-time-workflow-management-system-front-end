@@ -331,7 +331,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
         }, [taskCollaborators, taskTeams]);
         
 
-        const updateWorkStatus = async () => {
+        const updateWorkStatus = async (value) => {
           try {
             const res = await axios.get(`http://localhost:8082/api/v1/task/getTasksByWorkId/${work.workId}`);
             
@@ -350,7 +350,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
               const id = work.workId;
               const arrayIndex = allWorks.findIndex((item) => item.workId === id);
               
-              if (arrayIndex !== -1 && arrayIndex + 1 < allWorks.length) {
+              if (arrayIndex !== -1 && arrayIndex + 1 < allWorks.length && value === "complete") {
                 await axios.put(`http://localhost:8086/api/v1/work/updateWorkStatus`, {
                   workId: parseInt(allWorks[arrayIndex + 1].workId),
                   status: false
@@ -448,7 +448,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
             }
           }
         
-          updateWorkStatus()
+          updateWorkStatus("complete")
         }
 
   useEffect(() => {
@@ -560,7 +560,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
       console.log(res.data);
       setTaskAdd(true);
     }).then(() => {
-      updateWorkStatus();
+      updateWorkStatus("delete");
     }
     ).catch((err) => {
       console.log(err);

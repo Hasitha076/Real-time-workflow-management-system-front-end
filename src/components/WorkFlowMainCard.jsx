@@ -4,10 +4,12 @@ import styled from "styled-components";
 import { Button } from "@mui/material";
 import form from "../Images/google-forms.png";
 import taskIcon from "../Images/tasks.png";
-
+import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
+import AddTaskIcon from '@mui/icons-material/AddTask';
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import UpdateTaskTemplate from "./UpdateTaskTemplate";
+import DeletePopup from "./DeletePopup";
 
 const Container = styled.div`
   padding: 14px;
@@ -99,6 +101,10 @@ const WorkFlowMainCard = ({ status, work, newForm, setNewForm, setNewTaskTemplat
   const [updateTaskTemplate, setUpdateTaskTemplate] = useState(false);
   const [templateDetails, setTemplateDetails] = useState({});
   const [taskTemplateUpdated, setTaskTemplateUpdated] = useState(false);
+  const [taskTemplateDeleted, setTaskTemplateDeleted] = useState(false);
+
+    //use state for delete popup
+    const [openDelete, setOpenDelete] = useState({ state: false, type: "Task Template", name: "", id: "", workflow: projectId });
 
   console.log(work);
   console.log(task);
@@ -138,11 +144,16 @@ if(taskTemplateUpdated) {
   getTaskTemplates();
   setTaskTemplateUpdated(false);
 }
+if(taskTemplateDeleted) {
+  getTaskTemplates();
+  setTaskTemplateDeleted(false);
+}
 
 
   return (
    
     <Container className={"item"}>
+      {openDelete.state && <DeletePopup openDelete={openDelete} setOpenDelete={setOpenDelete} setTaskTemplateDeleted={setTaskTemplateDeleted} />}
       <Top>
         <Title>How will tasks to be added to the project?</Title>
       </Top>
@@ -171,16 +182,26 @@ if(taskTemplateUpdated) {
 
         {taskTemplates?.map((template) => (
                       
-                      <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} onClick={() => {setUpdateTaskTemplate(true); setTemplateDetails(template)}} >
+        <div style={{ display: "flex", width: "100%" }} key={template.taskTemplateId}>
+          <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} onClick={() => {setUpdateTaskTemplate(true); setTemplateDetails(template)}} >
             <div style={{ display: "flex", alignItems: "center", justifyContent: 'flex-start', gap: "8px" }}>
-            <Image src={taskIcon} />
+            {/* <Image src={taskIcon} /> */}
+            <AddTaskIcon />
                 <div>
                     <TaskMainText>{template.taskTemplateName}</TaskMainText>
                 </div>
             </div>
+          
         </Button>
-                    ))}
-
+        <Button onClick={() => setOpenDelete({ 
+            state: true, 
+            type: 'Task Template', 
+            name: template?.taskTemplateName, 
+            id: template.taskTemplateId,
+            workflow: projectId
+            })}><DisabledByDefaultIcon style={{ color: "red" }} /></Button>
+        </div>
+        ))}
 
       </Bottom>
 

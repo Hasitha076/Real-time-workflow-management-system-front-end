@@ -87,7 +87,7 @@ const Button = styled.button`
 `;
 
 
-const DeletePopup = ({ openDelete, setOpenDelete }) => {
+const DeletePopup = ({ openDelete, setOpenDelete, setTaskTemplateDeleted }) => {
 
   const [name, setName] = React.useState('');
   const [loading, setLoading] = React.useState(false);
@@ -114,6 +114,8 @@ const DeletePopup = ({ openDelete, setOpenDelete }) => {
       DeleteTeam();
     } else if (openDelete.type === "Work") {
       deleteWork();
+    } else if (openDelete.type === "Task Template") {
+      deleteTaskTemplate();
     }
 
   }
@@ -181,6 +183,29 @@ const DeletePopup = ({ openDelete, setOpenDelete }) => {
         }));
     })
   }
+
+  const deleteTaskTemplate = async () => {
+
+    await axios.delete(`http://localhost:8082/api/v1/task/deleteTaskTemplate/${openDelete.id}`)
+    .then((res) => {
+      console.log(res);
+      dispatch(openSnackbar
+        ({
+          message: "Task template deleted successfully",
+          type: "success",
+        }));
+
+      setTaskTemplateDeleted(true);
+      handleDeleteSuccess(`/workflow/${openDelete.workflow}`);
+    }
+    ).catch((err) => {
+      dispatch(openSnackbar
+        ({
+          message: err.message,
+          type: "error",
+        }));
+    })
+}
 
 
   const handleDeleteSuccess = (link) => {

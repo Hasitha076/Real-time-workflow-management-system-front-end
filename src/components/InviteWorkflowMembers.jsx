@@ -273,12 +273,12 @@ const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, invite
                 );
 
                 setLoading(false);
-                if (selectedUsers.length > 0) {
+                // if (selectedUsers.length > 0) {
                     setInviteMemberPopup(false);
-                } 
-                if (selectedTeam.length > 0) {
+                // } 
+                // if (selectedTeam.length > 0) {
                     setInviteTeamPopup(false);
-                }
+                // }
             })
 
         }
