@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Fragment, useRef } from "react";
 import styled from "styled-components";
 import { TimelapseRounded } from "@mui/icons-material";
@@ -111,6 +111,60 @@ const AvatarGroup = styled.div`
 
 const Card = ({ tagColor, item, index, status }) => {
   const ref = useRef(null);
+  const [teams, setTeams] = React.useState([]);
+const [collaborators, setCollaborators] = React.useState([]);
+const [members, setMembers] = React.useState([]);
+
+const getAvailableTeams = async () => {
+  try {
+    const res = await axios.get("http://localhost:8085/api/v1/team/getAllTeams");
+    const matchingTeams = res.data
+      .filter((team) => item.teamIds.includes(team.teamId))
+      .map((team) => ({
+        name: team.teamName
+      }));
+    
+    setTeams(matchingTeams);
+    return matchingTeams;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+};
+
+
+const getAvailableCollaborators = async () => {
+  try {
+    const res = await axios.get("http://localhost:8081/api/v1/user/getAllUsers");
+    const matchingCollaborators = res.data
+      .filter((user) => item.collaboratorIds.includes(user.userId))
+      .map((user) => ({
+        name: user.userName
+      }));
+    
+    setCollaborators(matchingCollaborators);
+    return matchingCollaborators;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+};
+
+
+useEffect(() => {
+  const fetchData = async () => {
+    const [teamsData, collaboratorsData] = await Promise.all([
+      getAvailableTeams(),
+      getAvailableCollaborators()
+    ]);
+
+    const combinedMembers = [...teamsData, ...collaboratorsData];
+    setMembers(combinedMembers);
+  };
+
+  fetchData();
+}, []);
+
 
   return (
     <Link to={`/projects/${item.projectId}`} style={{ textDecoration: "none" }}>
@@ -137,8 +191,8 @@ const Card = ({ tagColor, item, index, status }) => {
               <TimelapseRounded sx={{fontSize: '18px'}}/> Updated {format(item.updatedAt)}
             </Time>
             <AvatarGroup>
-              {item.memberIcons.map((member, index) => (
-                <Avatar key={index} sx={{marginRight: '-12px', width: '34px', height: '34px'}}>{member}</Avatar>
+              {members?.map((member, index) => (
+                <Avatar key={index} sx={{marginRight: '-12px', width: '34px', height: '34px'}}>{member.name.charAt(0)}</Avatar>
               ))}
             </AvatarGroup>
           </Bottom>

@@ -548,6 +548,70 @@ const WorkDetailsPage = ({setUpdateWorkFromTask}) => {
   console.log(projectTeams);
   console.log(works);
   
+
+  const [teamNames, setTeamNames] = React.useState([]);
+const [collaboratorNames, setCollaboratorNames] = React.useState([]);
+const [members, setMembers] = React.useState([]);
+
+const getAvailableTeams = async () => {
+  try {
+    const res = await axios.get("http://localhost:8085/api/v1/team/getAllTeams");
+    console.log(res.data);
+    const matchingTeams = res.data
+      .filter((team) => item.teamIds.includes(team.teamId))
+      .map((team) => ({
+        name: team.teamName
+      }));
+    console.log(matchingTeams);
+    
+      setTeamNames(matchingTeams);
+    return matchingTeams;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+};
+
+
+const getAvailableCollaborators = async () => {
+  try {
+    const res = await axios.get("http://localhost:8081/api/v1/user/getAllUsers");
+    console.log(res.data);
+    const matchingCollaborators = res.data
+      .filter((user) => item.collaboratorIds.includes(user.userId))
+      .map((user) => ({
+        name: user.userName
+      }));
+    console.log(matchingCollaborators);
+    
+      setCollaboratorNames(matchingCollaborators);
+    return matchingCollaborators;
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+};
+
+
+useEffect(() => {
+  const fetchData = async () => {
+    const [teamsData, collaboratorsData] = await Promise.all([
+      getAvailableTeams(),
+      getAvailableCollaborators()
+    ]);
+
+    const combinedMembers = [...teamsData, ...collaboratorsData];
+    setMembers(combinedMembers);
+  };
+
+  fetchData();
+}, [item]);
+
+console.log(item);
+
+console.log(collaboratorNames);
+console.log(teamNames);
+console.log(members);
   
   
 
@@ -642,8 +706,6 @@ const WorkDetailsPage = ({setUpdateWorkFromTask}) => {
 };
 
   
-
-
   return (
     <Container>
       {openUpdate.state && <UpdateWork openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} type={openUpdate.type} />}
@@ -669,15 +731,17 @@ const WorkDetailsPage = ({setUpdateWorkFromTask}) => {
               ))}
             </Tags>
             <Members>
-              <AvatarGroup>
-                {item.memberIcons.map((member) => (
-                  <Avatar
-                    sx={{ marginRight: "-12px", width: "38px", height: "38px" }}
-                  >
-                    {member.charAt(0)}
-                  </Avatar>
-                ))}
-              </AvatarGroup>
+            <AvatarGroup>
+              {members?.map((member, index) => (
+                <Avatar
+                  key={index}
+                  sx={{ marginRight: "-12px", width: "38px", height: "38px" }}
+                >
+                  {member.name?.charAt(0)}
+                </Avatar>
+              ))}
+            </AvatarGroup>
+
               <InviteButton onClick={() => setInvitePopup(true)}>
                 <PersonAdd sx={{ fontSize: "12px" }} />
                 Invite

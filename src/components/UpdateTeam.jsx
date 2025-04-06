@@ -140,7 +140,7 @@ const UpdateTeam = ({ openUpdate, setOpenUpdate }) => {
             name: openUpdate.data.teamName, 
             description: openUpdate.data.teamDescription, 
             tags: openUpdate.data.tags,
-            memberIcons: openUpdate.data.members
+            collaboratorIds: openUpdate.data.collaboratorIds
         });
 
 
@@ -165,21 +165,26 @@ const UpdateTeam = ({ openUpdate, setOpenUpdate }) => {
 
     const dispatch = useDispatch();
 
+    console.log(openUpdate);
+    console.log(inputs);
+    
 
     const UpdateTeam = async () => {
         setLoading(true);
         setDisabled(true);
         setBackDisabled(true);
 
+        console.log(inputs);
+
         await axios.put(`http://localhost:8085/api/v1/team/updateTeam`, {
-            teamId: inputs.teamId, 
-            teamName: inputs.teamName, 
+            teamId: inputs.id, 
+            teamName: inputs.name, 
             teamDescription: inputs.description,
             tags: inputs.tags,
-            collaboratorIds: inputs.collaboratorIds,
-            members: inputs.memberIcons
+            collaboratorIds: inputs.collaboratorIds
         })
             .then((res) => {
+                console.log(res);
                 setLoading(false);
                 setOpenUpdate({ ...openUpdate, state: false });
                 dispatch(
@@ -201,7 +206,6 @@ const UpdateTeam = ({ openUpdate, setOpenUpdate }) => {
                     })
                 );
             });
-
     };
 
     return (
