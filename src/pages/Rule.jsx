@@ -20,13 +20,20 @@ import {Drawer, Slide} from '@mui/material';
 import Divider from '@mui/material/Divider';
 import { useNavigate } from "react-router-dom";
 import workflow from "../Images/workflow.png";
-import WorkFlowCards from "../components/WorkFlowCards";
-import WorkFlowMainCard from "../components/WorkFlowMainCard";
-import AddForm from "../components/AddForm";
 import InviteWorkflowMembers from "../components/InviteWorkflowMembers";
-import AddTaskTemplate from "../components/AddTaskTemplate";
 import { useQuery } from "@apollo/client";
 import { LOAD_PROJECT_BY_ID } from "../GraphQL/Queries";
+import { HiArrowDown } from "react-icons/hi";
+import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import CancelIcon from '@mui/icons-material/Cancel';
+import TriggerFunctionCards from "../components/TriggerFunctionCards";
+import ActionFunctionCards from "../components/ActionFunctionCards";
+import TriggerRuleCard from "../components/TriggerRuleCard";
+import ActionRuleCard from "../components/ActionRuleCard";
+import PublishIcon from '@mui/icons-material/Publish';
+import AddTaskTemplate from "../components/AddTaskTemplate";
+import AddForm from "../components/AddForm";
+
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -121,7 +128,7 @@ const Body = styled.div`
 `;
 
 const Work = styled.div`
-  flex: 1.6;
+  flex: 2;
 `;
 
 const ItemWrapper = styled.div`
@@ -141,7 +148,7 @@ const ItemWrapper = styled.div`
 
 const Top = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 30px;
@@ -195,8 +202,18 @@ const Image = styled.img`
   height: 50px;
 `;
 
+const IcoBtn = styled(IconButton)`
+  width: 15px;
+  height: 15px;
+  color: ${({ theme }) => theme.white} !important;
+  &:hover {
+    background-color: ${({ theme }) => theme.white} !important;
+    color: ${({ theme }) => theme.black} !important;
+  }
+`;
 
-const Workflow = () => {
+
+const Rule = () => {
   const { id } = useParams();
   const [item, setItems] = useState([]);
   const [projectCollaborators, setProjectCollaborators] = useState([]);
@@ -245,25 +262,6 @@ const Workflow = () => {
           }
         }, [loading, data]);
 
-  const getproject = async (id) => {
-    // await axios.get(`http://localhost:8083/api/v1/project/getProject/${id}`)
-    //   .then((res) => {
-    //     setItems(res.data);
-    //     setProjectCollaborators(res.data.collaboratorIds);
-    //     setProjectTeams(res.data.teamIds);
-    //   })
-    //   .then(() => {
-    //     setLoading(false);
-    //   })
-    //   .catch((err) => {
-    //     dispatch(
-    //       openSnackbar({
-    //         message: err.response.data.message,
-    //         severity: "error",
-    //       })
-    //     );
-    //   });
-  };
 
   const getCollaborators = async () => {
     await axios.get(`http://localhost:8081/api/v1/user/getAllUsers`)
@@ -325,10 +323,227 @@ const Workflow = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    getproject(id); 
-    // getProjectWorks(id);
   }, [openWork, openUpdate, inviteMemberPopup, id]);
 
+
+  const [triggerHandle, setTriggerHandle] = useState(true);
+  const [actionHandle, setActionHandle] = useState(false);
+  const [triggers, setTriggers] = useState([
+    {
+      id: 1,
+      name: "Trigger 1",
+      type: "trigger",
+      status: "active",
+      triggerDetails: {},
+    },
+  ]);
+
+  const [actions, setActions] = useState([
+    {
+      id: 1,
+      name: "Action 1",
+      type: "action",
+      status: "inactive",
+      actionDetails: {},
+    },
+  ]);
+
+  const [activeTrigger, setActiveTrigger] = useState(triggers[0]);
+  const [activeAction, setActiveAction] = useState(actions[0]);
+  const [isActiveTrigger, setIsActiveTrigger] = useState(true);
+  const [isActiveAction, setIsActiveAction] = useState(false);
+
+  const addTrigger = () => {
+    console.log("Add Trigger");
+    console.log("Actions:", actions);
+    console.log("Triggers:", triggers);
+
+    const updatedActions = actions.map((ele) => ({ ...ele, status: "inactive" }));
+    setActions(updatedActions);
+
+    const updatedTriggers = triggers.map((ele) => ({ ...ele, status: "inactive" }));
+
+    const newId = triggers.length > 0 ? triggers[triggers.length - 1].id + 1 : 1;
+
+    const newTrigger = {
+      id: newId,
+      name: `Trigger ${newId}`,
+      type: "trigger",
+      status: "active",
+      triggerDetails: {},
+    };
+
+    setTriggers([...updatedTriggers, newTrigger]);
+    setActiveTrigger(newTrigger);
+  };
+
+  const deleteTrigger = (id, status) => {
+    if (status === "inactive" && triggers.length > 1) {
+      const result = triggers.filter((ele) => ele.id !== id);
+      if (result.length === 0) {
+        setTriggers([
+          {
+            id: 1,
+            name: "Trigger 1",
+            type: "trigger",
+            status: "active",
+            triggerDetails: {},
+          },
+        ]);
+      } else {
+        setTriggers(result);
+      }
+    }
+  };
+
+  const triggerEventHandle = (ele) => {
+    console.log("Trigger Event Handle");
+    setIsActiveTrigger(true);
+    setIsActiveAction(false);
+
+    const updatedActions = actions.map((a) => ({ ...a, status: "inactive" }));
+    setActions(updatedActions);
+
+    const updatedTriggers = triggers.map((item) => {
+      if (item.id === ele.id) {
+        return {
+          ...item,
+          status: "active",
+          triggerDetails: { ...ele.triggerDetails },
+        };
+      }
+      return { ...item, status: "inactive" };
+    });
+    setTriggers(updatedTriggers);
+    setActiveTrigger(ele);
+  };
+
+  const addAction = () => {
+    console.log("Add Action");
+    console.log("Actions:", actions);
+    console.log("Triggers:", triggers);
+
+    const updatedTriggers = triggers.map((trigger) => ({ ...trigger, status: "inactive" }));
+    setTriggers(updatedTriggers);
+
+    const updatedActions = actions.map((action) => ({ ...action, status: "inactive" }));
+
+    const newId = actions.length > 0 ? actions[actions.length - 1].id + 1 : 1;
+
+    const newAction = {
+      id: newId,
+      name: `Action ${newId}`,
+      type: "action",
+      status: "active",
+      actionDetails: {},
+    };
+
+    setActions([...updatedActions, newAction]);
+    setActiveAction(newAction);
+  };
+
+  const deleteAction = (id, status) => {
+    if (status === "inactive" && actions.length > 1) {
+      const result = actions.filter((ele) => ele.id !== id);
+      if (result.length === 0) {
+        setActions([
+          {
+            id: 1,
+            name: "Action 1",
+            type: "action",
+            status: "active",
+            actionDetails: {},
+          },
+        ]);
+      } else {
+        setActions(result);
+      }
+    }
+  };
+
+  const actionEventHandle = (ele) => {
+    console.log("Action Event Handle");
+    setIsActiveAction(true);
+    setIsActiveTrigger(false);
+
+    const updatedTriggers = triggers.map((t) => ({ ...t, status: "inactive" }));
+    setTriggers(updatedTriggers);
+
+    const updatedActions = actions.map((item) => {
+      if (item.id === ele.id) {
+        return {
+          ...item,
+          status: "active",
+          actionDetails: { ...ele.actionDetails },
+        };
+      }
+      return { ...item, status: "inactive" };
+    });
+    setActions(updatedActions);
+    setActiveAction(ele);
+  };
+
+  useEffect(() => {
+    if (triggerHandle) {
+      const updated = actions.map((item) => ({ ...item, status: "inactive" }));
+      setActions(updated);
+    } else {
+      const updated = triggers.map((item) => ({ ...item, status: "inactive" }));
+      setTriggers(updated);
+    }
+  }, [triggerHandle, actionHandle]);
+
+  useEffect(() => {
+    if (isActiveTrigger) {
+      console.log("Trigger is active");
+      triggerEventHandle(activeTrigger);
+    } else if (isActiveAction) {
+      console.log("Action is active");
+      actionEventHandle(activeAction);
+    }
+  }, [isActiveTrigger, isActiveAction, activeTrigger, activeAction]);
+  
+  console.log(triggers);
+  console.log(actions);
+  console.log(activeTrigger);
+    console.log(activeAction);
+    console.log(isActiveTrigger);
+    console.log(isActiveAction);
+  
+
+    const publish = async () => {
+        const triggerData = triggers.map((ele) => ({
+            ...ele,
+            triggerDetails: { ...ele.triggerDetails },
+        }));
+    
+        const actionData = actions.map((ele) => ({
+            ...ele,
+            actionDetails: { ...ele.actionDetails },
+        }));
+    
+        const data = {
+            projectId: id,
+            triggers: triggerData,
+            actions: actionData,
+        };
+    
+        console.log(data);
+    
+        // await axios.post(`http://localhost:8086/api/v1/workflow/createWorkflow`, data)
+        //     .then((res) => {
+        //     console.log(res.data);
+        //     dispatch(openSnackbar({ open: true, message: "Workflow Created", type: "success" }));
+        //     setTriggers([]);
+        //     setActions([]);
+        //     setActiveTrigger({});
+        //     setActiveAction({});
+        //     })
+        //     .catch((err) => {
+        //     console.log(err);
+        //     dispatch(openSnackbar({ open: true, message: "Error Creating Workflow", type: "error" }));
+        //     });
+    }
 
   const DrawerList = (
     <DrawerContainer style={{ backgroundColor: '#f9f9f9' }}>
@@ -490,7 +705,6 @@ const Workflow = () => {
                 setInviteTeamPopup={setInviteTeamPopup}
                 id={id}
                 teamInvite={false}
-                // setLoading={setLoading}
                 data={item}
                 workDetails={workDetails}
               />
@@ -504,7 +718,6 @@ const Workflow = () => {
                 setInviteMemberPopup={setInviteMemberPopup}
                 id={id}
                 teamInvite={false}
-                // setLoading={setLoading}
                 data={item}
                 workDetails={workDetails}
               />
@@ -515,38 +728,124 @@ const Workflow = () => {
               <Column alignment={alignment}>
                 <ItemWrapper>
                   <Top>
+                    <div>
                     <Image src={workflow} />
                     <SubText>
-                      Start building your workflow in two minutes
+                      Add Rule
                     </SubText>
                     <Text>
                         Automate your team's process and keep work flowing.
                     </Text>
-                  </Top>
-                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
-                    <Masonry gutter="14px">
+                    </div>
 
-                    {works.length != 0 && works.map((work) => (
-                        <div>
-                          <WorkFlowCards
-                            work={work}
-                            projectId={id}
-                            ProjectMembers={projectCollaborators}
-                            ProjectTeams={projectTeams}
-                            setInviteMemberPopup={setInviteMemberPopup}
-                            setInviteTeamPopup={setInviteTeamPopup}
-                            setWorkDetails={setWorkDetails}
-                          />
+                    <Button sx={{
+                        borderRadius: '10px',
+                        border: '1px solid darkorange',
+                        color: 'darkorange',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        display: 'flex',
+                        gap: '5px',
+                        '&:hover': {
+                        backgroundColor: 'darkorange',
+                        color: 'white'
+                        }
+                    }} onClick={publish} >
+                        <PublishIcon sx={{ fontSize: "15px" }} />
+                        Publish Rule
+                    </Button>
+                  </Top>
+                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 1, 900: 1 }}>
+                    <Masonry gutter="10px">
+                         {/* Trigger cards */}
+                         {triggers.map((ele) => (
+                            <div
+                                style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                padding: "0px", 
+                                textAlign: "center", 
+                                display: "block",
+                                margin: "auto",
+                                borderRadius: "10px",
+                                border: ele.status === "active" ? "1px solid #fff" : "1px dashed #fff",
+                                backgroundColor: ele.status === "active" ? "azure" : `${({ theme }) => theme.card}`
+                                }}
+                            >
+                                <Button onClick={() => { setTriggerHandle(true); setActionHandle(false); triggerEventHandle(ele) }} style={{ 
+                                    border: "none",
+                                    backgroundColor: "transparent",
+                                    }}
+                                    >
+                                    <TriggerRuleCard trigger={ele} />
+                                </Button>
+
+                                <Button onClick={() => deleteTrigger(ele.id, ele.status)}>
+                                    <CancelIcon style={{ color: "red" }} />
+                                </Button>
+                                
+                            </div>               
+                        ))}
+                        {/* Add New Trigger Button */}
+                        <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+                        <IcoBtn style={{ border: "1px solid orange" }} onClick={addTrigger}>
+                            <ControlPointIcon />
+                        </IcoBtn>
                         </div>
-                      ))}
-                  </Masonry>
-                  </ResponsiveMasonry >
+
+                        {/* Arrow Between Triggers and Actions */}
+                        {triggers.length !== 0 && actions.length !== 0 && (
+                        <div style={{ width: "100%", textAlign: "center", margin: "20px 0" }}>
+                            <HiArrowDown size={40} color="#999" />
+                        </div>
+                        )}
+
+                        {/* Trigger cards */}
+                        {actions.map((ele) => (
+                            <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                padding: "0px", 
+                                textAlign: "center", 
+                                display: "block",
+                                margin: "auto",
+                                border: ele.status === "active" ? "1px solid #fff" : "1px dashed #fff",
+                                backgroundColor: ele.status === "active" ? "azure" : `${({ theme }) => theme.card}`
+                                }}
+                            >
+                                <Button onClick={() => { setTriggerHandle(false); setActionHandle(true); actionEventHandle(ele) }} style={{ 
+                                    border: "none",
+                                    backgroundColor: "transparent",
+                                    }}
+                                    >
+                                    <ActionRuleCard action={ele} />
+                                </Button>
+
+                                <Button onClick={() => deleteAction(ele.id, ele.status)}>
+                                    <CancelIcon style={{ color: "red" }} />
+                                </Button>
+                                
+                            </div>               
+                        ))}
+
+                        {/* Add New Trigger Button */}
+                        <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+                        <IcoBtn style={{ border: "1px solid orange" }} onClick={addAction}>
+                            <ControlPointIcon />
+                        </IcoBtn>
+                        </div>
+
+                    </Masonry>
+                    </ResponsiveMasonry>
+
                 </ItemWrapper>
               </Column>
             </Work>
             <HrHor />
             <Extra>
-                <WorkFlowMainCard projectId={id} newForm={newForm} setNewForm={setNewForm} setNewTaskTemplate={setNewTaskTemplate} taskTemplateAdded={taskTemplateAdded} setTaskTemplateAdded={setTaskTemplateAdded}/>
+                {triggerHandle && <TriggerFunctionCards setIsActiveTrigger={setIsActiveTrigger} setIsActiveAction={setIsActiveAction} projectId={id} activeTrigger={activeTrigger} setActiveTrigger={setActiveTrigger} />}
+                {actionHandle && <ActionFunctionCards setIsActiveAction={setIsActiveAction} setIsActiveTrigger={setIsActiveTrigger} projectId={id} activeAction={activeAction} setActiveAction={setActiveAction} />}
             </Extra>
           </Body>
         </>
@@ -563,9 +862,9 @@ const Workflow = () => {
 
         {newForm && <AddForm setNewForm={setNewForm} />}
         {newTaskTemplate && <AddTaskTemplate setNewTaskTemplate={setNewTaskTemplate} projectId={item.projectId} setTaskTemplateAdded={setTaskTemplateAdded} />}
-
+    
     </Container>
   );
 };
 
-export default Workflow;
+export default Rule;

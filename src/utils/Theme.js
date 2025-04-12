@@ -20,7 +20,8 @@ export const darkTheme = {
     contact_background: "#151a21",
     update: '#ec9a16',
     white: '#ffffff',
-    black: '#000000'
+    black: '#000000',
+    chart: '#fff'
 
     /*Colors
 Swatch 1
@@ -34,7 +35,7 @@ Swatch 4
 Swatch 5
 #185c1a
 Swatch 6
-#40b957*/
+#ffffff*/
 }
 
 export const lightTheme = {
@@ -57,5 +58,6 @@ export const lightTheme = {
     contact_background: "#ffffff",
     update: '#ec9a16',
     white: '#000000',
-    black: '#ffffff'
+    black: '#ffffff',
+    chart: '#fff'
   }

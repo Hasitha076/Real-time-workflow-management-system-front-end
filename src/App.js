@@ -43,6 +43,8 @@ import Home from "./pages/Home/Home";
 import Members from "./pages/Members";
 import MemberDetails from "./pages/MemberDetails";
 import AddNewUser from "./components/AddNewUser";
+import Rule from "./pages/Rule";
+import RulesPage from "./pages/RulesPage";
 // import WorkDetailsPage from './pages/WorkDetailsPage';
 
 
@@ -132,6 +134,13 @@ function App() {
                         <Route path="workflow" element={<Workflow />} />
                         <Route path="workflow">
                           <Route path=":id" element={<Workflow />} />
+                        </Route>
+                        <Route path="rules" element={<RulesPage />} />
+                        <Route path="rules">
+                          <Route path=":id" element={<RulesPage />} />
+                        </Route>
+                        <Route path="rule">
+                          <Route path=":id" element={<Rule />} />
                         </Route>
                         <Route path="members" element={<Members setNewUser={setNewUser} userCreated={userCreated} setUserCreated={setUserCreated} />} />
                         <Route path="members">

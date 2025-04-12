@@ -20,13 +20,22 @@ import {Drawer, Slide} from '@mui/material';
 import Divider from '@mui/material/Divider';
 import { useNavigate } from "react-router-dom";
 import workflow from "../Images/workflow.png";
-import WorkFlowCards from "../components/WorkFlowCards";
-import WorkFlowMainCard from "../components/WorkFlowMainCard";
-import AddForm from "../components/AddForm";
 import InviteWorkflowMembers from "../components/InviteWorkflowMembers";
-import AddTaskTemplate from "../components/AddTaskTemplate";
 import { useQuery } from "@apollo/client";
 import { LOAD_PROJECT_BY_ID } from "../GraphQL/Queries";
+import { HiArrowDown } from "react-icons/hi";
+import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import CancelIcon from '@mui/icons-material/Cancel';
+import TriggerFunctionCards from "../components/TriggerFunctionCards";
+import ActionFunctionCards from "../components/ActionFunctionCards";
+import TriggerRuleCard from "../components/TriggerRuleCard";
+import ActionRuleCard from "../components/ActionRuleCard";
+import PublishIcon from '@mui/icons-material/Publish';
+import AddTaskTemplate from "../components/AddTaskTemplate";
+import AddForm from "../components/AddForm";
+import WorkFlowCards from "../components/WorkFlowCards";
+import RuleTemplateCard from "../components/RuleTemplateCard";
+
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -121,7 +130,7 @@ const Body = styled.div`
 `;
 
 const Work = styled.div`
-  flex: 1.6;
+  flex: 2;
 `;
 
 const ItemWrapper = styled.div`
@@ -141,7 +150,7 @@ const ItemWrapper = styled.div`
 
 const Top = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 30px;
@@ -195,8 +204,42 @@ const Image = styled.img`
   height: 50px;
 `;
 
+const IcoBtn = styled(IconButton)`
+  width: 15px;
+  height: 15px;
+  color: ${({ theme }) => theme.white} !important;
+  &:hover {
+    background-color: ${({ theme }) => theme.white} !important;
+    color: ${({ theme }) => theme.black} !important;
+  }
+`;
 
-const Workflow = () => {
+const CustomRuleCard = styled.div`
+  padding: 14px;
+  height: 100%;
+  text-align: center;
+  display: flex;
+justify-content: center;
+align-items: center;
+  margin: 2px 0px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 10px;
+  border: 1px dashed ${({ theme }) => theme.soft2};
+  background-color: ${({ theme }) => theme.card};
+  color: ${({ theme }) => theme.text};
+  box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.09);
+  &:hover {
+    transition: all 0.6s ease-in-out;
+    box-shadow: 0 0 18px 0 rgba(0, 0, 0, 0.5);
+    background-color: ${({ theme }) => theme.soft2};
+    color: ${({ theme }) => theme.black};
+  }
+`;
+
+
+const RulesPage = () => {
   const { id } = useParams();
   const [item, setItems] = useState([]);
   const [projectCollaborators, setProjectCollaborators] = useState([]);
@@ -245,25 +288,6 @@ const Workflow = () => {
           }
         }, [loading, data]);
 
-  const getproject = async (id) => {
-    // await axios.get(`http://localhost:8083/api/v1/project/getProject/${id}`)
-    //   .then((res) => {
-    //     setItems(res.data);
-    //     setProjectCollaborators(res.data.collaboratorIds);
-    //     setProjectTeams(res.data.teamIds);
-    //   })
-    //   .then(() => {
-    //     setLoading(false);
-    //   })
-    //   .catch((err) => {
-    //     dispatch(
-    //       openSnackbar({
-    //         message: err.response.data.message,
-    //         severity: "error",
-    //       })
-    //     );
-    //   });
-  };
 
   const getCollaborators = async () => {
     await axios.get(`http://localhost:8081/api/v1/user/getAllUsers`)
@@ -309,15 +333,6 @@ const Workflow = () => {
   }, [item, id]);
   
 
-  console.log(id);
-    console.log(item);
-  console.log(collaborators);
-  console.log(teams);
-  console.log(works);
-  console.log(projectCollaborators);
-  console.log(projectTeams);
-  
-
   const openWorkDetails = (work) => {
     setCurrentWork(work);
     setOpenWork(true);
@@ -325,10 +340,7 @@ const Workflow = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    getproject(id); 
-    // getProjectWorks(id);
   }, [openWork, openUpdate, inviteMemberPopup, id]);
-
 
   const DrawerList = (
     <DrawerContainer style={{ backgroundColor: '#f9f9f9' }}>
@@ -384,7 +396,7 @@ const Workflow = () => {
                   backgroundColor: '#d09107',
                   color: 'white'
                 }
-              }} onClick={() => navigate(`/rules/${item.projectId}`)} >
+              }} onClick={toggleDrawer(true)} >
                 <ElectricBoltIcon sx={{ fontSize: "15px" }} />
                 Rules
             </Button>
@@ -480,55 +492,33 @@ const Workflow = () => {
                     Customize
                 </Button>
             </div>
-
-            <Hr />
-            {inviteMemberPopup && (
-              <InviteWorkflowMembers
-                inviteMemberPopup={inviteMemberPopup}
-                setInviteMemberPopup={setInviteMemberPopup}
-                inviteTeamPopup={inviteTeamPopup}
-                setInviteTeamPopup={setInviteTeamPopup}
-                id={id}
-                teamInvite={false}
-                // setLoading={setLoading}
-                data={item}
-                workDetails={workDetails}
-              />
-            )}
-
-            {inviteTeamPopup && (
-              <InviteWorkflowMembers
-                inviteTeamPopup={inviteTeamPopup}
-                setInviteTeamPopup={setInviteTeamPopup}
-                inviteMemberPopup={inviteMemberPopup}
-                setInviteMemberPopup={setInviteMemberPopup}
-                id={id}
-                teamInvite={false}
-                // setLoading={setLoading}
-                data={item}
-                workDetails={workDetails}
-              />
-            )}
           </Header>
           <Body>
             <Work>
               <Column alignment={alignment}>
                 <ItemWrapper>
                   <Top>
+                    <div>
                     <Image src={workflow} />
                     <SubText>
-                      Start building your workflow in two minutes
+                      Add Rule
                     </SubText>
                     <Text>
                         Automate your team's process and keep work flowing.
                     </Text>
+                    </div>
+
                   </Top>
-                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
-                    <Masonry gutter="14px">
+                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 3, 900: 4 }}>
+                    <Masonry gutter="10px">
+
+                    <CustomRuleCard onClick={() => navigate(`/rule/${item.projectId}`)}>
+                        Create a Custom Rule
+                    </CustomRuleCard>
 
                     {works.length != 0 && works.map((work) => (
                         <div>
-                          <WorkFlowCards
+                          <RuleTemplateCard
                             work={work}
                             projectId={id}
                             ProjectMembers={projectCollaborators}
@@ -539,15 +529,13 @@ const Workflow = () => {
                           />
                         </div>
                       ))}
-                  </Masonry>
-                  </ResponsiveMasonry >
+
+                    </Masonry>
+                    </ResponsiveMasonry>
+
                 </ItemWrapper>
               </Column>
             </Work>
-            <HrHor />
-            <Extra>
-                <WorkFlowMainCard projectId={id} newForm={newForm} setNewForm={setNewForm} setNewTaskTemplate={setNewTaskTemplate} taskTemplateAdded={taskTemplateAdded} setTaskTemplateAdded={setTaskTemplateAdded}/>
-            </Extra>
           </Body>
         </>
       )}
@@ -563,9 +551,9 @@ const Workflow = () => {
 
         {newForm && <AddForm setNewForm={setNewForm} />}
         {newTaskTemplate && <AddTaskTemplate setNewTaskTemplate={setNewTaskTemplate} projectId={item.projectId} setTaskTemplateAdded={setTaskTemplateAdded} />}
-
+    
     </Container>
   );
 };
 
-export default Workflow;
+export default RulesPage;

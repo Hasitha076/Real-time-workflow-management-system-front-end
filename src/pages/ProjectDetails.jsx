@@ -296,6 +296,7 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
   const [open, setOpen] = useState(false);
     const [newForm, setNewForm] = useState(false);
   const [newTaskTemplate, setNewTaskTemplate] = useState(false);
+  const [newRule, setNewRule] = useState(false);
   const [workAdded, setWorkAdded] = useState(false);
   const [workUpdated, setWorkUpdated] = useState(false);
   const [collaboratorUpdated, setCollaboratorUpdated] = useState(false);
@@ -489,7 +490,7 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
                   backgroundColor: '#d09107',
                   color: 'white'
                 }
-              }} onClick={toggleDrawer(true)} >
+              }} onClick={() => navigate(`/rules/${item.projectId}`)} >
                 <ElectricBoltIcon sx={{ fontSize: "15px" }} />
                 Rules
             </Button>

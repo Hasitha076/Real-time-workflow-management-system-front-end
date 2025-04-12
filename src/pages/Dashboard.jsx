@@ -374,11 +374,66 @@ const Dashboard = () => {
             <ChartBox>
                 <Box>
                     <h2 style={{ marginTop: '0' }}>Project, Task, and Work Summary</h2>
-                    <Bar data={barChartData} options={{ responsive: true }} style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '15px' }} />
+                    <Bar data={barChartData} options={{ 
+                      responsive: true,
+                      plugins: {
+                        legend: {
+                          labels: {
+                            color: '#fff' // Legend text
+                          }
+                        }
+                      },
+                      scales: {
+                        x: {
+                          ticks: {
+                            color: '#fff' // X-axis labels
+                          },
+                          grid: {
+                            color: '#ffffff21' // X-axis grid lines
+                          }
+                        },
+                        y: {
+                          ticks: {
+                            color: '#fff' // Y-axis labels
+                          },
+                          grid: {
+                            color: '#ffffff21' // Y-axis grid lines
+                          }
+                        }
+                      }
+                      
+                    }} style={{ backgroundColor: 'transparent', padding: '10px', borderRadius: '15px' }} />
                 </Box>
                 <Box>
                     <h2 style={{ marginTop: '0' }}>Monthly Completed Trends</h2>
-                    <Line data={lineChartData} options={{ responsive: true }} style={{ backgroundColor: '#fff', padding: '10px', borderRadius: '15px' }}  />
+                    <Line data={lineChartData} options={{ 
+                      responsive: true,
+                      plugins: {
+                        legend: {
+                          labels: {
+                            color: '#fff' // Legend text
+                          }
+                        }
+                      },
+                      scales: {
+                        x: {
+                          ticks: {
+                            color: '#fff' // X-axis labels
+                          },
+                          grid: {
+                            color: '#ffffff21' // X-axis grid lines
+                          }
+                        },
+                        y: {
+                          ticks: {
+                            color: '#fff' // Y-axis labels
+                          },
+                          grid: {
+                            color: '#ffffff21' // Y-axis grid lines
+                          }
+                        }
+                      }
+                     }} style={{ backgroundColor: 'transparent', padding: '10px', borderRadius: '15px' }}  />
                 </Box>
             </ChartBox>
 
