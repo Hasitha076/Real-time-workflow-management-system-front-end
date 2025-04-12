@@ -33,6 +33,7 @@ import ActionRuleCard from "../components/ActionRuleCard";
 import PublishIcon from '@mui/icons-material/Publish';
 import AddTaskTemplate from "../components/AddTaskTemplate";
 import AddForm from "../components/AddForm";
+import { useLocation } from 'react-router-dom';
 
 
 const Container = styled.div`
@@ -233,6 +234,16 @@ const Rule = () => {
   const [workDetails, setWorkDetails] = useState({});
   const [taskTemplateAdded, setTaskTemplateAdded] = useState(false);
 
+  const location = useLocation();
+  const existingRule = location.state?.existingRule;
+    const existingRuleDetails = location.state?.ruleDetails;
+
+    console.log(existingRule);
+    
+
+  const [ruleDetails, setRuleDetails] = useState(existingRuleDetails);
+  
+
   const { loading, error, data } = useQuery(LOAD_PROJECT_BY_ID, {
     variables: { id: parseInt(id) },  // Ensure ID is an integer
     skip: !id,  // Avoid sending query if ID is undefined
@@ -334,7 +345,7 @@ const Rule = () => {
       name: "Trigger 1",
       type: "trigger",
       status: "active",
-      triggerDetails: {},
+      triggerDetails: ruleDetails?.triggers[0]?.triggerDetails || {},
     },
   ]);
 
@@ -344,7 +355,7 @@ const Rule = () => {
       name: "Action 1",
       type: "action",
       status: "inactive",
-      actionDetails: {},
+      actionDetails: ruleDetails?.actions[0]?.actionDetails || {},
     },
   ]);
 
@@ -511,7 +522,7 @@ const Rule = () => {
     console.log(isActiveAction);
   
 
-    const publish = async () => {
+    const createRule = async () => {
         const triggerData = triggers.map((ele) => ({
             ...ele,
             triggerDetails: { ...ele.triggerDetails },
@@ -523,26 +534,88 @@ const Rule = () => {
         }));
     
         const data = {
-            projectId: id,
+            ruleName: "Rule 1",
+            projectId: item.projectId,
             triggers: triggerData,
             actions: actionData,
         };
     
         console.log(data);
     
-        // await axios.post(`http://localhost:8086/api/v1/workflow/createWorkflow`, data)
-        //     .then((res) => {
-        //     console.log(res.data);
-        //     dispatch(openSnackbar({ open: true, message: "Workflow Created", type: "success" }));
-        //     setTriggers([]);
-        //     setActions([]);
-        //     setActiveTrigger({});
-        //     setActiveAction({});
-        //     })
-        //     .catch((err) => {
-        //     console.log(err);
-        //     dispatch(openSnackbar({ open: true, message: "Error Creating Workflow", type: "error" }));
-        //     });
+        await axios.post(`http://localhost:8082/api/v1/task/createRule`, data)
+            .then((res) => {
+            console.log(res.data);
+            
+            dispatch(
+                openSnackbar({
+                    message: "Rule created successfully",
+                    type: "success",
+                })
+            );
+            navigate(`/rules/${item.projectId}`);
+
+            setTriggers([{
+                id: 1,
+                name: "Trigger 1",
+                type: "trigger",
+                status: "active",
+                triggerDetails: {},
+            }]);
+            setActions([{
+                id: 1,
+                name: "Action 1",
+                type: "action",
+                status: "inactive",
+                actionDetails: {},
+            }]);
+            setActiveTrigger({});
+            setActiveAction({});
+            })
+            .catch((err) => {
+            console.log(err);
+            dispatch(openSnackbar({ open: true, message: "Error Creating Workflow", type: "error" }));
+            });
+    }
+
+    const publish = async () => {
+        console.log(ruleDetails);
+
+        const triggerData = ruleDetails.triggers.map((ele) => ({
+            ...ele,
+            triggerDetails: { ...ele.triggerDetails },
+        }));
+        
+        const actionData = ruleDetails.actions.map((ele) => ({
+            ...ele,
+            actionDetails: { ...ele.actionDetails },
+        }));
+        
+
+        const data = {
+            ruleName: ruleDetails.ruleName,
+            projectId: ruleDetails.projectId,
+            triggers: triggerData,
+            actions: actionData,
+        };
+        
+        
+        await axios.post(`http://localhost:8082/api/v1/task/createPublishFlow`, data)
+        .then((res) => {
+        console.log(res.data);
+        
+        dispatch(
+            openSnackbar({
+                message: "Publish Rule successfully",
+                type: "success",
+            })
+        );
+        navigate(`/rules/${item.projectId}`);
+
+        })
+        .catch((err) => {
+        console.log(err);
+        dispatch(openSnackbar({ open: true, message: "Error Publishing Rule", type: "error" }));
+        });
     }
 
   const DrawerList = (
@@ -738,7 +811,7 @@ const Rule = () => {
                     </Text>
                     </div>
 
-                    <Button sx={{
+                    {existingRule ? <Button sx={{
                         borderRadius: '10px',
                         border: '1px solid darkorange',
                         color: 'darkorange',
@@ -753,12 +826,30 @@ const Rule = () => {
                     }} onClick={publish} >
                         <PublishIcon sx={{ fontSize: "15px" }} />
                         Publish Rule
-                    </Button>
+                    </Button> : 
+                    <Button sx={{
+                        borderRadius: '10px',
+                        border: '1px solid darkorange',
+                        color: 'darkorange',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        display: 'flex',
+                        gap: '5px',
+                        '&:hover': {
+                        backgroundColor: 'darkorange',
+                        color: 'white'
+                        }
+                    }} onClick={createRule} >
+                        <PublishIcon sx={{ fontSize: "15px" }} />
+                        Create Rule
+                    </Button>}
+
+                    
                   </Top>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 1, 900: 1 }}>
                     <Masonry gutter="10px">
                          {/* Trigger cards */}
-                         {triggers.map((ele) => (
+                         {triggers?.map((ele) => (
                             <div
                                 style={{
                                 display: "flex",
@@ -777,7 +868,7 @@ const Rule = () => {
                                     backgroundColor: "transparent",
                                     }}
                                     >
-                                    <TriggerRuleCard trigger={ele} />
+                                    <TriggerRuleCard trigger={ele}  />
                                 </Button>
 
                                 <Button onClick={() => deleteTrigger(ele.id, ele.status)}>
@@ -787,11 +878,12 @@ const Rule = () => {
                             </div>               
                         ))}
                         {/* Add New Trigger Button */}
+                        {!existingRule ? 
                         <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
                         <IcoBtn style={{ border: "1px solid orange" }} onClick={addTrigger}>
                             <ControlPointIcon />
                         </IcoBtn>
-                        </div>
+                        </div> : null}
 
                         {/* Arrow Between Triggers and Actions */}
                         {triggers.length !== 0 && actions.length !== 0 && (
@@ -830,11 +922,12 @@ const Rule = () => {
                         ))}
 
                         {/* Add New Trigger Button */}
+                        {!existingRule ?
                         <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
                         <IcoBtn style={{ border: "1px solid orange" }} onClick={addAction}>
                             <ControlPointIcon />
                         </IcoBtn>
-                        </div>
+                        </div> : null}
 
                     </Masonry>
                     </ResponsiveMasonry>
@@ -844,8 +937,8 @@ const Rule = () => {
             </Work>
             <HrHor />
             <Extra>
-                {triggerHandle && <TriggerFunctionCards setIsActiveTrigger={setIsActiveTrigger} setIsActiveAction={setIsActiveAction} projectId={id} activeTrigger={activeTrigger} setActiveTrigger={setActiveTrigger} />}
-                {actionHandle && <ActionFunctionCards setIsActiveAction={setIsActiveAction} setIsActiveTrigger={setIsActiveTrigger} projectId={id} activeAction={activeAction} setActiveAction={setActiveAction} />}
+                {triggerHandle && <TriggerFunctionCards existingRule={existingRule} setIsActiveTrigger={setIsActiveTrigger} setIsActiveAction={setIsActiveAction} projectId={id} activeTrigger={activeTrigger} setActiveTrigger={setActiveTrigger} />}
+                {actionHandle && <ActionFunctionCards existingRule={existingRule} setIsActiveAction={setIsActiveAction} setIsActiveTrigger={setIsActiveTrigger} projectId={id} activeAction={activeAction} setActiveAction={setActiveAction} />}
             </Extra>
           </Body>
         </>

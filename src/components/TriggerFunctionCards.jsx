@@ -101,10 +101,10 @@ const Image = styled.img`
   height: 30px;
 `;
 
-const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, projectId, setIsActiveTrigger, setIsActiveAction }) => {
+const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, projectId, setIsActiveTrigger, setIsActiveAction, existingRule }) => {
   
 
-  console.log(activeTrigger);
+  console.log(existingRule);
 
   const eventHandle = (event) => {
     setIsActiveTrigger(true);
@@ -148,7 +148,7 @@ const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, p
 
       <Bottom>
             <p>Task moved</p>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }}
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }}
             onClick={() => {
                 eventHandle("Task moved")
             }} >
@@ -159,7 +159,7 @@ const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, p
                     </div>
                 </div>
             </Button>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Task added")
             }} >
@@ -174,7 +174,7 @@ const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, p
             <br />
 
             <p>Task field is...</p>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Task assigned")
             }} >
@@ -189,7 +189,7 @@ const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, p
             <br />
 
             <p>Due date is...</p>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Due date changed")
             }} >
@@ -200,7 +200,7 @@ const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, p
                     </div>
                 </div>
             </Button>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Due date approaching")
             }} >
@@ -211,7 +211,7 @@ const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, p
                     </div>
                 </div>
             </Button>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Task overdue")
             }} >
@@ -226,7 +226,7 @@ const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, p
             <br />
 
             <p>Task status is changed</p>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Task status changed")
             }} >
@@ -237,7 +237,7 @@ const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, p
                     </div>
                 </div>
             </Button>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Approval status changed")
             }} >

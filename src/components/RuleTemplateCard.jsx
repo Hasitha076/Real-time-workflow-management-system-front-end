@@ -7,6 +7,8 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import { Button } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import MoveUpIcon from '@mui/icons-material/MoveUp';
 
 const Container = styled.div`
   padding: 14px;
@@ -19,6 +21,11 @@ const Container = styled.div`
   background-color: ${({ theme }) => theme.card};
   color: ${({ theme }) => theme.text};
   box-shadow: 0 0 16px 0 rgba(0, 0, 0, 0.09);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 150px;
   &:hover {
     transition: all 0.6s ease-in-out;
     box-shadow: 0 0 18px 0 rgba(0, 0, 0, 0.5);
@@ -31,6 +38,7 @@ const Top = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 5px;
 `;
 
 const Title = styled.div`
@@ -92,58 +100,20 @@ const Bottom = styled.div`
   text-align: left;
 `;
 
-const RuleTemplateCard = ({ status, work, setInviteMemberPopup, setInviteTeamPopup, setWorkDetails }) => {
+const RuleTemplateCard = ({ rule, existingRule }) => {
   
-  const [color, setColor] = useState("primary");
-  const [task, setTask] = useState([]);
-  const [completed, setCompleted] = useState(0);
-  const [progress, setProgress] = useState(0);
-
-  const getTasks = async (work) => {
-    await axios.get(`http://localhost:8082/api/v1/task/getTasksByProjectId/${work.projectId}`)
-    .then((res) => {
-      console.log(res.data);
-      
-      const filterData = res.data.filter((item) => item.workId === work.workId);
-      setTask(filterData);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  }
-
-
-  useEffect(() => {
-    getTasks(work);
-  }, [work]);
-
-  console.log(work);
-  console.log(task);
-  
-
-  useEffect(() => {
-    let count = 0;
-    let Members = [];
-    task.forEach((item) => {
-      if (item.status === true) {
-        count++;
-      }
-    
-    });
-    setCompleted(count);
-    setProgress(completed);
-  }, [task]);
-
     const navigate = useNavigate();
   return (
    
-    <Container className={"item"} onClick={() => navigate(`/rule/${work.projectId}`)}>
+    <Container className={"item"} onClick={() => navigate(`/rule/${rule.projectId}`, { state: { existingRule, ruleDetails: rule } })}>
       <Top>
-        <Title>{work.workName}</Title>
+      <AddCircleIcon style={{ backgroundColor: "#0059fe9e", padding: "5px", borderRadius: "5px" }} />
+      +
+      <MoveUpIcon style={{ backgroundColor: "#e2e0e09e", padding: "5px", borderRadius: "5px" }} />
       </Top>
 
       <Bottom>
-        <p>Rules</p>
+      <Title>{rule.triggers[0].triggerDetails.triggerType} - {rule.actions[0].actionDetails.actionType}</Title>
       </Bottom>
       
     </Container>

@@ -210,7 +210,7 @@ const InviteButton = styled.button`
 `;
 
 
-const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsActiveAction, setIsActiveTrigger }) => {
+const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsActiveAction, setIsActiveTrigger, existingRule }) => {
 
     const [open, setOpen] = useState(false);
       const [invitePopup, setInvitePopup] = useState(false);
@@ -222,6 +222,9 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
     const toggleActionDrawer = (newOpen) => () => {
         setOpen(newOpen);
       };
+
+      console.log(existingRule);
+      
 
   const eventHandle = (event) => {
     setIsActiveAction(true);
@@ -365,7 +368,7 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
 
       <Bottom>
             <p>Move task</p>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }}
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }}
             onClick={() => {
                 eventHandle("Task moved")
             }} >
@@ -376,7 +379,7 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
                     </div>
                 </div>
             </Button>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Remove task")
             }} >
@@ -391,7 +394,7 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
             <br />
 
             <p>Change status</p>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Change status")
             }} >
@@ -406,7 +409,7 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
             <br />
 
             <p>Change task field to...</p>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => eventHandle("Change assignee") } >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: 'flex-start', gap: "10px" }}>
                 <GroupAddIcon style={{ backgroundColor: "#e2e0e09e", padding: "5px", borderRadius: "5px" }} />
@@ -415,7 +418,7 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
                     </div>
                 </div>
             </Button>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Change due date")
             }} >
@@ -426,7 +429,7 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
                     </div>
                 </div>
             </Button>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Set task title")
             }} >
@@ -438,7 +441,7 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
                 </div>
             </Button>
 
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Set task description")
             }} >
@@ -453,7 +456,7 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
             <br />
 
             <p>Create new</p>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Create task")
             }} >
@@ -464,7 +467,7 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
                     </div>
                 </div>
             </Button>
-            <Button style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Create approvel")
             }} >

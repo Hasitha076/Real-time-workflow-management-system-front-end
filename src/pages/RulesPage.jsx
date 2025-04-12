@@ -338,6 +338,25 @@ const RulesPage = () => {
     setOpenWork(true);
   };
 
+  const [rules, setRules] = useState([]);
+
+  const getAllRules = async () => {
+    await axios.get(`http://localhost:8082/api/v1/task/getRulesByProjectId/${id}`)
+      .then((res) => {
+        setRules(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  console.log("Rules", rules);
+  
+
+useEffect(() => {
+    getAllRules();
+}, [item, id]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [openWork, openUpdate, inviteMemberPopup, id]);
@@ -509,23 +528,19 @@ const RulesPage = () => {
                     </div>
 
                   </Top>
-                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 3, 900: 4 }}>
+                  <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 3, 900: 3 }}>
                     <Masonry gutter="10px">
 
-                    <CustomRuleCard onClick={() => navigate(`/rule/${item.projectId}`)}>
-                        Create a Custom Rule
+                    <CustomRuleCard onClick={() => navigate(`/rule/${item.projectId}`, { state: { existingRule: false } })}>
+                        <h2>Create a Custom Rule</h2>
                     </CustomRuleCard>
 
-                    {works.length != 0 && works.map((work) => (
+                    {rules.length != 0 && rules.map((rule) => (
                         <div>
                           <RuleTemplateCard
-                            work={work}
+                            rule={rule}
                             projectId={id}
-                            ProjectMembers={projectCollaborators}
-                            ProjectTeams={projectTeams}
-                            setInviteMemberPopup={setInviteMemberPopup}
-                            setInviteTeamPopup={setInviteTeamPopup}
-                            setWorkDetails={setWorkDetails}
+                            existingRule={true}
                           />
                         </div>
                       ))}
