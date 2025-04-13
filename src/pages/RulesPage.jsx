@@ -35,6 +35,7 @@ import AddTaskTemplate from "../components/AddTaskTemplate";
 import AddForm from "../components/AddForm";
 import WorkFlowCards from "../components/WorkFlowCards";
 import RuleTemplateCard from "../components/RuleTemplateCard";
+import PostAddIcon from '@mui/icons-material/PostAdd';
 
 
 const Container = styled.div`
@@ -219,6 +220,7 @@ const CustomRuleCard = styled.div`
   height: 100%;
   text-align: center;
   display: flex;
+    flex-direction: column;
 justify-content: center;
 align-items: center;
   margin: 2px 0px;
@@ -532,7 +534,8 @@ useEffect(() => {
                     <Masonry gutter="10px">
 
                     <CustomRuleCard onClick={() => navigate(`/rule/${item.projectId}`, { state: { existingRule: false } })}>
-                        <h2>Create a Custom Rule</h2>
+                        <PostAddIcon style={{ backgroundColor: "#e5560e9e", padding: "5px", borderRadius: "5px" }} />
+                        <h2 style={{ margin: '10px 0 0 0' }}>Create a Custom Rule</h2>
                     </CustomRuleCard>
 
                     {rules.length != 0 && rules.map((rule) => (

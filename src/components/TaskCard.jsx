@@ -32,6 +32,10 @@ import { useDispatch } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import EditNoteIcon from '@mui/icons-material/EditNote';
+import UpdateWork from "./UpdateWork";
+import UpdateTask from "./UpdateTask";
+import CheckIcon from '@mui/icons-material/Check';
 
 const Container = styled.div`
   padding: 14px;
@@ -213,7 +217,7 @@ const CommentButton = styled.button`
   }
 `
 
-const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEditTask, workCollaborators, workTeams, setUpdateWorkFromTask, allWorks}) => {
+const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTask, setEditTask, workCollaborators, workTeams, setUpdateWorkFromTask, allWorks}) => {
 
   const [completed, setCompleted] = useState(false);
   const [project, setProject] = useState([]);
@@ -230,6 +234,9 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
   const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
   const token = localStorage.getItem("token");
   const dispatch = useDispatch();
+
+  console.log(editTask);
+  
   
     const { loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
       variables: { id: parseInt(item.projectId) },  // Ensure ID is an integer
@@ -571,15 +578,24 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
   }
 
 
+    //use state enum to check for which updation
+    const [openUpdate, setOpenUpdate] = useState({ state: false, type: "all", data: item });
+
   const DrawerList = (
     <DrawerContainer>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
       <IcoBtn onClick={() => {toggleDrawer(false); setEditTask(true);}}>
         <KeyboardDoubleArrowRightIcon/>
       </IcoBtn>
-      <IcoBtn style={{ backgroundColor: 'red' }} onClick={() => {toggleDrawer(false); deleteTask(true);}}>
+      <div style={{ display: 'flex', gap: '5px' }}>
+      <Button sx={{ backgroundColor: item.status == true ? '#07bf07' : 'transparent', border: '1px solid #000', color: '#000', fontSize: "13px" }} onClick={() => changeStateFunction(!completed)} ><CheckIcon sx={{ fontSize: "20px", marginRight: "5px" }} />  Mark Complete</Button>
+      <IcoBtn style={{ backgroundColor: 'orange', color: '#000 !important' }} onClick={() => setOpenUpdate({ state: true, type: 'all', data: item })}>
+        <EditNoteIcon />
+      </IcoBtn>
+      <IcoBtn style={{ backgroundColor: 'red', color: '#000' }} onClick={() => {toggleDrawer(false); deleteTask(true);}}>
         <DeleteForeverIcon />
       </IcoBtn>
+      </div>
       </Box>
       <Box sx={{ width: 500 }} role="presentation">
           <top>
@@ -842,7 +858,10 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, setEdit
     
 
   return (
+    
     <>
+    {openUpdate.state && <UpdateTask setUpdateWorkFromTask={setUpdateWorkFromTask} setEditTask={setEditTask} editTask={editTask} openUpdate={openUpdate} setOpenUpdate={setOpenUpdate} type={openUpdate.type} />}
+
     {item && (
             <Container className={"item"}>
             <Top>

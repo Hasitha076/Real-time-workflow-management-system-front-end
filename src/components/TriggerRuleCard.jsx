@@ -96,7 +96,12 @@ const TriggerRuleCard = ({  trigger }) => {
         {trigger.triggerDetails.triggerType == undefined ? 
         <Title>+ Add {trigger.type} - {trigger.id} - {trigger.status}</Title> 
         :
-        <Title>{trigger.triggerDetails.triggerType}</Title>
+
+        <Title>{trigger.triggerDetails.triggerType} <span> - </span>
+                {trigger.triggerDetails.triggerType === "Section is" ?
+                trigger.triggerDetails.section
+                 : null}
+        </Title> 
         }
       </Top>
       

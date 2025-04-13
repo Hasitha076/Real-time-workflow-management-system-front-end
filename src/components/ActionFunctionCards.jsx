@@ -482,7 +482,7 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
       </Bottom>
 
 
-      <Drawer 
+        <Drawer 
             anchor="right" 
             open={open} 
             onClose={toggleActionDrawer(false)} 

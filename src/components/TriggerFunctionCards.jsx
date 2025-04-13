@@ -18,6 +18,11 @@ import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import HistoryIcon from '@mui/icons-material/History';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import VerifiedIcon from '@mui/icons-material/Verified';
+import { IconButton } from "@mui/material";
+import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import {Drawer, Slide} from '@mui/material';
 
 
 const Container = styled.div`
@@ -101,8 +106,111 @@ const Image = styled.img`
   height: 30px;
 `;
 
-const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, projectId, setIsActiveTrigger, setIsActiveAction, existingRule }) => {
+const DrawerContainer = styled.div`
+  padding: 30px;
+  text-align: left;
+  margin: 2px 0px;
+  font-size: 16px;
+  font-weight: 500;
+`;
+
+const Hr = styled.hr`
+  margin: 18px 0px;
+  border: 0.5px solid ${({ theme }) => theme.soft + "99"};
+`;
+
+const IcoBtn = styled(IconButton)`
+  width: 15px;
+  height: 15px;
+  color: ${({ theme }) => theme.white} !important;
+  &:hover {
+    background-color: ${({ theme }) => theme.white} !important;
+    color: ${({ theme }) => theme.black} !important;
+  }
+`;
+
+const ArrowIcoBtn = styled(IconButton)`
+  color: ${({ theme }) => theme.textSoft} !important;
+`;
+
+const OutlinedBox = styled.div`
+  min-height: 48px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid ${({ theme }) => theme.soft2};
+  color: ${({ theme }) => theme.soft2};
+  ${({ googleButton, theme }) =>
+    googleButton &&
+    `
+    user-select: none; 
+  gap: 16px;`}
+  ${({ button, theme }) =>
+    button &&
+    `
+    user-select: none; 
+  border: none;
+    font-weight: 600;
+    font-size: 16px;
+    background: ${theme.soft};
+    color:'${theme.soft2}';`}
+    ${({ activeButton, theme }) =>
+    activeButton &&
+    `
+    user-select: none; 
+  border: none;
+    background: ${theme.primary};
+    color: white;`}
+  margin: 3px 0;
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 14px;
+   &:hover {
+    transition: all 0.6s ease-in-out;
+    background: ${({ theme }) => theme.soft};
+    color: white;
+  }
+`;
+
+
+const TriggerFunctionCards = ({ status, works, activeTrigger, setActiveTrigger, projectId, setIsActiveTrigger, setIsActiveAction, existingRule }) => {
   
+    const [open, setOpen] = useState(false);
+    const [whichSection, setWhichSection] = useState(false);
+    const [option1, setOption1] = useState("Section_changed");
+    const [option2, setOption2] = useState("");
+    const [icons, setIcons] = useState([]);
+
+    console.log(option1);
+    console.log(option2);
+    console.log(activeTrigger);
+    
+    
+        const handleChange = (event) => {
+            setOption1(event.target.value);
+            if (event.target.value === "Section_changed") {
+                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section changed" } });
+                setWhichSection(false);
+            } else if (event.target.value === "Section_is") {
+                setWhichSection(true);
+                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is", section: option2 } });
+                setIcons([]);
+            }
+            
+        }
+
+        const handleWorkChange = (event) => {
+            setOption2(event.target.value);
+            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is", section: event.target.value } });
+            setIcons([]);
+            
+        }
+
+    const toggleActionDrawer = (newOpen) => () => {
+        setOpen(newOpen);
+      };
 
   console.log(existingRule);
 
@@ -111,7 +219,8 @@ const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, p
     setIsActiveAction(false);
 
     if(event === "Task moved") {
-      setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task moved" } });
+    //   setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task moved" } });
+      setOpen(true);
     }
     if(event === "Task added") {
       setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task added" } });
@@ -136,6 +245,87 @@ const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, p
     }
 
   }
+
+
+  const DrawerTriggerList = (
+    <DrawerContainer style={{ backgroundColor: '#f9f9f9' }}>
+      <ArrowIcoBtn onClick={toggleActionDrawer(false)}>
+        <KeyboardDoubleArrowRightIcon/>
+      </ArrowIcoBtn>
+      <Box sx={{ width: '400px' }} role="presentation">
+          <top>
+            <h2 style={{ margin: '10px 0' }}>Task is moved to a section</h2>
+          </top>
+
+          <Divider sx={{ padding: '10px 0' }} />
+
+          <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px', paddingTop: '20px'}}>
+            <p style={{ margin: '0' }}>Choose an option</p> 
+
+            <OutlinedBox style={{ marginTop: "0px", width: '-webkit-fill-available' }}>
+                <select
+                id="priority"
+                name="priority"
+                value={setOption1}
+                onChange={handleChange}
+                style={{
+                    width: "100%",
+                    padding: "0",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    fontSize: "16px",
+                    backgroundColor: "transparent",
+                    color: "#C1C7C9",
+                    border: "none",
+                }}
+                >
+                <option value="" disabled>
+                    Section is changed
+                </option>
+                <option value="Section_changed">Section is changed</option>
+                <option value="Section_is">Section is...</option>
+                </select>
+            </OutlinedBox>
+          </Box>
+
+          {whichSection && (
+            <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px', paddingTop: '20px'}}>
+            <p style={{ margin: '0' }}>Choose a work</p> 
+
+            <OutlinedBox style={{ marginTop: "0px", width: '-webkit-fill-available' }}>
+                <select
+                id="work"
+                name="work"
+                value={option2}
+                onChange={(e) => handleWorkChange(e)}
+                style={{
+                    width: "100%",
+                    padding: "0",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    fontSize: "16px",
+                    backgroundColor: "transparent",
+                    color: "#C1C7C9",
+                    border: "none",
+                }}
+                >
+                <option value="" disabled>
+                    -
+                </option>
+                {works.map((work) => (
+                    <option key={work.id} value={work.workName}>
+                    {work.workName}
+                    </option>
+                ))}
+                </select>
+
+            </OutlinedBox>
+          </Box>
+          )}
+
+      </Box>
+    </DrawerContainer>
+  );
 
 
   return (
@@ -250,6 +440,16 @@ const TriggerFunctionCards = ({ status, work, activeTrigger, setActiveTrigger, p
             </Button>
 
       </Bottom>
+
+      <Drawer 
+                  anchor="right" 
+                  open={open} 
+                  onClose={toggleActionDrawer(false)} 
+                  TransitionComponent={Slide}
+                  transitionDuration={1000}
+              >
+                  {DrawerTriggerList}
+              </Drawer>
 
     </Container>
 

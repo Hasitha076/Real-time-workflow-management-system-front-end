@@ -547,6 +547,9 @@ const WorkDetailsPage = ({setUpdateWorkFromTask}) => {
   console.log(projectCollaborators);
   console.log(projectTeams);
   console.log(works);
+
+  console.log(editTask);
+  
   
 
   const [teamNames, setTeamNames] = React.useState([]);
@@ -869,6 +872,7 @@ console.log(members);
                             setTaskAdd={setTaskAdd}
                             work={item}
                             tasks={tasks}
+                            editTask={editTask}
                             setEditTask={setEditTask}
                             workCollaborators={workCollaborators}
                             workTeams={workTeams}
@@ -909,6 +913,8 @@ console.log(members);
                             setTaskAdd={setTaskAdd}
                             work={item}
                             tasks={tasks}
+                            editTask={editTask}
+                            setEditTask={setEditTask}
                             workCollaborators={workCollaborators}
                             workTeams={workTeams}
                             setUpdateWorkFromTask={setUpdateWorkFromTask}
