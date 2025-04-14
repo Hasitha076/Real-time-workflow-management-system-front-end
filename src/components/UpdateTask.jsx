@@ -310,7 +310,7 @@ useEffect(() => {
         setBackDisabled(true);
         
 
-        await axios.put(`http://localhost:8082/api/v1/task/updateTask`, {
+        await axios.put(`http://localhost:8082/api/v1/task/movedAndUpdateTask`, {
             taskId: inputs.taskId, 
             taskName: inputs.taskName, 
             description: inputs.description, 
