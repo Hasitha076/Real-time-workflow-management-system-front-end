@@ -23,6 +23,11 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import {Drawer, Slide} from '@mui/material';
+import Avatar from "@mui/material/Avatar";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import {PersonAdd} from "@mui/icons-material";
+import InviteActionMembers from "./InviteActionMember";
+import InviteTriggerMembers from "./InvitetriggerMembers";
 
 
 const Container = styled.div`
@@ -174,18 +179,63 @@ const OutlinedBox = styled.div`
   }
 `;
 
+const Members = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 8px 0px 0px 0px;
+`;
 
-const TriggerFunctionCards = ({ status, works, activeTrigger, setActiveTrigger, projectId, setIsActiveTrigger, setIsActiveAction, existingRule }) => {
+const AvatarGroup = styled.div`
+  display: flex;
+  align-items: center;
+  margin-right: 12px;
+`;
+
+const InviteButton = styled.button`
+  padding: 6px 14px;
+  background-color: transparent;
+  border: 1px solid ${({ theme }) => theme.primary};
+  color: ${({ theme }) => theme.primary};
+  border-radius: 3px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  margin: 0px 16px;
+  &:hover {
+    background-color: ${({ theme }) => theme.primary};
+    color: ${({ theme }) => theme.text};
+  }
+`;
+
+
+const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, setActiveTrigger, projectId, setIsActiveTrigger, setIsActiveAction, existingRule }) => {
   
-    const [open, setOpen] = useState(false);
+    const [open1, setOpen1] = useState(false);
+    const [open2, setOpen2] = useState(false);
+    const [open3, setOpen3] = useState(false);
+    const [open4, setOpen4] = useState(false);
     const [whichSection, setWhichSection] = useState(false);
     const [option1, setOption1] = useState("Section_changed");
     const [option2, setOption2] = useState("");
+    const [option3, setOption3] = useState("All tasks");
+    const [option4, setOption4] = useState("");
+    const [option5, setOption5] = useState("Status_changed");
     const [icons, setIcons] = useState([]);
+    const [isSetAssignee, setIsSetAssignee] = useState(false);
+     const [invitePopup, setInvitePopup] = useState(false);
+       const [assignee, setAssignee] = useState("");
 
     console.log(option1);
     console.log(option2);
     console.log(activeTrigger);
+    console.log(taskTemplates);
+    
     
     
         const handleChange = (event) => {
@@ -208,8 +258,56 @@ const TriggerFunctionCards = ({ status, works, activeTrigger, setActiveTrigger, 
             
         }
 
-    const toggleActionDrawer = (newOpen) => () => {
-        setOpen(newOpen);
+        const handleTaskAddChange = (event) => {
+            setOption3(event.target.value);
+            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task is add from", task: event.target.value } });
+            setIcons([]);
+            
+        }
+
+        const handleAssigneeChange = (event) => {
+            setAssignee(event.target.value);
+            if (event.target.value === "Assignee is changed") {
+                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Assignee is changed" } });
+                setIsSetAssignee(false);
+            } else if (event.target.value === "Assignee is empty") {
+                setIsSetAssignee(false);
+                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Assignee is empty" } });
+                setIcons([]);
+            } else if (event.target.value === "Assignee is...") {
+                setIsSetAssignee(true);
+                setIcons([]);
+            }
+            
+        }
+
+        const handleStatusChange = (event) => {
+            setOption5(event.target.value);
+            if (event.target.value === "Status_is_changed") {
+                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Status is changed" } });
+                setWhichSection(false);
+            } else if (event.target.value === "Status_is_incomplete") {
+                setWhichSection(true);
+                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is incomplete"} });
+                setIcons([]);
+            } else if (event.target.value === "Status_is_complete") {
+                setWhichSection(true);
+                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is complete"} });
+                setIcons([]);
+            }
+            
+        }
+
+    const toggleTriggerDrawer = (newOpen, number) => () => {
+        if(number === 1) {
+            setOpen1(newOpen);
+        } else if(number === 2) {
+            setOpen2(newOpen);
+        } else if (number === 3) {
+            setOpen3(newOpen)
+        } else if (number === 4) {
+            setOpen4(newOpen)
+        }
       };
 
   console.log(existingRule);
@@ -220,13 +318,15 @@ const TriggerFunctionCards = ({ status, works, activeTrigger, setActiveTrigger, 
 
     if(event === "Task moved") {
     //   setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task moved" } });
-      setOpen(true);
+        setOpen1(true);
     }
     if(event === "Task added") {
-      setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task added" } });
+    //   setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task added" } });
+        setOpen2(true);
     }
     if(event === "Task assigned") {
-      setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task assigned" } });
+    //   setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task assigned" } });
+      setOpen3(true);
     }
     if(event === "Due date changed") {
       setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Due date changed" } });
@@ -238,7 +338,8 @@ const TriggerFunctionCards = ({ status, works, activeTrigger, setActiveTrigger, 
       setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task overdue" } });
     }
     if(event === "Task status changed") {
-      setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task status changed" } });
+    //   setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task status changed" } });
+      setOpen4(true);
     }
     if(event === "Approval status changed") {
       setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Approval status changed" } });
@@ -249,7 +350,7 @@ const TriggerFunctionCards = ({ status, works, activeTrigger, setActiveTrigger, 
 
   const DrawerTriggerList = (
     <DrawerContainer style={{ backgroundColor: '#f9f9f9' }}>
-      <ArrowIcoBtn onClick={toggleActionDrawer(false)}>
+      <ArrowIcoBtn onClick={toggleTriggerDrawer(false, 1)}>
         <KeyboardDoubleArrowRightIcon/>
       </ArrowIcoBtn>
       <Box sx={{ width: '400px' }} role="presentation">
@@ -328,6 +429,190 @@ const TriggerFunctionCards = ({ status, works, activeTrigger, setActiveTrigger, 
   );
 
 
+  const DrawerTriggerAddTaskList = (
+    <DrawerContainer style={{ backgroundColor: '#f9f9f9' }}>
+      <ArrowIcoBtn onClick={toggleTriggerDrawer(false, 2)}>
+        <KeyboardDoubleArrowRightIcon/>
+      </ArrowIcoBtn>
+      <Box sx={{ width: '400px' }} role="presentation">
+          <top>
+            <h2 style={{ margin: '10px 0' }}>Task is added to this project</h2>
+          </top>
+
+          <Divider sx={{ padding: '10px 0' }} />
+
+
+            <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px', paddingTop: '20px'}}>
+            <p style={{ margin: '0' }}>Choose a source</p> 
+
+            <OutlinedBox style={{ marginTop: "0px", width: '-webkit-fill-available' }}>
+                <select
+                id="work"
+                name="work"
+                value={option3}
+                onChange={(e) => handleTaskAddChange(e)}
+                style={{
+                    width: "100%",
+                    padding: "0",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    fontSize: "16px",
+                    backgroundColor: "transparent",
+                    color: "#C1C7C9",
+                    border: "none",
+                }}
+                >
+                <option value="" disabled>
+                    -
+                </option>
+                <option value="All tasks">
+                    All tasks
+                </option>
+                {taskTemplates.map((taskTemplate) => (
+                    <option key={taskTemplate.taskTemplateId} value={taskTemplate.taskTemplateName}>
+                    {taskTemplate.taskTemplateName}
+                    </option>
+                ))}
+                </select>
+
+            </OutlinedBox>
+          </Box>
+
+      </Box>
+    </DrawerContainer>
+  );
+
+  const DrawerTriggerAssigneesList = (
+      <DrawerContainer style={{ backgroundColor: '#f9f9f9' }}>
+        <ArrowIcoBtn onClick={toggleTriggerDrawer(false, 3)}>
+          <KeyboardDoubleArrowRightIcon/>
+        </ArrowIcoBtn>
+        <Box sx={{ width: '400px' }} role="presentation">
+            <top>
+              <h2 style={{ margin: '10px 0' }}>Set assignee to...</h2>
+            </top>
+  
+            <Divider sx={{ padding: '10px 0' }} />
+  
+            <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px', paddingTop: '20px'}}>
+              <p style={{ margin: '0' }}>Choose an option</p> 
+  
+              <OutlinedBox style={{ marginTop: "0px", width: '-webkit-fill-available' }}>
+                    <select
+                      id="priority"
+                      name="priority"
+                      value={assignee}
+                      onChange={handleAssigneeChange}
+                      style={{
+                        width: "100%",
+                        padding: "0",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        fontSize: "16px",
+                        backgroundColor: "transparent",
+                        color: "#C1C7C9",
+                        border: "none",
+                      }}
+                    >
+                      <option value="" disabled>
+                        Assignee is changed
+                      </option>
+                      <option value="Assignee is changed">Assignee is changed</option>
+                      <option value="Assignee is empty">Assignee is empty</option>
+                      <option value="Assignee is...">Assignee is...</option>
+                    </select>
+                  </OutlinedBox>
+  
+                  <br />
+                  {isSetAssignee && 
+                  <>
+                      <p style={{ margin: '0' }}>Choose an assignee</p> 
+  
+                      <Members>
+                          {icons.length != 0 ? <AvatarGroup>
+            
+                              <Avatar
+                                  sx={{ marginRight: "5px", width: "38px", height: "38px" }}
+                              >
+                                  {icons[0].name.charAt(0).toUpperCase()}
+                              </Avatar>
+                              {icons[0].name}
+                              
+                          </AvatarGroup>  : <Avatar sx={{ backgroundColor: 'transparent', border: '1px dashed #000', color: '#000' }}><AccountCircleIcon/></Avatar>}
+                          <InviteButton onClick={() => setInvitePopup(true)}>
+                              <PersonAdd sx={{ fontSize: "12px" }} />
+                              Invite
+                          </InviteButton>
+                      </Members>
+                  </>
+                  }
+  
+              <Hr />
+              {invitePopup && (
+                <InviteTriggerMembers
+                  setInvitePopup={setInvitePopup}
+                  id={projectId}
+                  icons={icons}
+                  setIcons={setIcons}
+                  activeTrigger={activeTrigger}
+                  setActiveTrigger={setActiveTrigger}
+                />
+              )}
+  
+            </Box>
+  
+        </Box>
+      </DrawerContainer>
+    );
+
+
+    const DrawerTriggerStatusChange = (
+        <DrawerContainer style={{ backgroundColor: '#f9f9f9' }}>
+          <ArrowIcoBtn onClick={toggleTriggerDrawer(false, 4)}>
+            <KeyboardDoubleArrowRightIcon/>
+          </ArrowIcoBtn>
+          <Box sx={{ width: '400px' }} role="presentation">
+              <top>
+                <h2 style={{ margin: '10px 0' }}>Task completion status is changed</h2>
+              </top>
+    
+              <Divider sx={{ padding: '10px 0' }} />
+    
+              <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px', paddingTop: '20px'}}>
+                <p style={{ margin: '0' }}>Choose an option</p> 
+    
+                <OutlinedBox style={{ marginTop: "0px", width: '-webkit-fill-available' }}>
+                    <select
+                    id="priority"
+                    name="priority"
+                    value={setOption5}
+                    onChange={handleStatusChange}
+                    style={{
+                        width: "100%",
+                        padding: "0",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        fontSize: "16px",
+                        backgroundColor: "transparent",
+                        color: "#C1C7C9",
+                        border: "none",
+                    }}
+                    >
+                    <option value="" disabled>
+                        Status is changed
+                    </option>
+                    <option value="Status_is_changed">Status is changed</option>
+                    <option value="Status_is_incomplete">Status is incomplete</option>
+                    <option value="Status_is_complete">Status is complete</option>
+                    </select>
+                </OutlinedBox>
+              </Box>
+    
+          </Box>
+        </DrawerContainer>
+      );
+
+
   return (
    
     <Container className={"item"}>
@@ -390,7 +675,7 @@ const TriggerFunctionCards = ({ status, works, activeTrigger, setActiveTrigger, 
                     </div>
                 </div>
             </Button>
-            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={true} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Due date approaching")
             }} >
@@ -401,7 +686,7 @@ const TriggerFunctionCards = ({ status, works, activeTrigger, setActiveTrigger, 
                     </div>
                 </div>
             </Button>
-            <Button disabled={existingRule} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
+            <Button disabled={true} style={{ border: '1px solid #fff', backgroundColor: "#ffffff", padding: '10px 20px', borderRadius: '10px', width: '100%', display: "flex", alignItems: "center", justifyContent: 'flex-start' }} 
             onClick={() => {
                 eventHandle("Task overdue")
             }} >
@@ -442,14 +727,44 @@ const TriggerFunctionCards = ({ status, works, activeTrigger, setActiveTrigger, 
       </Bottom>
 
       <Drawer 
-                  anchor="right" 
-                  open={open} 
-                  onClose={toggleActionDrawer(false)} 
-                  TransitionComponent={Slide}
-                  transitionDuration={1000}
-              >
-                  {DrawerTriggerList}
-              </Drawer>
+        anchor="right" 
+        open={open1} 
+        onClose={toggleTriggerDrawer(false, 1)} 
+        TransitionComponent={Slide}
+        transitionDuration={1000}
+        >
+            {DrawerTriggerList}
+        </Drawer>
+
+        <Drawer 
+        anchor="right" 
+        open={open2} 
+        onClose={toggleTriggerDrawer(false, 2)} 
+        TransitionComponent={Slide}
+        transitionDuration={1000}
+        >
+            {DrawerTriggerAddTaskList}
+        </Drawer>
+
+        <Drawer 
+        anchor="right" 
+        open={open3} 
+        onClose={toggleTriggerDrawer(false, 3)} 
+        TransitionComponent={Slide}
+        transitionDuration={1000}
+        >
+            {DrawerTriggerAssigneesList}
+        </Drawer>
+
+        <Drawer 
+        anchor="right" 
+        open={open4} 
+        onClose={toggleTriggerDrawer(false, 4)} 
+        TransitionComponent={Slide}
+        transitionDuration={1000}
+        >
+            {DrawerTriggerStatusChange}
+        </Drawer>
 
     </Container>
 

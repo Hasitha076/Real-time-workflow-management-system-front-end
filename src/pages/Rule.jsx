@@ -233,6 +233,7 @@ const Rule = () => {
   const [newTaskTemplate, setNewTaskTemplate] = useState(false);
   const [workDetails, setWorkDetails] = useState({});
   const [taskTemplateAdded, setTaskTemplateAdded] = useState(false);
+    const [taskTemplates, setTaskTemplates] = useState([]);
 
   const location = useLocation();
   const existingRule = location.state?.existingRule;
@@ -310,11 +311,22 @@ const Rule = () => {
       console.log(err);
     });
   }
+
+    const getTaskTemplates = async () => {
+      await axios.get(`http://localhost:8082/api/v1/task/getTaskTemplatesByProjectId/${id}`)
+        .then((res) => {
+          setTaskTemplates(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
   
   useEffect(() => {
     getCollaborators();
     getTeams();
     getWorks();
+    getTaskTemplates();
   }, [item, id]);
   
 
@@ -325,6 +337,8 @@ const Rule = () => {
   console.log(works);
   console.log(projectCollaborators);
   console.log(projectTeams);
+  console.log(taskTemplates);
+  
   
 
   const openWorkDetails = (work) => {
@@ -617,6 +631,7 @@ const Rule = () => {
         dispatch(openSnackbar({ open: true, message: "Error Publishing Rule", type: "error" }));
         });
     }
+    
 
   const DrawerList = (
     <DrawerContainer style={{ backgroundColor: '#f9f9f9' }}>
@@ -937,7 +952,7 @@ const Rule = () => {
             </Work>
             <HrHor />
             <Extra>
-                {triggerHandle && <TriggerFunctionCards works={works} existingRule={existingRule} setIsActiveTrigger={setIsActiveTrigger} setIsActiveAction={setIsActiveAction} projectId={id} activeTrigger={activeTrigger} setActiveTrigger={setActiveTrigger} />}
+                {triggerHandle && <TriggerFunctionCards works={works} taskTemplates={taskTemplates} existingRule={existingRule} setIsActiveTrigger={setIsActiveTrigger} setIsActiveAction={setIsActiveAction} projectId={id} activeTrigger={activeTrigger} setActiveTrigger={setActiveTrigger} />}
                 {actionHandle && <ActionFunctionCards existingRule={existingRule} setIsActiveAction={setIsActiveAction} setIsActiveTrigger={setIsActiveTrigger} projectId={id} activeAction={activeAction} setActiveAction={setActiveAction} />}
             </Extra>
           </Body>

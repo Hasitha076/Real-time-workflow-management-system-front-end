@@ -351,8 +351,6 @@ const RulesPage = () => {
         console.log(err);
       });
   };
-
-  console.log("Rules", rules);
   
 
 useEffect(() => {

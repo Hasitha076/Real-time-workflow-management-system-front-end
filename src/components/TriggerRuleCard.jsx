@@ -6,6 +6,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import { Button } from "@mui/material";
 import axios from "axios";
+import Avatar from "@mui/material/Avatar";
 
 const Container = styled.div`
   padding: 14px;
@@ -97,10 +98,25 @@ const TriggerRuleCard = ({  trigger }) => {
         <Title>+ Add {trigger.type} - {trigger.id} - {trigger.status}</Title> 
         :
 
-        <Title>{trigger.triggerDetails.triggerType} <span> - </span>
+        <Title style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "10px"}}>{trigger.triggerDetails.triggerType} <span> - </span>
                 {trigger.triggerDetails.triggerType === "Section is" ?
                 trigger.triggerDetails.section
-                 : null}
+                 : trigger.triggerDetails.triggerType === "Task is add from" ? 
+                trigger.triggerDetails.task 
+                : 
+                trigger.triggerDetails.triggerType === "Set assignee to" ? 
+                trigger.triggerDetails.assignee 
+                : 
+                trigger.triggerDetails.triggerType === "Assignee is..." ?
+                <div style={{display: "flex", alignItems: "center"}}>
+                  <Avatar
+                  sx={{ marginRight: "5px", width: "38px", height: "38px" }}>
+                  {trigger.triggerDetails.assignee?.name.charAt(0).toUpperCase()}
+                  </Avatar>  
+                  {trigger.triggerDetails.assignee?.name}
+                </div>
+                : null
+                }
         </Title> 
         }
       </Top>
