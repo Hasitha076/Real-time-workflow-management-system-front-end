@@ -347,29 +347,31 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
             if (res.data.length > 0) {
               setTasksData(res.data);
             }
-        
-            if (res.data.length === 0 || res.data.every((task) => task.status === true)) {
-              await axios.put(`http://localhost:8086/api/v1/work/updateWorkStatus`, {
-                workId: work.workId,
-                status: true
-              });
-        
-              const id = work.workId;
+
+            const id = work.workId;
               const arrayIndex = allWorks.findIndex((item) => item.workId === id);
               
-              if (arrayIndex !== -1 && arrayIndex + 1 < allWorks.length && value === "complete") {
+              if (arrayIndex !== -1 && arrayIndex + 1 <= allWorks.length && value === true) {
                 await axios.put(`http://localhost:8086/api/v1/work/updateWorkStatus`, {
-                  workId: parseInt(allWorks[arrayIndex + 1].workId),
+                  workId: parseInt(allWorks[arrayIndex].workId),
                   status: false
                 }).then((res) => {
+                  projectStatusUpdate(false);
                   console.log("Updated work status: ", res.data);
                 })
               } else {
                 console.warn("No next work item found in allWorks.");
               }
         
+            if (res.data.length === 0 || res.data.every((task) => task.status === true)) {
+              await axios.put(`http://localhost:8086/api/v1/work/updateWorkStatus`, {
+                workId: work.workId,
+                status: true
+              });
+      
+        
               setUpdateWorkFromTask(true);
-              await projectStatusUpdate();
+              await projectStatusUpdate(value);
             }
           } catch (err) {
             console.error("Error updating work status:", err);
@@ -389,14 +391,16 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
         console.log("Works: ", allWorks);
         
         
-        
-        
-
-        const projectStatusUpdate = async () => {
+        const projectStatusUpdate = async (value) => {
+          console.log("project status updating...");
+          console.log(value);
+          
+          
           await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${work.projectId}`)
           .then((res) => {
             console.log("res.data: ", res.data);
-            if (!res.data?.every((work) => work.status == false)) {         
+            if (!res.data?.every((work) => work.status == false) && value === true) {      
+              console.log("Updating project status to COMPLETED");   
                updateProjectStatus({
                 variables: {
                   projectId: parseInt(work.projectId),
@@ -411,7 +415,26 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
             .catch((err) => {
                 console.log(err);
             });
-            }
+          }
+
+          if (value === false) {     
+            console.log("Updating project status to ON_GOING");    
+            updateProjectStatus({
+             variables: {
+               projectId: parseInt(work.projectId),
+               input: {
+                 status: "ON_GOING"
+               }
+             }
+           }).then((res) => {
+             console.log(res);
+             
+         })
+         .catch((err) => {
+             console.log(err);
+         });
+       }
+          
           }).catch((err) => {
             console.log(err);
             
@@ -441,6 +464,8 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
                 console.log(res.data);
               })
             }
+
+            updateWorkStatus(status)
           } else {
             if(item.comments.length === 0) {
               await axios.put(`http://localhost:8082/api/v1/task/changeTaskStatus/${item.taskId}`)
@@ -453,9 +478,10 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
                 console.log(res.data);
               })
             }
+
+            updateWorkStatus(status)
           }
         
-          updateWorkStatus("complete")
         }
 
   useEffect(() => {

@@ -9,6 +9,8 @@ import { useSelector } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
+import { LOAD_PROJECT_BY_ID, UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
+import { useMutation, useQuery } from "@apollo/client";
 
 
 
@@ -131,6 +133,13 @@ const UpdateTask = ({ openUpdate, setOpenUpdate, setEditTask, setUpdateWorkFromT
     const [showAddMember, setShowAddMember] = useState(false);
     const [works, setWorks] = useState([]);
     const [selectedWork, setSelectedWork] = useState(null);
+      const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
+
+        const { loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
+          variables: { id: parseInt(openUpdate.data.projectId) },  // Ensure ID is an integer
+          skip: !openUpdate.data.projectId,  // Avoid sending query if ID is undefined
+          fetchPolicy: "cache-and-network" // Ensures fresh data is fetched
+        });
 
     const goToAddProject = () => {
         setShowAddProject(true);
@@ -261,11 +270,38 @@ useEffect(() => {
                   });
             
                   setUpdateWorkFromTask(true);
+                  await projectStatusUpdate();
                 }
               } catch (err) {
                 console.error("Error updating work status:", err);
               }
             };
+
+    const projectStatusUpdate = async () => {
+        await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${openUpdate.data.projectId}`)
+        .then((res) => {
+        console.log("res.data: ", res.data);
+        if (!res.data?.every((work) => work.status == true)) {         
+            updateProjectStatus({
+            variables: {
+                projectId: parseInt(openUpdate.data.projectId),
+                input: {
+                status: "ON_GOING"
+                }
+            }
+            }).then((res) => {
+            console.log(res);
+            
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+        }
+        }).catch((err) => {
+        console.log(err);
+        
+        })
+    }
     
 
     const UpdateTask = async () => {
