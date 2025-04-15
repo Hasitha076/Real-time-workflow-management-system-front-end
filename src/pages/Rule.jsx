@@ -953,7 +953,7 @@ const Rule = () => {
             <HrHor />
             <Extra>
                 {triggerHandle && <TriggerFunctionCards works={works} taskTemplates={taskTemplates} existingRule={existingRule} setIsActiveTrigger={setIsActiveTrigger} setIsActiveAction={setIsActiveAction} projectId={id} activeTrigger={activeTrigger} setActiveTrigger={setActiveTrigger} />}
-                {actionHandle && <ActionFunctionCards existingRule={existingRule} setIsActiveAction={setIsActiveAction} setIsActiveTrigger={setIsActiveTrigger} projectId={id} activeAction={activeAction} setActiveAction={setActiveAction} />}
+                {actionHandle && <ActionFunctionCards works={works} existingRule={existingRule} setIsActiveAction={setIsActiveAction} setIsActiveTrigger={setIsActiveTrigger} projectId={id} activeAction={activeAction} setActiveAction={setActiveAction} />}
             </Extra>
           </Body>
         </>

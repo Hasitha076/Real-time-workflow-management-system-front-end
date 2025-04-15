@@ -73,7 +73,7 @@ const TaskMainText = styled.text`
   justify-content: space-between;
   align-items: center;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 12px;
   color: ${({ theme }) => theme.soft2};
   line-height: 2;
 `;
@@ -221,11 +221,11 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
     const [open3, setOpen3] = useState(false);
     const [open4, setOpen4] = useState(false);
     const [whichSection, setWhichSection] = useState(false);
-    const [option1, setOption1] = useState("Section_changed");
+    const [option1, setOption1] = useState("");
     const [option2, setOption2] = useState("");
-    const [option3, setOption3] = useState("All tasks");
+    const [option3, setOption3] = useState("");
     const [option4, setOption4] = useState("");
-    const [option5, setOption5] = useState("Status_changed");
+    const [option5, setOption5] = useState("");
     const [icons, setIcons] = useState([]);
     const [isSetAssignee, setIsSetAssignee] = useState(false);
      const [invitePopup, setInvitePopup] = useState(false);
@@ -241,7 +241,7 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
         const handleChange = (event) => {
             setOption1(event.target.value);
             if (event.target.value === "Section_changed") {
-                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section changed" } });
+                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section changed", section: "Any section" } });
                 setWhichSection(false);
             } else if (event.target.value === "Section_is") {
                 setWhichSection(true);
@@ -252,8 +252,9 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
         }
 
         const handleWorkChange = (event) => {
-            setOption2(event.target.value);
-            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is", section: event.target.value } });
+            const { workId, workName } = JSON.parse(event.target.value);
+            setOption2({ workId, workName });
+            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is", section: { workId, workName } } });
             setIcons([]);
             
         }
@@ -317,15 +318,12 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
     setIsActiveAction(false);
 
     if(event === "Task moved") {
-    //   setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task moved" } });
         setOpen1(true);
     }
     if(event === "Task added") {
-    //   setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task added" } });
         setOpen2(true);
     }
     if(event === "Task assigned") {
-    //   setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task assigned" } });
       setOpen3(true);
     }
     if(event === "Due date changed") {
@@ -338,7 +336,6 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
       setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task overdue" } });
     }
     if(event === "Task status changed") {
-    //   setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task status changed" } });
       setOpen4(true);
     }
     if(event === "Approval status changed") {
@@ -367,7 +364,7 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
                 <select
                 id="priority"
                 name="priority"
-                value={setOption1}
+                value={option1}
                 onChange={handleChange}
                 style={{
                     width: "100%",
@@ -414,7 +411,7 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
                     -
                 </option>
                 {works.map((work) => (
-                    <option key={work.id} value={work.workName}>
+                    <option key={work.id} value={JSON.stringify({ workId: work.workId, workName: work.workName })}>
                     {work.workName}
                     </option>
                 ))}

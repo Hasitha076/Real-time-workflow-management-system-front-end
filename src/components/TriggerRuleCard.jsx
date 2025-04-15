@@ -98,9 +98,13 @@ const TriggerRuleCard = ({  trigger }) => {
         <Title>+ Add {trigger.type} - {trigger.id} - {trigger.status}</Title> 
         :
 
-        <Title style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "10px"}}>{trigger.triggerDetails.triggerType} <span> - </span>
-                {trigger.triggerDetails.triggerType === "Section is" ?
+        <Title style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "10px"}}>
+            {trigger.triggerDetails.triggerType} <span> - </span>
+                {trigger.triggerDetails.triggerType === "Section changed" ?
                 trigger.triggerDetails.section
+                 :
+                trigger.triggerDetails.triggerType === "Section is" ?
+                trigger.triggerDetails.section.workName
                  : trigger.triggerDetails.triggerType === "Task is add from" ? 
                 trigger.triggerDetails.task 
                 : 

@@ -246,6 +246,9 @@ useEffect(() => {
     const updateWorkStatus = async (value) => {
               try {
                 console.log(value);
+                console.log("selectedWork: ", selectedWork);
+                console.log("inputs.selectedWork: ", inputs.selectedWork);
+                
                 
                 const res = await axios.get(`http://localhost:8082/api/v1/task/getTasksByWorkId/${selectedWork.workId}`);
                 
@@ -267,11 +270,22 @@ useEffect(() => {
                   await axios.put(`http://localhost:8086/api/v1/work/updateWorkStatus`, {
                     workId: selectedWork.workId,
                     status: true
-                  });
+                });
             
                   setUpdateWorkFromTask(true);
                   await projectStatusUpdate();
                 }
+
+                const nextWork = await axios.get(`http://localhost:8082/api/v1/task/getTasksByWorkId/${inputs.selectedWork.workId}`);
+
+                if (nextWork.data.length === 0 || nextWork.data.every((task) => task.status === true)) {
+                    await axios.put(`http://localhost:8086/api/v1/work/updateWorkStatus`, {
+                      workId: inputs.selectedWork.workId,
+                      status: true
+                    }).then((res) => {
+                      console.log("Updated work status: ", res.data);
+                    })
+                  }
               } catch (err) {
                 console.error("Error updating work status:", err);
               }

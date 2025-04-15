@@ -69,7 +69,7 @@ const TaskMainText = styled.text`
   justify-content: space-between;
   align-items: center;
   font-weight: 700;
-  font-size: 15px;
+  font-size: 12px;
   color: ${({ theme }) => theme.soft2};
   line-height: 2;
 `;
@@ -210,20 +210,26 @@ const InviteButton = styled.button`
 `;
 
 
-const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsActiveAction, setIsActiveTrigger, existingRule }) => {
+const ActionFunctionCards = ({ works, activeAction, setActiveAction, projectId, setIsActiveAction, setIsActiveTrigger, existingRule }) => {
 
-    const [open, setOpen] = useState(false);
-      const [invitePopup, setInvitePopup] = useState(false);
-        const [icons, setIcons] = useState([]);
-          const [collaboratorUpdated, setCollaboratorUpdated] = useState(false);
-          const [isSetAssignee, setIsSetAssignee] = useState(true);
-          const [isActive, setIsActive] = useState(false);
+    const [open1, setOpen1] = useState(false);
+    const [open3, setOpen3] = useState(false);
+    const [invitePopup, setInvitePopup] = useState(false);
+    const [icons, setIcons] = useState([]);
+    const [option1, setOption1] = useState("");
+    const [collaboratorUpdated, setCollaboratorUpdated] = useState(false);
+    const [isSetAssignee, setIsSetAssignee] = useState(true);
+    const [isActive, setIsActive] = useState(false);
 
-    const toggleActionDrawer = (newOpen) => () => {
-        setOpen(newOpen);
+    const toggleActionDrawer = (newOpen, number) => () => {
+        if(number === 1) {
+            setOpen1(newOpen);
+        } else if(number === 3) {
+            setOpen3(newOpen);
+        }
       };
 
-      console.log(existingRule);
+    console.log(existingRule);
       
 
   const eventHandle = (event) => {
@@ -231,14 +237,15 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
     setIsActiveTrigger(false);
 
     if(event === "Task moved") {
-      setActiveAction({ ...activeAction, actionDetails: { actionType: "Task moved" } });
+    setOpen1(true);
     }
     if(event === "Remove task") {
       setActiveAction({ ...activeAction, actionDetails: { actionType: "Remove task from the project" } });
     }
     if(event === "Change assignee") {
         setActiveAction({ ...activeAction, actionDetails: { actionType: "Set assignee to" } });
-        setOpen(true);
+        setOpen3(true);
+        setOption1("");
     }
     if(event === "Change status") {
       setActiveAction({ ...activeAction, actionDetails: { actionType: "Change status" } });
@@ -275,9 +282,17 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
         
     }
 
+    const handleWorkChange = (event) => {
+        const { workId, workName } = JSON.parse(event.target.value);
+        setOption1({ workId, workName });
+        setActiveAction({ ...activeAction, actionDetails: { actionType: "Move task to section", ActionMovedSection: { workId, workName } } });
+        setIcons([]);
+        
+    }
+
   const DrawerActionList = (
     <DrawerContainer style={{ backgroundColor: '#f9f9f9' }}>
-      <ArrowIcoBtn onClick={toggleActionDrawer(false)}>
+      <ArrowIcoBtn onClick={toggleActionDrawer(false, 3)}>
         <KeyboardDoubleArrowRightIcon/>
       </ArrowIcoBtn>
       <Box sx={{ width: '400px' }} role="presentation">
@@ -351,6 +366,56 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
               />
             )}
 
+          </Box>
+
+      </Box>
+    </DrawerContainer>
+  );
+
+
+  const DrawerWorkList = (
+    <DrawerContainer style={{ backgroundColor: '#f9f9f9' }}>
+      <ArrowIcoBtn onClick={toggleActionDrawer(false, 1)}>
+        <KeyboardDoubleArrowRightIcon/>
+      </ArrowIcoBtn>
+      <Box sx={{ width: '400px' }} role="presentation">
+          <top>
+            <h2 style={{ margin: '10px 0' }}>Task is moved to a section</h2>
+          </top>
+
+          <Divider sx={{ padding: '10px 0' }} />
+
+            <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px', paddingTop: '20px'}}>
+            <p style={{ margin: '0' }}>Choose a work</p> 
+
+            <OutlinedBox style={{ marginTop: "0px", width: '-webkit-fill-available' }}>
+                <select
+                id="work"
+                name="work"
+                value={option1.workName}
+                onChange={(e) => handleWorkChange(e)}
+                style={{
+                    width: "100%",
+                    padding: "0",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    fontSize: "16px",
+                    backgroundColor: "transparent",
+                    color: "#C1C7C9",
+                    border: "none",
+                }}
+                >
+                <option value="" disabled>
+                    -
+                </option>
+                {works.map((work) => (
+                    <option key={work.id} value={JSON.stringify({ workId: work.workId, workName: work.workName })}>
+                    {work.workName}
+                    </option>
+                ))}
+                </select>
+
+            </OutlinedBox>
           </Box>
 
       </Box>
@@ -484,12 +549,22 @@ const ActionFunctionCards = ({ activeAction, setActiveAction, projectId, setIsAc
 
         <Drawer 
             anchor="right" 
-            open={open} 
-            onClose={toggleActionDrawer(false)} 
+            open={open3} 
+            onClose={toggleActionDrawer(false, 3)} 
             TransitionComponent={Slide}
             transitionDuration={1000}
         >
             {DrawerActionList}
+        </Drawer>
+
+        <Drawer 
+            anchor="right" 
+            open={open1} 
+            onClose={toggleActionDrawer(false, 1)} 
+            TransitionComponent={Slide}
+            transitionDuration={1000}
+        >
+            {DrawerWorkList}
         </Drawer>
 
         

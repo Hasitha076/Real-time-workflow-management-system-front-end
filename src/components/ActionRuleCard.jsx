@@ -100,9 +100,11 @@ const ActionRuleCard = ({  action }) => {
         {action.actionDetails.actionType == undefined ? 
         <Title>+ Add {action.type} - {action.id} - {action.status}</Title> 
         :
-        <Title>{action.actionDetails.actionType}  
+        <Title>{action.actionDetails.actionType}   <span> - </span>
             <div style={{display: "flex", alignItems: "center"}}>
-                {action.actionDetails.actionType === "Set assignee to" && 
+                {action.actionDetails.actionType === "Move task to section" ?
+                action.actionDetails.ActionMovedSection.workName :
+                action.actionDetails.actionType === "Set assignee to" ?
                 <>
                 <Avatar
                 sx={{ marginRight: "5px", width: "38px", height: "38px" }}>
@@ -110,7 +112,7 @@ const ActionRuleCard = ({  action }) => {
                 </Avatar>  
                 {action.actionDetails.assignee?.name}
                 </>
-                }
+                : null}
             
             </div>
         </Title> 
