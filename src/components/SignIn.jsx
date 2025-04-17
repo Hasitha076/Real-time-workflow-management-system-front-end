@@ -19,6 +19,7 @@ import axios from "axios";
 
 import Google from "../Images/google.svg"
 import { useNavigate } from "react-router-dom";
+import OTPInput from "./OTP";
 
 const Container = styled.div`
   width: 100%;
@@ -160,7 +161,6 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
 
   //verify otp
   const [showOTP, setShowOTP] = useState(false);
-  const [otpVerified, setOtpVerified] = useState(false);
   //reset password
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [samepassword, setSamepassword] = useState("");
@@ -168,7 +168,8 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
   const [confirmedpassword, setConfirmedpassword] = useState("");
   const [passwordCorrect, setPasswordCorrect] = useState(false);
   const [resetDisabled, setResetDisabled] = useState(true);
-  const [resettingPassword, setResettingPassword] = useState(false);
+  const [OTP, setOTP] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate()
 
@@ -182,9 +183,9 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
   }, [email, password]);
 
   const handleLogin = async () => {
-    // e.preventDefault();
+  
     if (!disabled) {
-      // dispatch(loginStart());
+
       await axios.post("http://localhost:8081/api/v1/auth/login", {
         email: email,
         password: password,
@@ -230,8 +231,10 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
   const validateEmail = () => {
     if (validator.isEmail(email)) {
       setEmailError("");
+      setResetDisabled(false);
     } else {
-      setEmailError("Enter a valid Email Id!");
+      setEmailError("Enter a valid Email");
+      setResetDisabled(true);
     }
   };
 
@@ -275,21 +278,69 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
     }
   }, [newpassword, confirmedpassword]);
 
-  const sendOtp = () => {
 
+  const sendOtp = async () => {
+    console.log(email);
+
+    const data = {
+      email: email,
+    }
+    
+    await axios.post("http://localhost:8081/api/v1/auth/generateOTP", data)
+      .then((res) => {
+        console.log(res.data);
+        if (res.data === "User not found") {
+          setEmailError("User not found");
+        }
+        else {
+          setOTP(res.data);
+          dispatch(
+            openSnackbar({
+              message: "OTP sent to your email",
+              severity: "success",
+            })
+          );
+          setShowOTP(true);
+        }
+      })
+      .catch((err) => {
+        dispatch(
+          openSnackbar({
+            message: "Something went wrong",
+            severity: "error",
+          })
+        );
+        console.log(err);
+    });
+    
   }
 
-  const performResetPassword = async () => {
 
+  const resetPassword = async () => {
+    await axios.post("http://localhost:8081/api/v1/auth/resetPassword", {
+      email: email,
+      password: newpassword
+    })
+      .then((res) => {
+          dispatch(
+            openSnackbar({
+              message: "Password reset successfully",
+              severity: "success",
+            })
+          );
+          setShowForgotPassword(false);
+          setShowNewPassword(false);
+      })
+      .catch((err) => {
+        dispatch(
+          openSnackbar({
+            message: "Something went wrong",
+            severity: "error",
+          })
+        );
+        console.log(err);
+    });
   }
-  const closeForgetPassword = () => {
-    setShowForgotPassword(false)
-    setShowOTP(false)
-  }
-  useEffect(() => {
-    performResetPassword();
-  }, [otpVerified]);
-
 
 
   return (
@@ -397,14 +448,12 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
             <CloseRounded
               style={{
                 position: "absolute",
-                top: "24px",
+                top: "5px",
                 right: "30px",
                 cursor: "pointer",
               }}
-              onClick={() => { closeForgetPassword() }}
+
             />
-
-
                     <OutlinedBox style={{ marginTop: "24px" }}>
                       <EmailRounded
                         sx={{ fontSize: "20px" }}
@@ -413,18 +462,21 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
                       <TextInput
                         placeholder="Email Id"
                         type="email"
+                        value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />
                     </OutlinedBox>
                     <Error error={emailError}>{emailError}</Error>
-                    <OutlinedBox>
+                    {showNewPassword && (
+                      <>
+                      <OutlinedBox>
                       <PasswordRounded
                         sx={{ fontSize: "20px" }}
                         style={{ paddingRight: "12px" }}
                       />
                       <TextInput
                         placeholder="New Password"
-                        type="text"
+                        type={values.showPassword ? "text" : "password"}
                         onChange={(e) => setNewpassword(e.target.value)}
                       />
                     </OutlinedBox>
@@ -451,19 +503,30 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
                         )}
                       </IconButton>
                     </OutlinedBox>
-                    <Error error={samepassword}>{samepassword}</Error>
+                    <Error error={samepassword}>{samepassword}</Error></>
+                    )}
+
+                    {showNewPassword ? 
+                      <OutlinedBox
+                        button={true}
+                        activeButton={!resetDisabled}
+                        style={{ marginTop: "6px", marginBottom: "24px" }}
+                        onClick={() => resetPassword()}
+                        >
+                        Reset Password
+                    </OutlinedBox> :
                     <OutlinedBox
                       button={true}
                       activeButton={!resetDisabled}
                       style={{ marginTop: "6px", marginBottom: "24px" }}
                       onClick={() => sendOtp()}
-                    >
-                      {Loading ? (
-                        <CircularProgress color="inherit" size={20} />
-                      ) : (
-                        "Submit"
-                      )}
-                    </OutlinedBox>
+                      >
+                      Send OTP
+                  </OutlinedBox>}
+                    
+                    {showOTP && (
+                      <OTPInput option={OTP} setShowNewPassword={setShowNewPassword} setShowOTP={setShowOTP} />
+                    )}
                     <LoginText>
                       Don't have an account ?
                       <Span
@@ -480,9 +543,6 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
                         Create Account
                       </Span>
                     </LoginText>
-
-
-              
 
           </Wrapper>
 

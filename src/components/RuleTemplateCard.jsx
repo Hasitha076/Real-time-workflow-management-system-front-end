@@ -101,11 +101,15 @@ const Bottom = styled.div`
 `;
 
 const RuleTemplateCard = ({ rule, existingRule }) => {
+
+    console.log("RuleTemplateCard", rule);
+
+    
   
     const navigate = useNavigate();
   return (
    
-    <Container className={"item"} onClick={() => navigate(`/rule/${rule.projectId}`, { state: { existingRule, ruleDetails: rule } })}>
+    <Container style={{ backgroundColor: rule.status === 'active' && '#a4b3c4' }} className={"item"} onClick={() => navigate(`/rule/${rule.projectId}`, { state: { existingRule, ruleDetails: rule } })}>
       <Top>
       <AddCircleIcon style={{ backgroundColor: "#0059fe9e", padding: "5px", borderRadius: "5px" }} />
       +

@@ -26,7 +26,7 @@ const Top = styled.div`
 `;
 
 const Title = styled.div`
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 500;
   color: ${({ theme }) => theme.textSoft};
   padding: 20px;
@@ -112,7 +112,14 @@ const ActionRuleCard = ({  action }) => {
                 </Avatar>  
                 {action.actionDetails.assignee?.name}
                 </>
-                : null}
+                : action.actionDetails.actionType === "Set task title" ? 
+                action.actionDetails.taskName : 
+                action.actionDetails.actionType === "Set task description" ? 
+                action.actionDetails.taskDescription :
+                action.actionDetails.actionType === "Set due date to" ? 
+                action.actionDetails.date : 
+                action.actionDetails.actionType === "Create task" ? 
+                action.actionDetails.task?.name : null}
             
             </div>
         </Title> 

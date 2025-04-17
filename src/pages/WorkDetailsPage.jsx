@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { use, useEffect, useMemo } from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
@@ -30,6 +30,8 @@ import { Menu, MenuItem } from "@mui/material";
 import AddNewTask from "../components/AddNewTask";
 import { LOAD_PROJECT_BY_ID, UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
 import { useMutation, useQuery } from "@apollo/client";
+import ReplyAllIcon from '@mui/icons-material/ReplyAll';
+import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -313,7 +315,7 @@ const SubCardsTitle = styled.div`
   -webkit-box-orient: vertical;
 `;
 
-const WorkDetailsPage = ({setUpdateWorkFromTask}) => {
+const WorkDetailsPage = ({setUpdateWorkFromTask, setTaskUpdated}) => {
   const { id } = useParams();
   const [item, setItems] = useState([]);
   const [projectCollaborators, setProjectCollaborators] = useState([]);
@@ -338,8 +340,11 @@ const WorkDetailsPage = ({setUpdateWorkFromTask}) => {
   const [collaboratorBlock, setCollaboratorBlock] = useState({});
   const [editTask, setEditTask] = useState(false);
   const {currentUser} = useSelector((state) => state.user);
-
   const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
+  const [teamNames, setTeamNames] = useState([]);
+  const [collaboratorNames, setCollaboratorNames] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [alignment, setAlignment] = useState(true);
 
       const [anchorEl, setAnchorEl] = useState(null);
       const openDropdown = Boolean(anchorEl);
@@ -541,20 +546,6 @@ const WorkDetailsPage = ({setUpdateWorkFromTask}) => {
     }
   }, [id, openWork, openUpdate, invitePopup]);
 
-  const [alignment, setAlignment] = useState(true);
-
-  console.log(taskTemplates);
-  console.log(projectCollaborators);
-  console.log(projectTeams);
-  console.log(works);
-
-  console.log(editTask);
-  
-  
-
-  const [teamNames, setTeamNames] = React.useState([]);
-const [collaboratorNames, setCollaboratorNames] = React.useState([]);
-const [members, setMembers] = React.useState([]);
 
 const getAvailableTeams = async () => {
   try {
@@ -610,14 +601,6 @@ useEffect(() => {
   fetchData();
 }, [item]);
 
-console.log(item);
-
-console.log(collaboratorNames);
-console.log(teamNames);
-console.log(members);
-  
-  
-
   //create new work card
   const createTaskCard = async (template) => {
     try {
@@ -627,7 +610,9 @@ console.log(members);
         // Fetch existing collaborators block
         try {
             const res = await axios.get(`http://localhost:8082/api/v1/task/getCollaboratorsBlock/${item.workId}`);
-            if (res.status === 200) {
+            if (res.status === 200 && res.data) {
+              console.log("Collaborators block found:", res.data);
+              
                 collaboratorBlock = res.data;
             }
         } catch (error) {
@@ -648,8 +633,8 @@ console.log(members);
             projectId: template.projectId,
             workId: item.workId,
             dueDate: template.taskTemplateDueDate,
-            collaboratorIds: collaboratorBlock?.memberIds || template.taskTemplateCollaboratorIds,
-            teamIds: collaboratorBlock?.teamIds || template.taskTemplateTeamIds,
+            collaboratorIds: template.taskTemplateCollaboratorIds.length != 0 ? template.taskTemplateCollaboratorIds : collaboratorBlock?.memberIds,
+            teamIds: template.taskTemplateTeamIds.length != 0 ? template.taskTemplateTeamIds : collaboratorBlock?.teamIds,
         };
 
         // Create Task Card
@@ -719,11 +704,33 @@ console.log(members);
         </div>
       ) : (
         <>
+        <div style={{ position:'relative', top:'0', right: '0', display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: '10px' }}>
+                <Button sx={{
+                        borderRadius: '10px',
+                        border: '1px solid rgb(57 204 223)',
+                        color: 'rgb(57 204 223)',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        display: 'flex',
+                        gap: '5px',
+                        '&:hover': {
+                        backgroundColor: 'rgb(57 204 223)',
+                        color: 'white'
+                        }
+                    }} onClick={() => {
+                      window.history.back();
+                    }}
+                     >
+                        <ReplyAllIcon sx={{ fontSize: "15px" }} />
+                        Back to project Info
+                    </Button>
+              
+                </div>
           <Header>
-            <Title>{item.workName}</Title>
-            <Desc>{item.description}</Desc>
+            <Title>{item?.workName}</Title>
+            <Desc>{item?.description}</Desc>
             <Tags>
-              {item.tags.map((tag) => (
+              {item?.tags.map((tag) => (
                 <Tag
                   tagColor={
                     tagColors[Math.floor(Math.random() * tagColors.length)]
@@ -878,6 +885,7 @@ console.log(members);
                             workTeams={workTeams}
                             setUpdateWorkFromTask={setUpdateWorkFromTask}
                             allWorks={works}
+                            setTaskUpdated={setTaskUpdated}
                           />
                       ))}
                   </Masonry>
@@ -919,6 +927,7 @@ console.log(members);
                             workTeams={workTeams}
                             setUpdateWorkFromTask={setUpdateWorkFromTask}
                             allWorks={works}
+                            setTaskUpdated={setTaskUpdated}
                           />
                       ))}
                  </Masonry>
@@ -931,9 +940,6 @@ console.log(members);
               <SubCards>
                 <SubCardTop>
                   <SubCardsTitle>Members</SubCardsTitle>
-                  <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'member', data: item })} >
-                    <Edit sx={{ fontSize: "16px" }} />
-                  </IcoBtn>
                 </SubCardTop>
                 {item.collaboratorIds.map((id) => (
                   collaborators.map((collaborator) => {
@@ -948,9 +954,6 @@ console.log(members);
               <SubCards>
                 <SubCardTop>
                   <SubCardsTitle>Teams</SubCardsTitle>
-                  <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'member', data: item })} >
-                    <Edit sx={{ fontSize: "16px" }} />
-                  </IcoBtn>
                 </SubCardTop>
                 {item.teamIds.map((id) => (
                   teams.map((team) => {

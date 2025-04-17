@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
@@ -303,14 +303,15 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
   const [projectUpdated, setProjectUpdated] = useState(false);
   const [icons, setIcons] = useState([]);
   const token = localStorage.getItem("token");
+  const [taskUpdated, setTaskUpdated] = useState(false);
+
 
   const { loading: Loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
     variables: { id: parseInt(id) },  // Ensure ID is an integer
     skip: !id,  // Avoid sending query if ID is undefined
     fetchPolicy: "cache-and-network" // Ensures fresh data is fetched
   });
-  
-  
+
   //use state enum to check for which updation
   const [openUpdate, setOpenUpdate] = useState({ state: false, type: "all", data: item });
 
@@ -366,6 +367,33 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
         setProjectUpdated(false)
       }
     }, [Loading, data, collaboratorUpdated, projectUpdated]);
+
+    const workStatusUpdate = async () => {
+      
+      for (const work of works) {
+        try {
+          const response = await axios.get(`http://localhost:8082/api/v1/task/getTasksByWorkId/${work.workId}`);
+          const tasks = response.data;
+    
+          const hasIncompleteTasks = tasks.some(task => task.status === false);
+    
+          if (hasIncompleteTasks) {
+            const updateResponse = await axios.put(`http://localhost:8086/api/v1/work/updateWorkStatus`, {
+              workId: work.workId,
+              status: false
+            })
+          }
+    
+        } catch (error) {
+          console.error(`Error updating status for work ID ${work.workId}:`, error);
+        }
+      }
+    };
+    
+    
+      useEffect(() => {
+          workStatusUpdate();
+      }, []);
     
 
   const getCollaborators = async () => {
@@ -413,6 +441,7 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
       );
       console.log(response.data);
       setWorks(response.data);
+      workStatusUpdate();
     } catch (error) {
       console.error("Error fetching works:", error);
     }
@@ -669,7 +698,7 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
                       workCount={works.length}
                     />
 
-                    {works.length != 0 && works.filter((item) => item.status === false)
+                    {works.length != 0 && works?.filter((item) => item.status === false)
                       .map((filteredItem) => (
                         <div onClick={() => openWorkDetails(filteredItem)}>
                           <WorkCards
@@ -705,7 +734,7 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
                   </Top>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">
-                    {works.length != 0 && works.filter((item) => item.status === true)
+                    {works.length != 0 && works?.filter((item) => item.status === true)
                       .map((item) => (
                         <div onClick={() => openWorkDetails(item)}>
                           <WorkCards
@@ -740,9 +769,9 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
                   <SubCardsTitle>Teams</SubCardsTitle>
                 </SubCardTop>
                 {item?.teamIds.map((id) => (
-                  teams.map((team) => {
+                  teams.map((team, key) => {
                     if (id === team.teamId) {
-                      return <MemberCard member={team} />;
+                      return <MemberCard key={key} member={team} />;
                     }
                   }
                 ))

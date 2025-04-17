@@ -220,12 +220,14 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
     const [open2, setOpen2] = useState(false);
     const [open3, setOpen3] = useState(false);
     const [open4, setOpen4] = useState(false);
+    const [open5, setOpen5] = useState(false);
     const [whichSection, setWhichSection] = useState(false);
     const [option1, setOption1] = useState("");
     const [option2, setOption2] = useState("");
     const [option3, setOption3] = useState("");
     const [option4, setOption4] = useState("");
     const [option5, setOption5] = useState("");
+    const [option6, setOption6] = useState("");
     const [icons, setIcons] = useState([]);
     const [isSetAssignee, setIsSetAssignee] = useState(false);
      const [invitePopup, setInvitePopup] = useState(false);
@@ -289,11 +291,28 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
                 setWhichSection(false);
             } else if (event.target.value === "Status_is_incomplete") {
                 setWhichSection(true);
-                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is incomplete"} });
+                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Status is incomplete"} });
                 setIcons([]);
             } else if (event.target.value === "Status_is_complete") {
                 setWhichSection(true);
-                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is complete"} });
+                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Status is complete"} });
+                setIcons([]);
+            }
+            
+        }
+
+        const handleDuedateChange = (event) => {
+            setOption6(event.target.value);
+            if (event.target.value === "duedate_is_changed") {
+                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Duedate is changed" } });
+                setWhichSection(false);
+            } else if (event.target.value === "duedate_is_before") {
+                setWhichSection(true);
+                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Duedate is before"} });
+                setIcons([]);
+            } else if (event.target.value === "duedate_is_after") {
+                setWhichSection(true);
+                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Duedate is after"} });
                 setIcons([]);
             }
             
@@ -308,6 +327,8 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
             setOpen3(newOpen)
         } else if (number === 4) {
             setOpen4(newOpen)
+        } else if (number === 5) {
+            setOpen5(newOpen)
         }
       };
 
@@ -327,7 +348,7 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
       setOpen3(true);
     }
     if(event === "Due date changed") {
-      setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Due date changed" } });
+    setOpen5(true);
     }
     if(event === "Due date approaching") {
       setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Due date approaching" } });
@@ -582,7 +603,7 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
                     <select
                     id="priority"
                     name="priority"
-                    value={setOption5}
+                    value={option5}
                     onChange={handleStatusChange}
                     style={{
                         width: "100%",
@@ -601,6 +622,52 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
                     <option value="Status_is_changed">Status is changed</option>
                     <option value="Status_is_incomplete">Status is incomplete</option>
                     <option value="Status_is_complete">Status is complete</option>
+                    </select>
+                </OutlinedBox>
+              </Box>
+    
+          </Box>
+        </DrawerContainer>
+      );
+
+      const DrawerTriggerDueDate = (
+        <DrawerContainer style={{ backgroundColor: '#f9f9f9' }}>
+          <ArrowIcoBtn onClick={toggleTriggerDrawer(false, 5)}>
+            <KeyboardDoubleArrowRightIcon/>
+          </ArrowIcoBtn>
+          <Box sx={{ width: '400px' }} role="presentation">
+              <top>
+                <h2 style={{ margin: '10px 0' }}>Due date is changed</h2>
+              </top>
+    
+              <Divider sx={{ padding: '10px 0' }} />
+    
+              <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px', paddingTop: '20px'}}>
+                <p style={{ margin: '0' }}>Choose an option</p> 
+    
+                <OutlinedBox style={{ marginTop: "0px", width: '-webkit-fill-available' }}>
+                    <select
+                    id="dueDate"
+                    name="dueDate"
+                    value={option6}
+                    onChange={handleDuedateChange}
+                    style={{
+                        width: "100%",
+                        padding: "0",
+                        border: "1px solid #ccc",
+                        borderRadius: "4px",
+                        fontSize: "16px",
+                        backgroundColor: "transparent",
+                        color: "#C1C7C9",
+                        border: "none",
+                    }}
+                    >
+                    <option value="" disabled>
+                        Due date is changed
+                    </option>
+                    <option value="duedate_is_changed">Due date is changed</option>
+                    <option value="duedate_is_before">Due date is before</option>
+                    <option value="duedate_is_after">Due date is after</option>
                     </select>
                 </OutlinedBox>
               </Box>
@@ -754,13 +821,23 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
         </Drawer>
 
         <Drawer 
-        anchor="right" 
-        open={open4} 
-        onClose={toggleTriggerDrawer(false, 4)} 
-        TransitionComponent={Slide}
-        transitionDuration={1000}
-        >
-            {DrawerTriggerStatusChange}
+            anchor="right" 
+            open={open4} 
+            onClose={toggleTriggerDrawer(false, 4)} 
+            TransitionComponent={Slide}
+            transitionDuration={1000}
+            >
+                {DrawerTriggerStatusChange}
+        </Drawer>
+
+        <Drawer 
+            anchor="right" 
+            open={open5} 
+            onClose={toggleTriggerDrawer(false, 5)} 
+            TransitionComponent={Slide}
+            transitionDuration={1000}
+            >
+                {DrawerTriggerDueDate}
         </Drawer>
 
     </Container>

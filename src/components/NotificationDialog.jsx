@@ -2,12 +2,13 @@ import { Avatar, Popover } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const Wrapper = styled.div`
   width: 100%;
   min-width: 300px;
   max-width: 400px;
-  height: 500px;
+  height: '-webkit-fill-available';
   display: flex;
   flex-direction: column;
   position: relative;
@@ -61,18 +62,34 @@ const NotificationDialog = ({
   id,
   anchorEl,
   handleClose,
-  currentUser,
+  // currentUser,
   notification,
 }) => {
 
 
   const [notifications, setNotifications] = useState([]);
+  const { currentUser } = useSelector((state) => state.user);
+  const token = localStorage.getItem("token");
+
+  console.log(currentUser);
+  
 
   const getNotifications = async () => {
-    await axios.get("http://localhost:8084/api/v1/notification/getAllNotifications")
+    await axios.get("http://localhost:8084/api/v1/notification/getAllNotifications", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type":   "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+    })
     .then((res) => {
-    
-      setNotifications(res.data);
+
+      const filterDAta = res.data.filter((item) => {
+        return item.collaboratorIds.includes(currentUser.userId);
+      }
+      );
+      console.log("filterDAta", filterDAta);
+      setNotifications(filterDAta);
     })
     .catch((err) => {
       console.log(err);
@@ -102,17 +119,52 @@ const NotificationDialog = ({
       <Wrapper>
         <Heading>Notifications</Heading>
 
-        {notification.map((item, index) => (
+        {notifications.map((item, index) => (
           <Item key={index}>
             <Avatar
               sx={{ width: "32px", height: "32px" }}
               src={currentUser.img}
             >
-              {currentUser.name.charAt(0)}
+              {currentUser.userName.charAt(0)}
             </Avatar>
             <Details>
-              <Title>{item.subject === "team-created" ? "Team Invitation" : "Other"}</Title>
-              <Desc>{item.message}</Desc>
+            <Title>
+              {item.subject === "project-created"
+                ? "Project Invitation"
+                : item.subject === "project-changed"
+                ? "Project changed"
+                : item.subject === "removed-from-project"
+                ? "Removed from project"
+                : item.subject === "removed-project"
+                ? "Project removed"
+                : item.subject === "task-created"
+                ? "Task Invitation"
+                : item.subject === "task-changed"
+                ? "Task changed"
+                : item.subject === "removed-from-task"
+                ? "Removed from task"
+                : item.subject === "removed-task"
+                ? "Task removed"
+                : item.subject === "team-created"
+                ? "Team Invitation"
+                : item.subject === "team-changed"
+                ? "Team changed"
+                : item.subject === "removed-from-team"
+                ? "Removed from team"
+                : item.subject === "removed-team"
+                ? "Team removed"
+                : item.subject === "work-created"
+                ? "Work Invitation"
+                : item.subject === "work-changed"
+                ? "Work changed"
+                : item.subject === "removed-from-work"
+                ? "Removed from work"
+                : item.subject === "removed-work"
+                ? "Work removed"
+                : "Other"}
+            </Title>
+
+              <Desc>{item.body}</Desc>
               <Hr />
             </Details>
           </Item>

@@ -63,7 +63,7 @@ const Flex = styled.div`
 `;
 
 const Logo = styled.div`
-  color: ${({ theme }) => theme.primary};
+  color: ${({ theme }) => theme.white};
   display: flex;
   align-items: center;
   gap: 16px;

@@ -234,14 +234,15 @@ const Rule = () => {
   const [workDetails, setWorkDetails] = useState({});
   const [taskTemplateAdded, setTaskTemplateAdded] = useState(false);
     const [taskTemplates, setTaskTemplates] = useState([]);
+    const [publishFlow, setPublishFlow] = useState({});
 
   const location = useLocation();
   const existingRule = location.state?.existingRule;
     const existingRuleDetails = location.state?.ruleDetails;
 
     console.log(existingRule);
+    console.log(existingRuleDetails);
     
-
   const [ruleDetails, setRuleDetails] = useState(existingRuleDetails);
   
 
@@ -321,12 +322,28 @@ const Rule = () => {
           console.log(err);
         });
     };
+
+    const getRuleFlows = async () => {
+        await axios.get(`http://localhost:8082/api/v1/task/getPublishFlowByRuleId/${existingRuleDetails.ruleId}`)
+          .then((res) => {
+            setPublishFlow(res.data);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+    };
+
+      console.log("PublishRules: ", publishFlow);
+      
   
   useEffect(() => {
     getCollaborators();
     getTeams();
     getWorks();
     getTaskTemplates();
+    if(existingRuleDetails){
+        getRuleFlows();
+    }
   }, [item, id]);
   
 
@@ -552,6 +569,7 @@ const Rule = () => {
             projectId: item.projectId,
             triggers: triggerData,
             actions: actionData,
+            status: "inactive",
         };
     
         console.log(data);
@@ -594,6 +612,102 @@ const Rule = () => {
     const publish = async () => {
         console.log(ruleDetails);
 
+        if (publishFlow.publishFlowId === undefined) {
+            console.log("New published workFlow");
+
+            const triggerData = ruleDetails.triggers.map((ele) => ({
+                ...ele,
+                triggerDetails: { ...ele.triggerDetails },
+            }));
+            
+            const actionData = ruleDetails.actions.map((ele) => ({
+                ...ele,
+                actionDetails: { ...ele.actionDetails },
+            }));
+            
+    
+            const data = {
+                publishFlowName: "Publish " + ruleDetails.ruleName,
+                ruleId: ruleDetails.ruleId,
+                projectId: ruleDetails.projectId,
+                triggers: triggerData,
+                actions: actionData,
+                status: "active",
+            };
+
+            await axios.post(`http://localhost:8082/api/v1/task/createPublishFlow`, data)
+            .then((res) => {
+            console.log(res.data);
+                axios.put(`http://localhost:8082/api/v1/task/updateRule`, {
+                ruleId: ruleDetails.ruleId,
+                ruleName: ruleDetails.ruleName,
+                projectId: ruleDetails.projectId,
+                triggers: triggerData,
+                actions: actionData,
+                status: "active",
+                })
+            dispatch(
+                openSnackbar({
+                    message: "Publish Rule successfully",
+                    type: "success",
+                })
+            );
+            navigate(`/rules/${item.projectId}`);
+
+            })
+            .catch((err) => {
+            console.log(err);
+            dispatch(openSnackbar({ open: true, message: "Error Publishing Rule", type: "error" }));
+            });
+        } else {
+
+            console.log("Existing published workFlow");
+            console.log("Existing published  data", publishFlow);
+            
+            
+
+            const data = {
+                publishFlowId: publishFlow.publishFlowId,
+                publishFlowName: publishFlow.publishFlowName,
+                ruleId: publishFlow.ruleId,
+                projectId: publishFlow.projectId,
+                triggers: publishFlow.triggers,
+                actions: publishFlow.actions,
+                status: "active",
+            };
+
+            await axios.put(`http://localhost:8082/api/v1/task/updatePublishFlow`, data)
+            .then((res) => {
+            console.log(res.data);
+                axios.put(`http://localhost:8082/api/v1/task/updateRule`, {
+                ruleId: ruleDetails.ruleId,
+                ruleName: ruleDetails.ruleName,
+                projectId: ruleDetails.projectId,
+                triggers: ruleDetails.triggers,
+                actions: ruleDetails.actions,
+                status: "active",
+                })
+            dispatch(
+                openSnackbar({
+                    message: "Publish Rule successfully",
+                    type: "success",
+                })
+            );
+            navigate(`/rules/${item.projectId}`);
+
+            })
+            .catch((err) => {
+            console.log(err);
+            dispatch(openSnackbar({ open: true, message: "Error Publishing Rule", type: "error" }));
+            });
+        }
+        
+    
+    }
+
+    const unpublish = async () => {
+        console.log(ruleDetails);
+
         const triggerData = ruleDetails.triggers.map((ele) => ({
             ...ele,
             triggerDetails: { ...ele.triggerDetails },
@@ -604,19 +718,26 @@ const Rule = () => {
             actionDetails: { ...ele.actionDetails },
         }));
         
-
-        const data = {
+        
+        await axios.put(`http://localhost:8082/api/v1/task/updatePublishFlow`, {
+            publishFlowId: publishFlow.publishFlowId,
+            publishFlowName: publishFlow.publishFlowName,
+            ruleId: publishFlow.ruleId,
+            projectId: publishFlow.projectId,
+            triggers: publishFlow.triggers,
+            actions: publishFlow.actions,
+            status: "inactive",
+        })
+        .then((res) => {
+        console.log(res.data);
+            axios.put(`http://localhost:8082/api/v1/task/updateRule`, {
+            ruleId: ruleDetails.ruleId,
             ruleName: ruleDetails.ruleName,
             projectId: ruleDetails.projectId,
             triggers: triggerData,
             actions: actionData,
-        };
-        
-        
-        await axios.post(`http://localhost:8082/api/v1/task/createPublishFlow`, data)
-        .then((res) => {
-        console.log(res.data);
-        
+            status: "inactive",
+            })
         dispatch(
             openSnackbar({
                 message: "Publish Rule successfully",
@@ -630,6 +751,25 @@ const Rule = () => {
         console.log(err);
         dispatch(openSnackbar({ open: true, message: "Error Publishing Rule", type: "error" }));
         });
+    }
+
+    const deleteRule = async () => {
+        console.log("Delete Rule");
+
+        axios.delete(`http://localhost:8082/api/v1/task/deleteRule/${existingRuleDetails.ruleId}`)
+            .then((res) => {
+                dispatch(
+                    openSnackbar({
+                        message: "Rule deleted successfully",
+                        type: "success",
+                    })
+                );
+                navigate(`/rules/${item.projectId}`);
+            })
+            .catch((err) => {
+                console.log(err);
+                dispatch(openSnackbar({ open: true, message: "Error Deleting Rule", type: "error" }));
+            });
     }
     
 
@@ -825,8 +965,27 @@ const Rule = () => {
                         Automate your team's process and keep work flowing.
                     </Text>
                     </div>
+                     <div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                     {existingRule ? 
+                     <Button sx={{
+                        borderRadius: '10px',
+                        border: '1px solid red',
+                        color: 'red',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        display: 'flex',
+                        gap: '5px',
+                        '&:hover': {
+                        backgroundColor: 'red',
+                        color: 'white'
+                        }
+                    }} onClick={deleteRule} >
+                        <PublishIcon sx={{ fontSize: "15px" }} />
+                        Delete Rule
+                    </Button>
+                    : null}
 
-                    {existingRule ? <Button sx={{
+                    {existingRule && existingRuleDetails?.status === "inactive" ? <Button sx={{
                         borderRadius: '10px',
                         border: '1px solid darkorange',
                         color: 'darkorange',
@@ -841,7 +1000,26 @@ const Rule = () => {
                     }} onClick={publish} >
                         <PublishIcon sx={{ fontSize: "15px" }} />
                         Publish Rule
-                    </Button> : 
+                    </Button> :
+                    existingRuleDetails?.status === "active" ?
+
+                    <Button sx={{
+                        borderRadius: '10px',
+                        border: '1px solid darkorange',
+                        color: 'darkorange',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        display: 'flex',
+                        gap: '5px',
+                        '&:hover': {
+                        backgroundColor: 'darkorange',
+                        color: 'white'
+                        }
+                    }} onClick={unpublish} >
+                        <PublishIcon sx={{ fontSize: "15px" }} />
+                        Unpublish Rule
+                    </Button>
+                     : 
                     <Button sx={{
                         borderRadius: '10px',
                         border: '1px solid darkorange',
@@ -858,6 +1036,7 @@ const Rule = () => {
                         <PublishIcon sx={{ fontSize: "15px" }} />
                         Create Rule
                     </Button>}
+                     </div>
 
                     
                   </Top>

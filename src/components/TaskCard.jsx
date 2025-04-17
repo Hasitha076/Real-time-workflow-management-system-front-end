@@ -217,7 +217,7 @@ const CommentButton = styled.button`
   }
 `
 
-const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTask, setEditTask, workCollaborators, workTeams, setUpdateWorkFromTask, allWorks}) => {
+const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTask, setEditTask, workCollaborators, workTeams, setUpdateWorkFromTask, allWorks, setTaskUpdated}) => {
 
   const [completed, setCompleted] = useState(false);
   const [project, setProject] = useState([]);
@@ -348,7 +348,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
               setTasksData(res.data);
             }
 
-            const id = work.workId;
+              const id = work.workId;
               const arrayIndex = allWorks.findIndex((item) => item.workId === id);
               
               if (arrayIndex !== -1 && arrayIndex + 1 <= allWorks.length && value === true) {
@@ -575,6 +575,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
       status: completed
     }).then((res) => {
       console.log(res.data);
+      setTaskUpdated(true);
       toggleDrawer(true);
     }).catch((err) => {
       console.log(err);
@@ -818,8 +819,6 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
                 : 'No Date Selected'}
             </p>
           )}
-
-
 
             </Box>
           </Box>

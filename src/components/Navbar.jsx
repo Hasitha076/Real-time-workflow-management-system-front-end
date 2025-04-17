@@ -141,7 +141,11 @@ console.log(currentUser);
   const getNotification = async () => {
     await axios.get("http://localhost:8084/api/v1/notification/getAllNotifications")
     .then((res) => {
-      setNotifications(res.data);
+      const filterDAta = res.data.filter((item) => {
+        return item.collaboratorIds.includes(currentUser.userId);
+      }
+      );
+      setNotifications(filterDAta);
     })
     .catch((err) => {
       console.log(err);
@@ -149,8 +153,11 @@ console.log(currentUser);
   };
 
     useEffect(() => {
-      // getNotification();
+      getNotification();
     }, []);
+
+    console.log("notifications", notifications);
+    
 
   return (
     <>

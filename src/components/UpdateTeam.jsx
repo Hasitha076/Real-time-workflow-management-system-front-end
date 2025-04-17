@@ -241,7 +241,7 @@ const UpdateTeam = ({ openUpdate, setOpenUpdate }) => {
                             <OutlinedBox style={{ marginTop: "6px" }}>
                                 <Desc
                                     placeholder="Description (Required)* "
-                                    name="desc"
+                                    name="description"
                                     rows={5}
                                     value={inputs.description}
                                     onChange={handleChange}

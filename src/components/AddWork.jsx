@@ -7,7 +7,7 @@ import { Avatar } from "@mui/material";
 import { Modal } from "@mui/material";
 // import { addWorks } from "../api";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import axios from "axios";
 import { UPDATE_PROJECT, UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
@@ -340,6 +340,7 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
 
  const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
  const token = localStorage.getItem("token");
+   const { currentUser } = useSelector((state) => state.user);
 
   //tasks
   // const [task, setTask] = useState([
@@ -433,6 +434,7 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
       description,
       tags: tags.split(","),
       priority,
+      assignerId: currentUser.userId,
       projectId: ProjectId,
       dueDate,
       collaboratorIds: selectedUsers.map((user) => user.id),

@@ -48,7 +48,7 @@ const UsersList = styled.div`
   gap: 12px;
   border-radius: 12px;
   color: ${({ theme }) => theme.textSoft};
-  height: 200px;
+  height: 130px;
   overflow-y: auto;
 `;
 
@@ -186,25 +186,27 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
 `;
 
-const InviteActionMembers = ({ setInvitePopup, id, memberIcons, setMemberIcons, activeAction, setActiveAction }) => {
+const InviteRuleTaskMembers = ({ icons, setIcons, setInvitePopup, selectCollaboratorIds, setSelectCollaboratorIds, selectTeamIds, setSelectTeamIds }) => {
 
   const [message, setMessage] = useState("");
   const { currentUser } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false)
-  const [availableusers, setAvailableUsers] = useState([]);
+  
 
-  const eventHandle = () => {
-    setMemberIcons(selectedUsers);
-    setActiveAction({
-      ...activeAction,
-      actionDetails: {
-        actionType: "Set assignee to",
-        assignee: selectedUsers[0]
-      },
-    });
+  const addCollaborators = async () => {
+    console.log("Submitted");
+    
+    setSelectCollaboratorIds(selectedUsers.map(user => user.id))
+    setSelectTeamIds(selectedTeam.map(team => team.id))
+
+    const combinedIds = [...selectedUsers.map(user => user.name), ...selectedTeam.map(team => team.name)];
+    setIcons(combinedIds);
+    setInvitePopup(false)
 
   };
-  
+
+  const [availableusers, setAvailableUsers] = useState([]);
+  const [availableTeams, setAvailableTeams] = useState([]);
 
   const getAvailableUsers = async () => {
     await axios.get("http://localhost:8081/api/v1/user/getAllUsers")
@@ -216,26 +218,22 @@ const InviteActionMembers = ({ setInvitePopup, id, memberIcons, setMemberIcons, 
     });
   }
 
+  const getAvailableTeams = async () => {
+    const response = await axios.get("http://localhost:8085/api/v1/team/getAllTeams")
+    const data = response.data;
+      setAvailableTeams(data);
+
+  }
+
     useEffect(() => {
       getAvailableUsers();
+      getAvailableTeams();
     }, []);
 
     const [selectedUsers, setSelectedUsers] = useState([]);
+    const [selectedTeam, setSelectedTeam] = useState([]);
 
-    useEffect(() => {
-        const matchingUsers = availableusers.filter((user) => user.userId === memberIcons[0]?.id)
-          .map((user) => ({
-            id: user.userId,
-            name: user.userName,
-            email: user.email,
-          }));
-      
-        if (matchingUsers.length > 0) {
-          setSelectedUsers(matchingUsers);
-        }
-      }, [availableusers, memberIcons.id]);
-      
-
+    
        //Add members from selected users
   const handleSelect = (user) => {
     const User = {
@@ -244,11 +242,28 @@ const InviteActionMembers = ({ setInvitePopup, id, memberIcons, setMemberIcons, 
       email: user.email,
     };
     
-    if (selectedUsers.length === 0) {
+    if (selectedUsers.find((u) => u.id === User.id)) {
+    } else {
       setSelectedUsers([...selectedUsers, {
         id: user.userId,
         name: user.userName,
         email: user.email,
+      }]);
+    }
+
+  };
+
+    //Add team from selected teams
+  const handleSelectTeam = (team) => {
+    const Team = {
+      id: team.teamId,
+      name: team.teamName
+    };
+    if (selectedTeam.find((t) => t.id === Team.teamId)) {
+    } else {
+      setSelectedTeam([...selectedTeam, {
+        id: team.teamId,
+        name: team.teamName
       }]);
     }
 
@@ -259,6 +274,10 @@ const InviteActionMembers = ({ setInvitePopup, id, memberIcons, setMemberIcons, 
     setSelectedUsers(selectedUsers.filter((u) => u.id !== user.userId));
   };
 
+    //remove teams from selected users
+  const handleRemoveTeam = (team) => {
+    setSelectedTeam(selectedTeam.filter((t) => t.id !== team.teamId));
+  };
 
   return (
     <Modal open={true} onClose={() => setInvitePopup(false)}>
@@ -316,22 +335,53 @@ const InviteActionMembers = ({ setInvitePopup, id, memberIcons, setMemberIcons, 
             </UsersList>
           </AddMember>
 
-          
+          <Label>Add Teams :</Label>
+
+          <AddMember>
+
+          <UsersList>
+            {availableTeams.map((team) => (
+                <MemberCard key={team.teamId}>
+                  <UserData>
+                    <Avatar sx={{ width: "34px", height: "34px" }}>
+                      {team.teamName.charAt(0)}
+                    </Avatar>
+                    <Details>
+                      <Name>{team.teamName}</Name>
+                    </Details>
+                  </UserData>
+                  {
+                    !selectedTeam.find((t) => t.id === team.teamId) && 
+                    <InviteButton onClick={() => handleSelectTeam(team)}>
+                    Add
+                    </InviteButton>
+                  }
+                  {
+                    selectedTeam.find((t) => t.id === team.teamId) && 
+                    <InviteButton onClick={() => handleRemoveTeam(team)}>
+                    Remove
+                  </InviteButton>
+                  }
+                </MemberCard>
+              ))}
+          </UsersList>
+
+          </AddMember>
           {message && <div style={{ color: "red" }}>{message}</div>}
 
           <ButtonContainer>
             <OutlinedBox
               button={true}
-              onClick={() => {
-                setInvitePopup(false);
-                eventHandle();
-              }}
+
               style={{ width: "100%" }}
+              onClick={() => {
+                addCollaborators();
+              }}
             >
               {loading ? (
                 <CircularProgress color="inherit" size={20} />
               ) : (
-                "Add Member"
+                "Add collaborators"
               )}
             </OutlinedBox>
           </ButtonContainer></>
@@ -342,4 +392,4 @@ const InviteActionMembers = ({ setInvitePopup, id, memberIcons, setMemberIcons, 
   );
 };
 
-export default InviteActionMembers;
+export default InviteRuleTaskMembers;

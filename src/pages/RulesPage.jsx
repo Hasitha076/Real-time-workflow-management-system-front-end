@@ -512,6 +512,7 @@ useEffect(() => {
                 </Button>
             </div>
           </Header>
+            <Hr />
           <Body>
             <Work>
               <Column alignment={alignment}>
@@ -520,7 +521,7 @@ useEffect(() => {
                     <div>
                     <Image src={workflow} />
                     <SubText>
-                      Add Rule
+                      Recommended Rules
                     </SubText>
                     <Text>
                         Automate your team's process and keep work flowing.

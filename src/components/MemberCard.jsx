@@ -57,9 +57,6 @@ const Access = styled.div`
 
 const MemberCard = ({ member }) => {
   
-  console.log(member);
-  
-
   return (
     <Container>
       <Wrapper>

@@ -131,7 +131,7 @@ const IcoBtn = styled(IconButton)`
   color: ${({ theme }) => theme.textSoft} !important;
 `;
 
-const Card = ({ status, work, setWorkUpdated }) => {
+const Card = ({ status, work, setWorkUpdated, setTaskUpdated }) => {
   
   const [color, setColor] = useState("primary");
   const [task, setTask] = useState([]);

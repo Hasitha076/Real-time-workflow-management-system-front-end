@@ -26,7 +26,7 @@ const Top = styled.div`
 `;
 
 const Title = styled.div`
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 500;
   color: ${({ theme }) => theme.textSoft};
   padding: 20px;
