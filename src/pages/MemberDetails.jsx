@@ -18,7 +18,7 @@ import { useDispatch } from "react-redux";
 import DeletePopup from "../components/DeletePopup";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import ProjectCard from "../components/Card";
-import { LOAD_PROJECTS_BY_TEAM_ID } from "../GraphQL/Queries";
+import { LOAD_PROJECTS_BY__USER_ID, LOAD_PROJECTS_BY_TEAM_ID } from "../GraphQL/Queries";
 import { useQuery } from "@apollo/client";
 import Badge from '@mui/material/Badge';
 import Stack from '@mui/material/Stack';
@@ -243,8 +243,8 @@ const MemberDetails = ({ currentUser }) => {
   };
 
   console.log(item);
-  const { loading: Loading, error, data, refetch } = useQuery(LOAD_PROJECTS_BY_TEAM_ID, {
-    variables: { teamId: parseInt(item.userId) },  // Ensure ID is an integer
+  const { loading: Loading, error, data, refetch } = useQuery(LOAD_PROJECTS_BY__USER_ID, {
+    variables: { collaboratorId: parseInt(item.userId) },  // Ensure ID is an integer
     fetchPolicy: "cache-and-network" // Ensures fresh data is fetched
   });
   
@@ -297,8 +297,8 @@ const MemberDetails = ({ currentUser }) => {
 
       useEffect(() => {
         
-        if (data?.getProjectsByTeamId) {
-          setProjects(data.getProjectsByTeamId);
+        if (data?.getProjectsByCollaboratorId) {
+          setProjects(data.getProjectsByCollaboratorId);
         }
       }, [Loading, data]);
 
@@ -338,6 +338,7 @@ const MemberDetails = ({ currentUser }) => {
   }, [openWork, openUpdate, invitePopup, id]);
 
   console.log(item);
+  console.log(projects);
   
 console.log(currentUser);
 

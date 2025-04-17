@@ -119,7 +119,10 @@ const NotificationDialog = ({
       <Wrapper>
         <Heading>Notifications</Heading>
 
-        {notifications.map((item, index) => (
+        {[...notifications]
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 10)
+          .map((item, index) => (
           <Item key={index}>
             <Avatar
               sx={{ width: "32px", height: "32px" }}
@@ -128,48 +131,46 @@ const NotificationDialog = ({
               {currentUser.userName.charAt(0)}
             </Avatar>
             <Details>
-            <Title>
-              {item.subject === "project-created"
-                ? "Project Invitation"
-                : item.subject === "project-changed"
-                ? "Project changed"
-                : item.subject === "removed-from-project"
-                ? "Removed from project"
-                : item.subject === "removed-project"
-                ? "Project removed"
-                : item.subject === "task-created"
-                ? "Task Invitation"
-                : item.subject === "task-changed"
-                ? "Task changed"
-                : item.subject === "removed-from-task"
-                ? "Removed from task"
-                : item.subject === "removed-task"
-                ? "Task removed"
-                : item.subject === "team-created"
-                ? "Team Invitation"
-                : item.subject === "team-changed"
-                ? "Team changed"
-                : item.subject === "removed-from-team"
-                ? "Removed from team"
-                : item.subject === "removed-team"
-                ? "Team removed"
-                : item.subject === "work-created"
-                ? "Work Invitation"
-                : item.subject === "work-changed"
-                ? "Work changed"
-                : item.subject === "removed-from-work"
-                ? "Removed from work"
-                : item.subject === "removed-work"
-                ? "Work removed"
-                : "Other"}
-            </Title>
-
+              <Title>
+                {item.subject === "project-created"
+                  ? "Project Invitation"
+                  : item.subject === "project-changed"
+                  ? "Project changed"
+                  : item.subject === "removed-from-project"
+                  ? "Removed from project"
+                  : item.subject === "removed-project"
+                  ? "Project removed"
+                  : item.subject === "task-created"
+                  ? "Task Invitation"
+                  : item.subject === "task-changed"
+                  ? "Task changed"
+                  : item.subject === "removed-from-task"
+                  ? "Removed from task"
+                  : item.subject === "removed-task"
+                  ? "Task removed"
+                  : item.subject === "team-created"
+                  ? "Team Invitation"
+                  : item.subject === "team-changed"
+                  ? "Team changed"
+                  : item.subject === "removed-from-team"
+                  ? "Removed from team"
+                  : item.subject === "removed-team"
+                  ? "Team removed"
+                  : item.subject === "work-created"
+                  ? "Work Invitation"
+                  : item.subject === "work-changed"
+                  ? "Work changed"
+                  : item.subject === "removed-from-work"
+                  ? "Removed from work"
+                  : item.subject === "removed-work"
+                  ? "Work removed"
+                  : "Other"}
+              </Title>
               <Desc>{item.body}</Desc>
               <Hr />
             </Details>
           </Item>
-        ))}
-
+      ))}
       </Wrapper>
     </Popover>
   );

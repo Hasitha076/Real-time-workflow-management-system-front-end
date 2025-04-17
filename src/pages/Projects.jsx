@@ -9,6 +9,7 @@ import { CircularProgress } from "@mui/material";
 import { useQuery } from '@apollo/client'
 import { LOAD_ALL_PROJECTS } from '../GraphQL/Queries'
 import { data } from "react-router-dom";
+import axios from "axios";
 
 const Container = styled.div`
   width: 100%;
@@ -91,6 +92,9 @@ const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated})
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useSelector((state) => state.user);
+  const [selectedUserId, setSelectedUserId] = useState("ALL");
+  const token = localStorage.getItem("token");
+  const [users, setUsers] = useState([]);
 
   const { loading: Loading, error, data: allProjects, refetch } = useQuery(LOAD_ALL_PROJECTS);
 
@@ -115,9 +119,26 @@ const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated})
   useEffect(() => {
       refetch()
       getprojects();
+      getAvailableMember();
   }, []);
 
-  console.log(projects);
+  const getAvailableMember = async () => {
+
+    try {
+      const response = await axios.get("http://localhost:8081/api/v1/user/getAllUsers", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type":   "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+  
+      setUsers(response.data);
+      loading(false);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
   
 
   return (
@@ -127,6 +148,30 @@ const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated})
           <CircularProgress />
         </div>
       ) : (
+
+        <>
+          <OutlinedBox style={{ width: "220px", marginBottom: "12px" }}>
+            <select
+              value={selectedUserId}
+              onChange={(e) => setSelectedUserId(e.target.value)}
+              style={{
+                width: "100%",
+                background: "transparent",
+                color: "#fff",
+                border: "none",
+                outline: "none",
+                fontSize: "16px",
+              }}
+            >
+              <option value="ALL">All Projects</option>
+              {users.map((user) => (
+                <option key={user.userId} value={user.userId}>
+                  {user.userName}
+                </option>
+              ))}
+            </select>
+          </OutlinedBox>
+        
         <Column>
           {statuses.map((s, index) => (
             <ItemWrapper key={index}>
@@ -139,6 +184,7 @@ const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated})
                   </OutlinedBox>
                 )}
                 {projects
+                  ?.filter(selectedUserId === "ALL" ? (item) => item.status === s.status : (item => item.collaboratorIds?.includes(parseInt(selectedUserId))))
                   ?.filter((item) => item.status === s.status)
                   .map((item, idx) => (
                     <Item key={item.projectId} item={item} index={idx} status={item.status} tagColor={tagColors[3]} />
@@ -147,6 +193,7 @@ const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated})
             </ItemWrapper>
           ))}
         </Column>
+        </>
       )}
     </Container>
   );

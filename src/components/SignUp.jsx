@@ -181,20 +181,28 @@ const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
       await axios.post("http://localhost:8081/api/v1/auth/register", {
         userName: name,
         email: email,
-        password: password,
-        role: selectedOption,
+        password: password
       })
         .then((res) => {
-          console.log(res.data);
-          
-          dispatch(
-            openSnackbar({
-              message: "Registerd Successfully",
-              severity: "success",
-            })
-          );
-          setSignInOpen(false);
-          setSignInOpen(true);
+
+          if(res.data === "Username already exists") {
+            dispatch(
+              openSnackbar({
+                message: "Username already exists",
+                severity: "error",
+              })
+            );
+          }
+          else {
+            dispatch(
+              openSnackbar({
+                message: "Registerd Successfully",
+                severity: "success",
+              })
+            );
+            setSignInOpen(false);
+            setSignInOpen(true);
+          }
         })
         .catch((err) => {
           dispatch(loginFailure());
@@ -360,35 +368,6 @@ const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
                   )}
                 </IconButton>
               </OutlinedBox>
-
-              <OutlinedBox>
-                  <select
-                    id="priority"
-                    name="priority"
-                    value={selectedOption}
-                    style={{
-                      width: "100%",
-                      padding: "0",
-                      border: "1px solid #ccc",
-                      borderRadius: "4px",
-                      backgroundColor: "transparent",
-                      color: "#606060",
-                      border: "none",
-                    }}
-                    onChange={(e) => setSelectedOption(e.target.value)}
-                  >
-                    <option value="" disabled>
-                      Select Role
-                    </option>
-                    <option value="ADMIN">Admin</option>
-                    <option value="MANAGER">Manager</option>
-                    <option value="DEVELOPER">Developer</option>
-                    <option value="QA">QA</option>
-                    <option value="USER">User</option>
-                    <option value="GUEST">Guest</option>
-                  </select>
-                </OutlinedBox>
-              <Error error={credentialError}>{credentialError}</Error>
               <OutlinedBox
                 button={true}
                 activeButton={!disabled}

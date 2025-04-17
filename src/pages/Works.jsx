@@ -120,6 +120,45 @@ const Task = styled.div`
     `}
 `;
 
+const OutlinedBox = styled.div`
+  min-height: 44px;
+  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.soft2};
+  color: ${({ theme }) => theme.soft2};
+  ${({ googleButton, theme }) =>
+    googleButton &&
+    `
+    user-select: none; 
+  gap: 16px;`}
+  ${({ button, theme }) =>
+    button &&
+    `
+    user-select: none; 
+  border: none;
+    font-weight: 600;
+    font-size: 16px;
+    background: ${theme.card}; `}
+    ${({ activeButton, theme }) =>
+    activeButton &&
+    `
+    user-select: none; 
+  border: none;
+    background: ${theme.primary};
+    color: white;`}
+    margin-top: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 14px;
+  &:hover {
+    transition: all 0.6s ease-in-out;
+    background: ${({ theme }) => theme.soft};
+    color: white;
+  }
+`;
+
 const ProjectDetails = () => {
   const [loading, setLoading] = useState(true);
   const [invitePopup, setInvitePopup] = useState(false);
@@ -127,7 +166,9 @@ const ProjectDetails = () => {
   const [tasks, setTasks] = useState([]);
   const [created, setCreated] = useState(false);
   const [currentWork, setCurrentWork] = useState({});
-
+  const [selectedUserId, setSelectedUserId] = useState("ALL");
+  const token = localStorage.getItem("token");
+  const [users, setUsers] = useState([]);
   const [openWork, setOpenWork] = useState(false);
   const [alignment, setAlignment] = useState(true);
 
@@ -151,9 +192,31 @@ const ProjectDetails = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     getAllWorks();
+    getAvailableMember();
   }, []);
 
+  console.log(selectedUserId);
   console.log(works);
+  
+  
+
+  const getAvailableMember = async () => {
+
+    try {
+      const response = await axios.get("http://localhost:8081/api/v1/user/getAllUsers", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type":   "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+  
+      setUsers(response.data);
+      loading(false);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
 
 
   return (
@@ -167,9 +230,28 @@ const ProjectDetails = () => {
         <>
     
             <Container>
-
-            <Work>
-              
+            <Work>  
+            <OutlinedBox style={{ width: "220px", marginBottom: "12px" }}>
+            <select
+              value={selectedUserId}
+              onChange={(e) => setSelectedUserId(e.target.value)}
+              style={{
+                width: "100%",
+                background: "transparent",
+                color: "#fff",
+                border: "none",
+                outline: "none",
+                fontSize: "16px",
+              }}
+            >
+              <option value="ALL">All Projects</option>
+              {users.map((user) => (
+                <option key={user.userId} value={user.userId}>
+                  {user.userName}
+                </option>
+              ))}
+            </select>
+          </OutlinedBox>
               <Column alignment={alignment}>
                 <ItemWrapper>
                   <Top>
@@ -179,7 +261,8 @@ const ProjectDetails = () => {
                       <Span>
                         ({" "}
                         {
-                          works.filter((item) => item.status === false)
+                          works
+                          .filter((item) => item.status === false)
                             .length
                         }{" "}
                         )
@@ -189,6 +272,7 @@ const ProjectDetails = () => {
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 1, 900: 1 }}>
                     <Masonry gutter="14px">
                       {works
+                      ?.filter(selectedUserId === "ALL" ? (item) => item.status === false : (item) => item.collaboratorIds?.includes(parseInt(selectedUserId)))
                         .filter((item) => item.status == false)
                         .map((item) => (
                           <div onClick={() => openWorkDetails(item)}>
@@ -225,6 +309,7 @@ const ProjectDetails = () => {
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 1, 900: 1 }}>
                     <Masonry gutter="14px">
                       {works
+                      ?.filter(selectedUserId === "ALL" ? (item) => item.status === true : (item) => item.collaboratorIds?.includes(parseInt(selectedUserId)))
                         .filter((item) => item.status == true)
                         .map((item) => (
                           <div onClick={() => openWorkDetails(item)}>

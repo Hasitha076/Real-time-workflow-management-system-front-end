@@ -14,10 +14,36 @@ import WorkCards from "../components/WorkCards";
 import { tagColors } from "../data/data";
 import { LOAD_ALL_PROJECTS } from "../GraphQL/Queries";
 import { useQuery } from "@apollo/client";
-import { Bar, Line } from "react-chartjs-2";
-import { Chart, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend } from "chart.js";
+import { Bar, Line, Doughnut, PolarArea } from 'react-chartjs-2';
 
-Chart.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  RadialLinearScale,
+  BarElement,
+  LineElement,
+  ArcElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend
+} from "chart.js";
+
+// Register all required chart components
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  RadialLinearScale, // Needed for Polar Area chart
+  BarElement,
+  LineElement,
+  ArcElement,        // Needed for Doughnut & Pie charts
+  PointElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
 
 const Container = Styled.div`
   overflow-y: visible !important;
@@ -295,6 +321,30 @@ const Dashboard = () => {
     ],
   };
 
+  const doughnutData = {
+    labels: ['Projects', 'Tasks', 'Works'],
+    datasets: [
+      {
+        label: 'Summary Distribution',
+        data: [10, 25, 15], // sample data
+        backgroundColor: ['#854CE6', '#FFB84C', '#00C897'],
+        borderWidth: 1,
+      },
+    ],
+  };
+  
+  const polarData = {
+    labels: ['Team A', 'Team B', 'Team C'],
+    datasets: [
+      {
+        label: 'Team Workload',
+        data: [12, 19, 11], // sample data
+        backgroundColor: ['#4FC3F7', '#FF6384', '#FFCE56'],
+      },
+    ],
+  };
+  
+
 
   return (
     <Container>
@@ -371,70 +421,105 @@ const Dashboard = () => {
 
             </StatsWrapper>
 
-            <ChartBox>
-                <Box>
-                    <h2 style={{ marginTop: '0' }}>Project, Task, and Work Summary</h2>
-                    <Bar data={barChartData} options={{ 
-                      responsive: true,
-                      plugins: {
-                        legend: {
-                          labels: {
-                            color: '#fff' // Legend text
-                          }
-                        }
+            <ChartBox sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '20px',
+                justifyContent: 'space-between',
+                padding: '20px',
+              }}>
+              <div style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
+              <Box
+                sx={{
+                  flex: '1 1 48%',
+                  backgroundColor: 'transparent',
+                  padding: '20px',
+                  borderRadius: '15px',
+                  border: '1px solid #ffffff21',
+                }}
+              >
+                <h2 style={{ marginTop: 0, color: '#fff' }}>Project, Task, and Work Summary</h2>
+                <Bar
+                  data={barChartData}
+                  options={{
+                    responsive: true,
+                    plugins: {
+                      legend: {
+                        labels: { color: '#fff' },
                       },
-                      scales: {
-                        x: {
-                          ticks: {
-                            color: '#fff' // X-axis labels
-                          },
-                          grid: {
-                            color: '#ffffff21' // X-axis grid lines
-                          }
-                        },
-                        y: {
-                          ticks: {
-                            color: '#fff' // Y-axis labels
-                          },
-                          grid: {
-                            color: '#ffffff21' // Y-axis grid lines
-                          }
-                        }
-                      }
-                      
-                    }} style={{ backgroundColor: 'transparent', padding: '10px', borderRadius: '15px' }} />
-                </Box>
-                <Box>
-                    <h2 style={{ marginTop: '0' }}>Monthly Completed Trends</h2>
-                    <Line data={lineChartData} options={{ 
-                      responsive: true,
-                      plugins: {
-                        legend: {
-                          labels: {
-                            color: '#fff' // Legend text
-                          }
-                        }
+                    },
+                    scales: {
+                      x: {
+                        ticks: { color: '#fff' },
+                        grid: { color: '#ffffff21' },
                       },
-                      scales: {
-                        x: {
-                          ticks: {
-                            color: '#fff' // X-axis labels
-                          },
-                          grid: {
-                            color: '#ffffff21' // X-axis grid lines
-                          }
+                      y: {
+                        ticks: { color: '#fff' },
+                        grid: { color: '#ffffff21' },
+                      },
+                    },
+                  }}
+                />
+              </Box>
+
+              <Box sx={{
+                  flex: '1 1 48%',
+                  backgroundColor: 'transparent',
+                  padding: '20px',
+                  borderRadius: '15px',
+                  border: '1px solid #ffffff21',
+                }}>
+                <h2 style={{ marginTop: '0' }}>Monthly Completed Trends</h2>
+                <Line
+                  data={lineChartData}
+                  options={{
+                    responsive: true,
+                    plugins: {
+                      legend: {
+                        labels: {
+                          color: '#fff',
                         },
-                        y: {
-                          ticks: {
-                            color: '#fff' // Y-axis labels
-                          },
-                          grid: {
-                            color: '#ffffff21' // Y-axis grid lines
-                          }
-                        }
-                      }
-                     }} style={{ backgroundColor: 'transparent', padding: '10px', borderRadius: '15px' }}  />
-                </Box>
+                      },
+                    },
+                    scales: {
+                      x: {
+                        ticks: { color: '#fff' },
+                        grid: { color: '#ffffff21' },
+                      },
+                      y: {
+                        ticks: { color: '#fff' },
+                        grid: { color: '#ffffff21' },
+                      },
+                    },
+                  }}
+                  style={{ backgroundColor: 'transparent', padding: '10px', borderRadius: '15px' }}
+                />
+              </Box>
+              </div>
+
+              <Box
+                sx={{
+                  flex: '1 1 48%',
+                  backgroundColor: 'transparent',
+                  padding: '20px',
+                  borderRadius: '15px',
+                  border: '1px solid #ffffff21',
+                }}
+              >
+                <h2 style={{ marginTop: 0, color: '#fff' }}>Summary Distribution</h2>
+                <Doughnut
+                  data={doughnutData}
+                  options={{
+                    responsive: true,
+                    plugins: {
+                      legend: {
+                        labels: { color: '#fff' },
+                      },
+                    },
+                  }}
+                />
+              </Box>
+
             </ChartBox>
 
             <Box >

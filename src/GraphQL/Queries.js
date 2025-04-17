@@ -63,6 +63,26 @@ export const LOAD_PROJECTS_BY_TEAM_ID = gql`
   }
 `;
 
+export const LOAD_PROJECTS_BY__USER_ID = gql`
+  query getProjectsByCollaboratorId($collaboratorId: Int!) {
+    getProjectsByCollaboratorId(collaboratorId: $collaboratorId) {
+      projectId
+      projectName
+      projectDescription
+      priority
+      assignerId
+      tags
+      dueDate
+      collaboratorIds
+      teamIds
+      memberIcons
+      status
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 // Mutation to create a project
 export const CREATE_PROJECT = gql`
   mutation createProject($input: ProjectInput!) {
