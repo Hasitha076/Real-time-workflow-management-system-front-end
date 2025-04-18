@@ -8,7 +8,6 @@ import {
   CloseRounded,
   Groups2Rounded,
   Logout,
-  Assignment,
   AccountTreeRounded,
   DashboardRounded,
 } from "@mui/icons-material";
@@ -16,7 +15,7 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import PersonIcon from '@mui/icons-material/Person';
-import LogoIcon from "../Images/logo.png";
+import LogoIcon from "../Images/logo2.png";
 import { useDispatch } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import axios from "axios";
@@ -25,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 import { Avatar, CircularProgress } from "@mui/material";
 import { LOAD_ALL_PROJECTS } from "../GraphQL/Queries";
 import { useQuery } from "@apollo/client";
+import { logout } from "../redux/userSlice";
 
 const Container = styled.div`
   flex: 1.3;
@@ -122,9 +122,11 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
   const token = localStorage.getItem("token");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const logoutUser = () => {
-    navigate(`/`);
-  };
+
+  const logoutUser = async () => {
+      dispatch(logout());
+      navigate("/");
+    };
 
   const [team, setTeams] = useState([]);
   const { currentUser } = useSelector(state => state.user);
@@ -162,6 +164,7 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
     getteams();
     getAllProjects();
   }, [currentUser, loading]);
+
 
   return (
     <Container setMenuOpen={setMenuOpen} >

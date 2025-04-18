@@ -438,23 +438,23 @@ const Dashboard = () => {
                   border: '1px solid #ffffff21',
                 }}
               >
-                <h2 style={{ marginTop: 0, color: '#fff' }}>Project, Task, and Work Summary</h2>
+                <h2 style={{ marginTop: 0 }}>Project, Task, and Work Summary</h2>
                 <Bar
                   data={barChartData}
                   options={{
                     responsive: true,
                     plugins: {
                       legend: {
-                        labels: { color: '#fff' },
+                        // labels: { color: '#fff' },
                       },
                     },
                     scales: {
                       x: {
-                        ticks: { color: '#fff' },
+                        // ticks: { color: '#fff' },
                         grid: { color: '#ffffff21' },
                       },
                       y: {
-                        ticks: { color: '#fff' },
+                        // ticks: { color: '#fff' },
                         grid: { color: '#ffffff21' },
                       },
                     },
@@ -477,17 +477,17 @@ const Dashboard = () => {
                     plugins: {
                       legend: {
                         labels: {
-                          color: '#fff',
+                          // color: '#fff',
                         },
                       },
                     },
                     scales: {
                       x: {
-                        ticks: { color: '#fff' },
+                        // ticks: { color: '#fff' },
                         grid: { color: '#ffffff21' },
                       },
                       y: {
-                        ticks: { color: '#fff' },
+                        // ticks: { color: '#fff' },
                         grid: { color: '#ffffff21' },
                       },
                     },
@@ -506,14 +506,14 @@ const Dashboard = () => {
                   border: '1px solid #ffffff21',
                 }}
               >
-                <h2 style={{ marginTop: 0, color: '#fff' }}>Summary Distribution</h2>
+                <h2 style={{ marginTop: 0 }}>Summary Distribution</h2>
                 <Doughnut
                   data={doughnutData}
                   options={{
                     responsive: true,
                     plugins: {
                       legend: {
-                        labels: { color: '#fff' },
+                        // labels: { color: '#fff' },
                       },
                     },
                   }}

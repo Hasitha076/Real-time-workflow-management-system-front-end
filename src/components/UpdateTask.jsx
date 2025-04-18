@@ -202,6 +202,7 @@ const UpdateTask = ({ openUpdate, setOpenUpdate, setEditTask, setUpdateWorkFromT
         workId: openUpdate.data.workId,
         dueDate: openUpdate.data.dueDate,
         assignerId: openUpdate.data.userId,
+        status: openUpdate.data.status,
         collaboratorIds: openUpdate.data.collaboratorIds,
         teamIds: openUpdate.data.teamIds,
         tags: openUpdate.data.tags,
@@ -333,6 +334,7 @@ useEffect(() => {
             workId: inputs.selectedWork.workId,
             assignerId: inputs.assignerId,
             dueDate: inputs.dueDate,
+            status: inputs.status,
             collaboratorIds: inputs.collaboratorIds,
             teamIds: inputs.teamIds,
             tags: inputs.tags

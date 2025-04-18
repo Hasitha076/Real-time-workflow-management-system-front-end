@@ -244,6 +244,9 @@ const Rule = () => {
     console.log(existingRuleDetails);
     
   const [ruleDetails, setRuleDetails] = useState(existingRuleDetails);
+
+  console.log("Rule details ===> ", ruleDetails);
+  
   
 
   const { loading, error, data } = useQuery(LOAD_PROJECT_BY_ID, {
@@ -370,25 +373,47 @@ const Rule = () => {
 
   const [triggerHandle, setTriggerHandle] = useState(true);
   const [actionHandle, setActionHandle] = useState(false);
-  const [triggers, setTriggers] = useState([
-    {
-      id: 1,
-      name: "Trigger 1",
-      type: "trigger",
-      status: "active",
-      triggerDetails: ruleDetails?.triggers[0]?.triggerDetails || {},
-    },
-  ]);
+  const [triggers, setTriggers] = useState(() => 
+    (ruleDetails?.triggers?.length > 0 ? 
+      ruleDetails.triggers.map((ele, index) => ({
+        id: index + 1,
+        name: `Trigger ${index + 1}`,
+        type: "trigger",
+        status: "active",
+        triggerDetails: ele.triggerDetails,
+      })) 
+      : [{
+        id: 1,
+        name: 'Trigger 1',
+        type: 'trigger',
+        status: 'active',
+        triggerDetails: {},
+      }]
+    )
+  );
+  
+  
 
-  const [actions, setActions] = useState([
-    {
-      id: 1,
-      name: "Action 1",
-      type: "action",
-      status: "inactive",
-      actionDetails: ruleDetails?.actions[0]?.actionDetails || {},
-    },
-  ]);
+  const [actions, setActions] = useState(() =>
+    (ruleDetails?.actions?.length > 0 
+      ? ruleDetails.actions.map((ele, index) => ({
+          id: index + 1,
+          name: `Action ${index + 1}`,
+          type: "action",
+          status: "inactive",
+          actionDetails: ele.actionDetails,
+        }))
+      : [{
+          id: 1,
+          name: 'Action 1',
+          type: 'action',
+          status: 'inactive',
+          actionDetails: {},
+        }]
+    )
+  );
+  
+  
 
   const [activeTrigger, setActiveTrigger] = useState(triggers[0]);
   const [activeAction, setActiveAction] = useState(actions[0]);
@@ -1065,9 +1090,9 @@ const Rule = () => {
                                     <TriggerRuleCard trigger={ele}  />
                                 </Button>
 
-                                <Button onClick={() => deleteTrigger(ele.id, ele.status)}>
+                                {!existingRule && <Button onClick={() => deleteTrigger(ele.id, ele.status)}>
                                     <CancelIcon style={{ color: "red" }} />
-                                </Button>
+                                    </Button>}
                                 
                             </div>               
                         ))}
@@ -1086,7 +1111,7 @@ const Rule = () => {
                         </div>
                         )}
 
-                        {/* Trigger cards */}
+                        {/* Action cards */}
                         {actions.map((ele) => (
                             <div
                             style={{
@@ -1107,10 +1132,10 @@ const Rule = () => {
                                     >
                                     <ActionRuleCard action={ele} />
                                 </Button>
-
-                                <Button onClick={() => deleteAction(ele.id, ele.status)}>
+                                    {!existingRule && <Button onClick={() => deleteAction(ele.id, ele.status)}>
                                     <CancelIcon style={{ color: "red" }} />
-                                </Button>
+                                </Button>}
+                                
                                 
                             </div>               
                         ))}

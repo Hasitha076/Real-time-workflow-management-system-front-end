@@ -699,6 +699,7 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
                     />
 
                     {works.length != 0 && works?.filter((item) => item.status === false)
+                      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
                       .map((filteredItem) => (
                         <div onClick={() => openWorkDetails(filteredItem)}>
                           <WorkCards

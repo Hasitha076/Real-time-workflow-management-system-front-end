@@ -869,6 +869,7 @@ useEffect(() => {
                     <Masonry gutter="14px">
 
                     {tasks?.filter((task) => task.status === false && task.workId === item.workId && task.projectId === item.projectId)
+                      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
                       .map((filteredItem) => (
                           <TaskCard
                             status="In Progress"
@@ -911,6 +912,7 @@ useEffect(() => {
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">
                     {tasks?.filter((task) => task.status === true && task.workId === item.workId)
+                    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
                       .map((filteredItem) => (
                           <TaskCard
                             status="Completed"

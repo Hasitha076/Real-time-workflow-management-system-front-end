@@ -186,6 +186,7 @@ const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated})
                 {projects
                   ?.filter(selectedUserId === "ALL" ? (item) => item.status === s.status : (item => item.collaboratorIds?.includes(parseInt(selectedUserId))))
                   ?.filter((item) => item.status === s.status)
+                  .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
                   .map((item, idx) => (
                     <Item key={item.projectId} item={item} index={idx} status={item.status} tagColor={tagColors[3]} />
                   ))}

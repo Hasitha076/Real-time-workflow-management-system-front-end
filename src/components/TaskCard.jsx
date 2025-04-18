@@ -36,6 +36,8 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import UpdateWork from "./UpdateWork";
 import UpdateTask from "./UpdateTask";
 import CheckIcon from '@mui/icons-material/Check';
+import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 const Container = styled.div`
   padding: 14px;
@@ -536,7 +538,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
         memberIcons: item.memberIcons,
         tags: item.tags,
         workId: item.workId,
-        status: completed,
+        status: completed != item.status ? item.status : completed,
         comments: commentData
       })
       .then((res) => {
@@ -558,6 +560,9 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
     console.log(item.teamIds);
     
 
+    console.log("Current Task Staus: ", item.status);
+    console.log("New Task Staus: ", completed);
+    
 
     await axios.put("http://localhost:8082/api/v1/task/updateTask", {
       taskId: item.taskId,
@@ -572,7 +577,7 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
       memberIcons: item.memberIcons,
       tags: item.tags,
       workId: item.workId,
-      status: completed
+      status: completed != item.status ? item.status : completed,
     }).then((res) => {
       console.log(res.data);
       setTaskUpdated(true);
@@ -891,7 +896,13 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
             <Container className={"item"}>
             <Top>
 
-              <Checkbox checked={completed} style={{ borderRadius: '100px', padding: '0', color: completed ? 'green' : 'orange'  }} onClick={() => changeStateFunction(!completed)} /> 
+            <IcoBtn onClick={() => changeStateFunction(!completed)}>
+              {item.status == true ? (
+                <CheckCircleIcon style={{ color: "green" }} />
+              ) : (
+                <PanoramaFishEyeIcon style={{ color: "orange" }} />
+              )}
+            </IcoBtn>
 
             <Title>{item.taskName}</Title>
               {item.priority === "HIGH" &&

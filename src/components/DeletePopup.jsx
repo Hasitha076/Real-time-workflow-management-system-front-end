@@ -116,6 +116,8 @@ const DeletePopup = ({ openDelete, setOpenDelete, setTaskTemplateDeleted }) => {
       deleteWork();
     } else if (openDelete.type === "Task Template") {
       deleteTaskTemplate();
+    } else if (openDelete.type === "Member") {
+      DeleteUser();
     }
 
   }
@@ -153,6 +155,27 @@ const DeletePopup = ({ openDelete, setOpenDelete, setTaskTemplateDeleted }) => {
         }));
 
       handleDeleteSuccess(`/teams`);
+    }
+    ).catch((err) => {
+      dispatch(openSnackbar
+        ({
+          message: err.message,
+          type: "error",
+        }));
+    })
+  }
+
+  const DeleteUser = async () => {
+    await axios.delete(`http://localhost:8081/api/v1/user/deleteUser/${openDelete.id}`)
+    .then((res) => {
+      console.log(res);
+      dispatch(openSnackbar
+        ({
+          message: "User deleted successfully",
+          type: "success",
+        }));
+
+      handleDeleteSuccess(`/members`);
     }
     ).catch((err) => {
       dispatch(openSnackbar

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import HeaderImage from "../../../Images/Header.png";
-import logo from '../../../Images/logo.png';
+// import logo from '../../../Images/logo.png';
+import logo from '../../../Images/logo2.png';
 import LoginIcon from '@mui/icons-material/Login';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import Stack from '@mui/material/Stack';
@@ -36,6 +37,7 @@ const Left = styled.div`
 `;
 
 const TitleTag = styled.div`
+font-family: "PT Serif", serif;
   font-size: 58px;
   @media (max-width: 768px) {
     font-size: 40px;
@@ -91,8 +93,8 @@ const Image = styled.img`
 `;
 
 const Logo = styled.img`
-  width: 70px;
-  height: 70px;
+  width: 120px;
+  height: 120px;
   flex: 0.8;
   display: flex;
   object-fit: scale-down;

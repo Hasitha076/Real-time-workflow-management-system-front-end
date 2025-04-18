@@ -121,7 +121,7 @@ const NotificationDialog = ({
 
         {[...notifications]
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-          .slice(0, 10)
+          // .slice(0, 10)
           .map((item, index) => (
           <Item key={index}>
             <Avatar
@@ -138,7 +138,7 @@ const NotificationDialog = ({
                   ? "Project changed"
                   : item.subject === "removed-from-project"
                   ? "Removed from project"
-                  : item.subject === "removed-project"
+                  : item.subject === "project-removed"
                   ? "Project removed"
                   : item.subject === "task-created"
                   ? "Task Invitation"
@@ -146,7 +146,7 @@ const NotificationDialog = ({
                   ? "Task changed"
                   : item.subject === "removed-from-task"
                   ? "Removed from task"
-                  : item.subject === "removed-task"
+                  : item.subject === "task-removed"
                   ? "Task removed"
                   : item.subject === "team-created"
                   ? "Team Invitation"
@@ -154,7 +154,7 @@ const NotificationDialog = ({
                   ? "Team changed"
                   : item.subject === "removed-from-team"
                   ? "Removed from team"
-                  : item.subject === "removed-team"
+                  : item.subject === "team-removed"
                   ? "Team removed"
                   : item.subject === "work-created"
                   ? "Work Invitation"
@@ -162,7 +162,7 @@ const NotificationDialog = ({
                   ? "Work changed"
                   : item.subject === "removed-from-work"
                   ? "Removed from work"
-                  : item.subject === "removed-work"
+                  : item.subject === "work-removed"
                   ? "Work removed"
                   : "Other"}
               </Title>

@@ -144,7 +144,7 @@ const AddNewUser = ({ setNewUser, setUserCreated }) => {
     console.log(inputs);
     
 
-    axios.post("http://localhost:8081/api/v1/user/createUser", {
+    axios.post("http://localhost:8081/api/v1/auth/register", {
         userName: inputs.userName,
         email: inputs.email,
         password: inputs.password,
@@ -157,9 +157,19 @@ const AddNewUser = ({ setNewUser, setUserCreated }) => {
           "Access-Control-Allow-Origin": "*",
         },
       }
-    )
-        .then(() => {
-          setLoading(false);
+      )
+        .then((res) => {
+
+          if(res.data === "Username already exists") {
+            dispatch(
+              openSnackbar({
+                message: "Username already exists",
+                type: "error",
+              })
+            );
+          }
+          else {
+            setLoading(false);
           setNewUser(false);
           setUserCreated(true);
           dispatch(
@@ -168,6 +178,7 @@ const AddNewUser = ({ setNewUser, setUserCreated }) => {
               type: "success",
             })
           );
+          }
         })
         .catch((err) => {
           console.log(err);
