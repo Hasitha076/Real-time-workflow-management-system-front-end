@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
 import { tagColors } from "../data/data";
 import { CircularProgress } from "@mui/material";
 import axios from "axios";
@@ -90,11 +89,8 @@ const OutlinedBox = styled.div`
 const Members = ({setNewUser, userCreated, setUserCreated}) => {
   const [loading, setLoading] = useState(true);
   const { currentUser } = useSelector((state) => state.user);
-const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token');
   const [users, setUsers] = useState([]);
-
-  console.log(token);
-  
 
   const getAvailableMember = async () => {
     if (!token) {
@@ -114,14 +110,12 @@ const token = localStorage.getItem('token');
       });
   
       setUsers(response.data);
-      loading(false);
+      // loading(false);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
   };
   
-  
-
   useEffect(() => {
     getAvailableMember();
   }, []);
@@ -132,9 +126,6 @@ const token = localStorage.getItem('token');
         setUserCreated(false);
     }
   }, [userCreated]);
-
-  console.log(users);
-
 
   return (
     <Container>

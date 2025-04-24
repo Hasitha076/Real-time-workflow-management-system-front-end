@@ -1,23 +1,21 @@
 import {
-  Block,
   CloseRounded,
   EmailRounded,
   Visibility,
   VisibilityOff,
-  PasswordRounded,
-  TroubleshootRounded,
+  PasswordRounded
 } from "@mui/icons-material";
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { IconButton, Modal } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import { loginFailure, loginStart, loginSuccess } from "../redux/userSlice";
+import { loginFailure, loginSuccess } from "../redux/userSlice";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import validator from "validator";
 import axios from "axios";
-
-import Google from "../Images/google.svg"
+import DraftsIcon from '@mui/icons-material/Drafts';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 import { useNavigate } from "react-router-dom";
 import OTPInput from "./OTP";
 
@@ -35,9 +33,9 @@ const Container = styled.div`
 
 const Wrapper = styled.div`
   width: 400px;
-  border-radius: 30px;
-  background-color: ${({ theme }) => theme.bgLighter};
-  color: ${({ theme }) => theme.text};
+  border-radius: 0;
+  background-color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.black};
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -47,19 +45,14 @@ const Wrapper = styled.div`
 const Title = styled.div`
   font-size: 22px;
   font-weight: 500;
-  color: ${({ theme }) => theme.text};
+  color: ${({ theme }) => theme.black};
   margin: 16px 28px;
 `;
 const OutlinedBox = styled.div`
   height: 44px;
-  border-radius: 12px;
+  border-radius: 0;
   border: 1px solid ${({ theme }) => theme.soft2};
   color: ${({ theme }) => theme.soft2};
-  ${({ googleButton, theme }) =>
-    googleButton &&
-    `
-    user-select: none; 
-  gap: 16px;`}
   ${({ button, theme }) =>
     button &&
     `
@@ -81,25 +74,6 @@ const OutlinedBox = styled.div`
   align-items: center;
   font-weight: 500;
   padding: 0px 14px;
-`;
-const GoogleIcon = styled.img`
-  width: 22px;
-`;
-const Divider = styled.div`
-  display: flex;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: ${({ theme }) => theme.soft};
-  font-size: 14px;
-  font-weight: 600;
-`;
-const Line = styled.div`
-  width: 80px;
-  height: 1px;
-  border-radius: 10px;
-  margin: 0px 10px;
-  background-color: ${({ theme }) => theme.soft};
 `;
 
 const TextInput = styled.input`
@@ -192,16 +166,35 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
       })
         .then((res) => {
           console.log(res.data);
-          
-          dispatch(loginSuccess(res.data));
-          dispatch(
-            openSnackbar({
-              message: "Login Successful",
-              severity: "success",
-            })
-          );
-          setSignInOpen(false);
-          navigate("/dashboard")
+          if (res.data.body === "User not found") {
+            dispatch(loginFailure());
+            dispatch(
+              openSnackbar({
+                message: "User not found",
+                severity: "error",
+              })
+            );
+          }
+          else if (res.data.body.user != undefined) {
+            dispatch(loginSuccess(res.data.body));
+            dispatch(
+              openSnackbar({
+                message: "User Login Successfully",
+                severity: "success",
+              })
+            );
+            setSignInOpen(false);
+            navigate("/dashboard")
+          }
+          else {
+            dispatch(loginFailure());
+            dispatch(
+              openSnackbar({
+                message: "Invalid credentials",
+                severity: "error",
+              })
+            );
+          }
         })
         .catch((err) => {
           dispatch(loginFailure());
@@ -288,12 +281,12 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
     
     await axios.post("http://localhost:8081/api/v1/auth/generateOTP", data)
       .then((res) => {
-        console.log(res.data);
-        if (res.data === "User not found") {
+        console.log(res.data.body);
+        if (res.data.body === "User not found") {
           setEmailError("User not found");
         }
         else {
-          setOTP(res.data);
+          setOTP(res.data.body);
           dispatch(
             openSnackbar({
               message: "OTP sent to your email",
@@ -317,19 +310,24 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
 
 
   const resetPassword = async () => {
+    console.log(email, newpassword);
+    
     await axios.post("http://localhost:8081/api/v1/auth/resetPassword", {
       email: email,
       password: newpassword
     })
       .then((res) => {
-          dispatch(
-            openSnackbar({
-              message: "Password reset successfully",
-              severity: "success",
-            })
-          );
-          setShowForgotPassword(false);
-          setShowNewPassword(false);
+        console.log(res.data.body);
+          if (res.data.body === "Password reset successfully") {
+            dispatch(
+              openSnackbar({
+                message: "Password reset successfully",
+                severity: "success",
+              })
+            );
+            setShowForgotPassword(false);
+            setShowNewPassword(false);
+          }
       })
       .catch((err) => {
         dispatch(
@@ -359,37 +357,21 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
             />
             <>
               <Title>Sign In</Title>
-              <OutlinedBox
-                googleButton={TroubleshootRounded}
-                style={{ margin: "24px" }}
-              >
-                {Loading ? (
-                  <CircularProgress color="inherit" size={20} />
-                ) : (
-                  <>
-                    <GoogleIcon src={Google} />
-                    Sign In with Google</>
-                )}
-              </OutlinedBox>
-              <Divider>
-                <Line />
-                or
-                <Line />
-              </Divider>
-              <OutlinedBox style={{ marginTop: "24px" }}>
-                <EmailRounded
+
+              <OutlinedBox style={{ marginTop: "10px" }}>
+                <DraftsIcon
                   sx={{ fontSize: "20px" }}
                   style={{ paddingRight: "12px" }}
                 />
                 <TextInput
-                  placeholder="Email Id"
+                  placeholder="Email"
                   type="email"
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </OutlinedBox>
               <Error error={emailError}>{emailError}</Error>
               <OutlinedBox>
-                <PasswordRounded
+                <LockOpenIcon
                   sx={{ fontSize: "20px" }}
                   style={{ paddingRight: "12px" }}
                 />
@@ -422,7 +404,7 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
                 {Loading ? (
                   <CircularProgress color="inherit" size={20} />
                 ) : (
-                  "Sign In"
+                  "Login"
                 )}
               </OutlinedBox>
             </>
@@ -525,7 +507,7 @@ const SignIn = ({ SignInOpen, setSignInOpen, setSignUpOpen }) => {
                   </OutlinedBox>}
                     
                     {showOTP && (
-                      <OTPInput option={OTP} setShowNewPassword={setShowNewPassword} setShowOTP={setShowOTP} />
+                      <OTPInput option={OTP} setShowNewPassword={setShowNewPassword} setResetDisabled={setResetDisabled} setShowOTP={setShowOTP} />
                     )}
                     <LoginText>
                       Don't have an account ?

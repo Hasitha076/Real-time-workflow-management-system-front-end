@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useMutation } from "@apollo/client";
 import { CREATE_PROJECT } from "../GraphQL/Queries";
+import dayjs from 'dayjs';
 
 const Container = styled.div`
   width: 100%;
@@ -227,7 +228,6 @@ const AddNewProject = ({ setNewProject, teamId, teamProject, setProjectCreated }
   const [showAddProject, setShowAddProject] = useState(true);
   const [showAddMember, setShowAddMember] = useState(false);
   const { currentUser } = useSelector((state) => state.user);
-
   const [createProject] = useMutation(CREATE_PROJECT);
 
   const goToAddProject = () => {
@@ -240,9 +240,6 @@ const AddNewProject = ({ setNewProject, teamId, teamProject, setProjectCreated }
     setShowAddProject(false);
     setShowAddMember(true);
   };
-
-  console.log(currentUser);
-  
 
   //add member part
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -292,10 +289,6 @@ const AddNewProject = ({ setNewProject, teamId, teamProject, setProjectCreated }
       }]);
     }
   };
-
-  console.log(selectedUsers);
-  console.log(selectedTeam);
-  
 
   //remove members from selected users
   const handleRemove = (user) => {
@@ -399,9 +392,6 @@ const AddNewProject = ({ setNewProject, teamId, teamProject, setProjectCreated }
 
   const dispatch = useDispatch();
 
-  console.log(availableUsers);
-  console.log(availableTeams);
-
   return (
     <Modal open={true} onClose={() => setNewProject(false)}>
       <Container>
@@ -469,17 +459,18 @@ const AddNewProject = ({ setNewProject, teamId, teamProject, setProjectCreated }
                   </select>
                 </OutlinedBox>
                 <OutlinedBox style={{ marginTop: "0px", width: "100%" }}>
-                  <TextInput
-                    type="text"
-                    onFocus={(e) => (e.target.type = "date")}
-                    onBlur={(e) => (e.target.type = "text")}
-                    id="dueDate"
-                    name="dueDate"
-                    style={{ fontSize: "16px" }}
-                    placeholder="Due Date"
-                    value={inputs.dueDate}
-                    onChange={handleChange}
-                  />
+                <TextInput
+                  type="text"
+                  onFocus={(e) => (e.target.type = "date")}
+                  onBlur={(e) => (e.target.type = "text")}
+                  id="dueDate"
+                  name="dueDate"
+                  style={{ fontSize: "16px" }}
+                  placeholder="Due Date"
+                  value={inputs.dueDate}
+                  onChange={handleChange}
+                  min={dayjs().format("YYYY-MM-DD")}
+                />
                 </OutlinedBox>
               </FlexDisplay>
 

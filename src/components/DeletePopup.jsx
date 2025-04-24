@@ -94,7 +94,6 @@ const DeletePopup = ({ openDelete, setOpenDelete, setTaskTemplateDeleted }) => {
   const [disabled, setDisabled] = React.useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const [deleteProject] = useMutation(DELETE_PROJECT);
 
   useEffect(() => {
@@ -119,7 +118,6 @@ const DeletePopup = ({ openDelete, setOpenDelete, setTaskTemplateDeleted }) => {
     } else if (openDelete.type === "Member") {
       DeleteUser();
     }
-
   }
 
   const DeleteProject = async () => {
@@ -230,15 +228,11 @@ const DeletePopup = ({ openDelete, setOpenDelete, setTaskTemplateDeleted }) => {
     })
 }
 
-
   const handleDeleteSuccess = (link) => {
     setLoading(false);
     setOpenDelete({ ...openDelete, state: false });
     navigate(`${link}`);
   }
-
-console.log(openDelete);
-
 
   return (
     <Modal open={true} onClose={() => setOpenDelete({ ...openDelete, state: false })}>

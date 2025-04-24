@@ -1,4 +1,4 @@
-import { IconButton, Modal, Snackbar } from "@mui/material";
+import { IconButton, Modal } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import styled from "styled-components";
@@ -6,7 +6,6 @@ import {
   CloseRounded
 } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
-import { useSelector } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
@@ -228,9 +227,7 @@ const AddNewTeam = ({ setNewTeam }) => {
     setShowAddMember(true);
   };
 
-
-  const [users, setUsers] = React.useState([]);
-  const { currentUser } = useSelector((state) => state.user);
+  const [users, setUsers] = useState([]);
 
   const handleSelect = (user) => {
     const User = {

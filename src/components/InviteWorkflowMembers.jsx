@@ -3,7 +3,6 @@ import { Modal } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Avatar } from "@mui/material";
-import { useSelector } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -184,17 +183,12 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
 `;
 
-const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, inviteTeamPopup, setInviteTeamPopup, id, data, member, team, workDetails }) => {
+const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, inviteTeamPopup, setInviteTeamPopup, data, workDetails }) => {
 
   const [message, setMessage] = useState("");
-  const { currentUser } = useSelector((state) => state.user);
   const [Loading, setLoading] = useState(false);
   const [collaboratorBlock, setCollaboratorBlock] = useState({});
   const [definedCollaborators, setDefinedCollaborators] = useState([]);
-
-  console.log(workDetails);
-  console.log(collaboratorBlock);
-  
 
   const getCollaboratorsBlock = async () => {
     await axios.get(`http://localhost:8082/api/v1/task/getCollaboratorsBlock/${workDetails.workId}`)
@@ -250,11 +244,7 @@ const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, invite
 
             
         } else {
-            // Update the existing block  
-
-            console.log("Selected users: ", selectedUsers);
-            console.log("Selected teams: ", selectedTeam);
-            
+            // Update the existing block
 
             await axios.put(`http://localhost:8082/api/v1/task/updateCollaboratorsBlock`, {
                 collaboratorsBlockId: collaboratorBlock.collaboratorsBlockId,
@@ -273,12 +263,8 @@ const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, invite
                 );
 
                 setLoading(false);
-                // if (selectedUsers.length > 0) {
-                    setInviteMemberPopup(false);
-                // } 
-                // if (selectedTeam.length > 0) {
-                    setInviteTeamPopup(false);
-                // }
+                setInviteMemberPopup(false);
+                setInviteTeamPopup(false);
             })
 
         }
@@ -295,12 +281,7 @@ const InviteWorkflowMembers = ({ inviteMemberPopup, setInviteMemberPopup, invite
     }
 };
 
-console.log("Collaborators in word: ", definedCollaborators);
-
-
-
   const dispatch = useDispatch();
-
   const [availableusers, setAvailableUsers] = useState([]);
   const [availableTeams, setAvailableTeams] = useState([]);
 
@@ -358,11 +339,7 @@ console.log("Collaborators in word: ", definedCollaborators);
     }, [definedCollaborators, availableusers, availableTeams]);
     
 
-
-  
-
-
-       //Add members from selected users
+  //Add members from selected users
   const handleSelect = (user) => {
     const User = {
       id: user.userId,
@@ -404,14 +381,6 @@ console.log("Collaborators in word: ", definedCollaborators);
   const handleRemoveTeam = (team) => {
     setSelectedTeam(selectedTeam.filter((t) => t.id !== team.teamId));
   };
-
-  console.log(data);
-  console.log(availableusers);
-  console.log(availableTeams);
-  console.log(selectedUsers);
-  console.log(selectedTeam);
-  
-
 
   return (
     <Modal open={true} onClose={() => setInviteMemberPopup(false)}>

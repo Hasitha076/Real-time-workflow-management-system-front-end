@@ -1,11 +1,9 @@
 import { Avatar, Popover } from "@mui/material";
 import React from "react";
 import styled from "styled-components";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {useNavigate} from 'react-router-dom';
 import { logout } from "../redux/userSlice";
-import axios from "axios";
-import { openSnackbar } from "../redux/snackbarSlice";
 import { tagColors } from "../data/data";
 
 const Wrapper = styled.div`
@@ -97,7 +95,7 @@ const Tag = styled.div`
   font-weight: 500;
 `;
 
-const AccountDialog = ({ open, id, anchorEl, handleClose, currentUser, token }) => {
+const AccountDialog = ({ open, anchorEl, handleClose, currentUser }) => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const logoutUser = async () => {
@@ -132,9 +130,6 @@ const AccountDialog = ({ open, id, anchorEl, handleClose, currentUser, token }) 
       //   );
       // }
     };
-
-    console.log(currentUser);
-    
 
     const handleProfile = () => {
       navigate(`/members/${currentUser.userId}`);

@@ -1,9 +1,8 @@
-import { IconButton, Modal, Snackbar } from "@mui/material";
+import { IconButton, Modal } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import styled from "styled-components";
 import {
-    AddTask,
   CloseRounded
 } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
@@ -219,17 +218,13 @@ const FlexDisplay = styled.div`
 `;
 
 
-const UpdateTaskTemplate = ({ teamId, teamProject, projectId, setTaskTemplateUpdated, setUpdateTaskTemplate, templateDetails, setTemplateDetails }) => {
+const UpdateTaskTemplate = ({ setTaskTemplateUpdated, setUpdateTaskTemplate, templateDetails }) => {
   const [Loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const [backDisabled, setBackDisabled] = useState(false);
   const [showAddProject, setShowAddProject] = useState(true);
   const [showAddMember, setShowAddMember] = useState(false);
   const {currentUser} = useSelector((state) => state.user);
-
-  console.log(templateDetails);
-  console.log("Current User: ", currentUser);
-  
 
   const goToAddProject = () => {
     setShowAddProject(true);
@@ -241,8 +236,6 @@ const UpdateTaskTemplate = ({ teamId, teamProject, projectId, setTaskTemplateUpd
     setShowAddProject(false);
     setShowAddMember(true);
   };
-
-
 
   //add member part
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -318,15 +311,6 @@ const UpdateTaskTemplate = ({ teamId, teamProject, projectId, setTaskTemplateUpd
       }, [templateDetails, availableUsers, availableTeams]);
       
 
-        console.log("Available Users: ", availableUsers);
-        console.log("Available Teams: ", availableTeams);
-        console.log("Select Users: ", selectedUsers);
-        console.log("Select Teams: ", selectedTeam);
-        console.log("Template Details: ", inputs);
-        
-      
-
-
     //Add members from selected users
   const handleSelect = (user) => {
     const User = {
@@ -358,10 +342,6 @@ const UpdateTaskTemplate = ({ teamId, teamProject, projectId, setTaskTemplateUpd
       }]);
     }
   };
-
-  console.log(selectedUsers);
-  console.log(selectedTeam);
-  
 
   //remove members from selected users
   const handleRemove = (user) => {
@@ -454,9 +434,6 @@ const UpdateTaskTemplate = ({ teamId, teamProject, projectId, setTaskTemplateUpd
   }, [inputs]);
 
   const dispatch = useDispatch();
-
-  console.log(availableUsers);
-  console.log(availableTeams);
 
   return (
     <Modal open={true} onClose={() => setUpdateTaskTemplate(false)}>

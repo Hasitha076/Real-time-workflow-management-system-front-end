@@ -4,12 +4,8 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Avatar } from "@mui/material";
 import { useSelector } from "react-redux";
-import { openSnackbar } from "../redux/snackbarSlice";
-import { useDispatch } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import axios from "axios";
-import { useMutation } from "@apollo/client";
-import { UPDATE_COLLABORATORS } from "../GraphQL/Queries";
 
 const Container = styled.div`
   width: 100%;
@@ -186,10 +182,9 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
 `;
 
-const InviteActionMembers = ({ setInvitePopup, id, memberIcons, setMemberIcons, activeAction, setActiveAction }) => {
+const InviteActionMembers = ({ setInvitePopup, memberIcons, setMemberIcons, activeAction, setActiveAction }) => {
 
   const [message, setMessage] = useState("");
-  const { currentUser } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false)
   const [availableusers, setAvailableUsers] = useState([]);
 

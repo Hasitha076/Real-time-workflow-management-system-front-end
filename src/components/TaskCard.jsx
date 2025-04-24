@@ -10,9 +10,7 @@ import {
   StarsRounded,
   PrivacyTipRounded
 } from "@mui/icons-material";
-import Checkbox from '@mui/material/Checkbox';
 import InputIcon from '@mui/icons-material/Input';
-import CloseIcon from '@mui/icons-material/Close';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import Box from '@mui/material/Box';
 import {Drawer, Slide } from '@mui/material';
@@ -21,7 +19,6 @@ import Divider from '@mui/material/Divider';
 import { IconButton } from "@mui/material";
 import CommentCard from "./CommentCard";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -33,7 +30,6 @@ import { openSnackbar } from "../redux/snackbarSlice";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import EditNoteIcon from '@mui/icons-material/EditNote';
-import UpdateWork from "./UpdateWork";
 import UpdateTask from "./UpdateTask";
 import CheckIcon from '@mui/icons-material/Check';
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
@@ -219,7 +215,7 @@ const CommentButton = styled.button`
   }
 `
 
-const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTask, setEditTask, workCollaborators, workTeams, setUpdateWorkFromTask, allWorks, setTaskUpdated}) => {
+const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask, workCollaborators, workTeams, setUpdateWorkFromTask, allWorks, setTaskUpdated}) => {
 
   const [completed, setCompleted] = useState(false);
   const [project, setProject] = useState([]);
@@ -237,9 +233,6 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
   const token = localStorage.getItem("token");
   const dispatch = useDispatch();
 
-  console.log(editTask);
-  
-  
     const { loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
       variables: { id: parseInt(item.projectId) },  // Ensure ID is an integer
       skip: !item.projectId,  // Avoid sending query if ID is undefined
@@ -253,7 +246,6 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
             };
         }, [loading, data]);
 
-        console.log("Project: ", project);
         
         const getUser = async () => {
           await axios.get(`http://localhost:8081/api/v1/user/getUser/${item.assignerId}`, {
@@ -264,8 +256,6 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
               },
         })
           .then((res) => {
-            console.log("Assigner: ", res.data);
-            
             setAssigner(res.data);
           })
           .catch((err) => {
@@ -380,24 +370,8 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
           }
         };
         
-        console.log("TaskCard tasksData: ", tasksData);
-        console.log("item: ", item);
-        console.log("Members: ", members);
-        console.log("Teams: ", teams);
-        console.log("Task collaborators: ", taskCollaborators);
-        console.log("Task teams: ", taskTeams);
-        console.log("All Task Members: ", allTaskMembers);
-        console.log("Work collaborators: ", workCollaborators);
-        console.log("Work teams: ", workTeams);
-        console.log("All Work Members: ", allWorkMembers);
-        console.log("Works: ", allWorks);
-        
-        
         const projectStatusUpdate = async (value) => {
-          console.log("project status updating...");
-          console.log(value);
-          
-          
+
           await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${work.projectId}`)
           .then((res) => {
             console.log("res.data: ", res.data);
@@ -442,10 +416,6 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
             
           })
         }
-
-        console.log("Assigner: ", assigner);
-        
-        
         
         const changeStateFunction = async (status) => {
           setCompleted(status);
@@ -486,17 +456,14 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
         
         }
 
-  useEffect(() => {
-    console.log("Completed status updated:", completed);
-  }, [completed, item, comment]);
-
+  // useEffect(() => {
+  //   console.log("Completed status updated:", completed);
+  // }, [completed, item, comment]);
 
   const [open, setOpen] = useState(false);
-
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
-
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(item.taskName);
   const [newDesc, setNewDesc] = useState(item.description);
@@ -508,22 +475,14 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
     setSelectedMembers(taskMembers ?? []);  // Ensure it's never undefined
   }, [taskMembers]);
 
-  console.log("Selected Members: ", selectedMembers);
-  console.log("New Collaborators: ", newCollaborators);
-  console.log("New Teams: ", newTeams);
-
   const handleDoubleClick = () => {
     setIsEditing(true);
   };
 
     // comment
     const handleComment = async () => {
-      console.log("Commented ===> ", item.taskId);
-      console.log("Commented ===> ", comment);
-      console.log(item);
   
       commentData.push(comment);
-  
   
       await axios.put(`http://localhost:8082/api/v1/task/updateTask`, {
         taskId: item.taskId,
@@ -552,17 +511,6 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
     const formattedDate = dayjs(newValue);
     newValue ? setSelectedDate(formattedDate) : setSelectedDate(dayjs(item.dueDate));
     setIsEditing(false);  
-
-    console.log("Selected Members: ", selectedMembers);
-    console.log("New Collaborators: ", newCollaborators);
-    console.log("New Teams: ", newTeams);
-    console.log(item.collaboratorIds);
-    console.log(item.teamIds);
-    
-
-    console.log("Current Task Staus: ", item.status);
-    console.log("New Task Staus: ", completed);
-    
 
     await axios.put("http://localhost:8082/api/v1/task/updateTask", {
       taskId: item.taskId,
@@ -843,9 +791,10 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
            <CommentCard item={item} allTaskMembers={allTaskMembers}  />
             
             <Box sx={{ display: 'flex', paddingTop: '20px' }}>
-              {allTaskMembers.slice(0, 1).map((member) => (
+              {allTaskMembers.slice(0, 1).map((member, idx) => (
 
                 <Avatar
+                key={idx}
                   sx={{
                     marginRight: "5px",
                     width: "26px",
@@ -927,8 +876,9 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
             </Top>
             <Desc>{item.description}</Desc>
             <Tags>
-              {item.tags.map((tag) => (
+              {item.tags.map((tag, idx) => (
                 <Tag
+                key={idx}
                   tagColor={tagColors[Math.floor(Math.random() * tagColors.length)]}
                 >
                   {tag}
@@ -942,8 +892,9 @@ const TaskCard = ({item, index, members, teams, setTaskAdd, work, tasks, editTas
                 {format(item.updatedAt)}
               </Time>
               <AvatarGroup>
-                {allTaskMembers.slice(0, 2).map((member) => (
+                {allTaskMembers.slice(0, 2).map((member, idx) => (
                   <Avatar
+                  key={idx}
                     sx={{
                       marginRight: "-13px",
                       width: "26px",

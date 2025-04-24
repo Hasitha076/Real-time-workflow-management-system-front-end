@@ -1,31 +1,30 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import SettingsBrightnessOutlinedIcon from "@mui/icons-material/SettingsBrightnessOutlined";
-import { Link } from "react-router-dom";
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import { Link, useNavigate } from "react-router-dom";
 import {
   Add,
   CloseRounded,
-  Groups2Rounded,
-  Logout,
-  AccountTreeRounded,
-  DashboardRounded,
+  Groups2Rounded
 } from "@mui/icons-material";
 import GroupsIcon from '@mui/icons-material/Groups';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import PersonIcon from '@mui/icons-material/Person';
+import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard';
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
+import TopicIcon from '@mui/icons-material/Topic';
 import LogoIcon from "../Images/logo2.png";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import axios from "axios";
-import { useSelector } from "react-redux";
-import { useNavigate } from 'react-router-dom';
 import { Avatar, CircularProgress } from "@mui/material";
 import { LOAD_ALL_PROJECTS } from "../GraphQL/Queries";
 import { useQuery } from "@apollo/client";
 import { logout } from "../redux/userSlice";
 
+// Styled components
 const Container = styled.div`
   flex: 1.3;
   background-color: ${({ theme }) => theme.bgLighter};
@@ -43,18 +42,21 @@ const Container = styled.div`
     z-index: 100;
     width: 100%;
     max-width: 250px;
-    left: ${({ setMenuOpen }) => (setMenuOpen ? "0" : "-100%")};
+    left: ${({ $setMenuOpen }) => ($setMenuOpen ? "0" : "-100%")};
     transition: 0.3s ease-in-out;
   }
 `;
+
 const ContainerWrapper = styled.div`
   height: 90%;
   overflow-y: scroll !important;
   margin-top: 0px;
 `;
+
 const Space = styled.div`
   height: 50px;
 `;
+
 const Flex = styled.div`
   display: flex;
   justify-content: space-between;
@@ -84,17 +86,16 @@ const Image = styled.img`
 
 const Item = styled.div`
   display: flex;
-  display: "flex";
-  alignItems: "center";
-  whiteSpace: "nowrap";
-  overflow: "hidden";
-  textOverflow: "ellipsis";
-  maxWidth: "200px";
-  color: ${({ theme }) => theme.itemText};
   align-items: center;
+  color: ${({ theme }) => theme.itemText};
   gap: 20px;
   cursor: pointer;
   padding: 7.5px 26px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+
   &:hover {
     background-color: ${({ theme }) => theme.itemHover};
   }
@@ -116,48 +117,54 @@ const Title = styled.h2`
   gap: 12px;
 `;
 
-const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
+// Main Component
+const Menu = ({ setMenuOpen, setNewTeam }) => {
   const [teamsLoading, setTeamsLoading] = useState(true);
   const [projectsLoading, setProjectsLoading] = useState(true);
+  const [team, setTeams] = useState([]);
+  const [recentProjects, setRecentProjects] = useState([]);
   const token = localStorage.getItem("token");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { currentUser } = useSelector(state => state.user);
+  const { loading, data } = useQuery(LOAD_ALL_PROJECTS);
 
   const logoutUser = async () => {
-      dispatch(logout());
-      navigate("/");
-    };
-
-  const [team, setTeams] = useState([]);
-  const { currentUser } = useSelector(state => state.user);
-    const [recentProjects, setRecentProjects] = useState([]);
-
-   const { loading, error, data } = useQuery(LOAD_ALL_PROJECTS);
-  
+    dispatch(logout());
+    dispatch(
+      openSnackbar({
+        message: "Logged out successfully",
+        type: "success",
+        severity: "success",
+      })
+    );
+    navigate("/");
+  };
 
   const getteams = async () => {
     setTeamsLoading(true);
-    await axios.get(`http://localhost:8085/api/v1/team/getAllTeams`)
-      .then((res) => {
-        setTeams(res.data);
-        setTeamsLoading(false);
-      })
-      .catch((err) => {
-        dispatch(openSnackbar({ message: err.message, type: "error" }));
-        if (err.response.status === 401 || err.response.status === 402) logoutUser();
-      });
+    try {
+      const res = await axios.get(`http://localhost:8085/api/v1/team/getAllTeams`);
+      setTeams(res.data);
+    } catch (err) {
+      dispatch(openSnackbar({ message: err.message, type: "error" }));
+      if (err.response?.status === 401 || err.response?.status === 402) logoutUser();
+    } finally {
+      setTeamsLoading(false);
+    }
   };
 
   const getAllProjects = async () => {
-        setProjectsLoading(true);
-        
+    setProjectsLoading(true);
     const sortedData = [...(data?.getAllProjects || [])].sort(
-        (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+      (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
     );
-
     setRecentProjects(sortedData);
     setProjectsLoading(false);
+  };
 
+  const handleProfile = () => {
+    navigate(`/members/${currentUser.userId}`);
   };
 
   useEffect(() => {
@@ -165,11 +172,10 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
     getAllProjects();
   }, [currentUser, loading]);
 
-
   return (
-    <Container setMenuOpen={setMenuOpen} >
+    <Container $setMenuOpen={setMenuOpen}>
       <Flex>
-        <Link to="/dashboard" style={{ textDecoration: "none", color: "inherit", alignItems: 'center',display: 'flex' }}>
+        <Link to="/dashboard" style={{ textDecoration: "none", color: "inherit", display: "flex", alignItems: "center" }}>
           <Logo>
             <Image src={LogoIcon} />
             SmartFlow
@@ -179,121 +185,76 @@ const Menu = ({ darkMode, setDarkMode, setMenuOpen, setNewTeam }) => {
           <CloseRounded onClick={() => setMenuOpen(false)} />
         </Close>
       </Flex>
+
       <ContainerWrapper>
         <Link to="/dashboard" style={{ textDecoration: "none", color: "inherit" }}>
-          <Item>
-            <DashboardRounded />
-            Dashboard
-          </Item>
+          <Item><SpaceDashboardIcon /> Dashboard</Item>
         </Link>
-        <Link
-          to="projects"
-          style={{ textDecoration: "none", color: "inherit" }}
-        >
-          <Item>
-            <AccountTreeRounded />
-            Projects
-          </Item>
+        <Link to="/projects" style={{ textDecoration: "none", color: "inherit" }}>
+          <Item><TopicIcon /> Projects</Item>
         </Link>
-        <Link
-          to="works"
-          style={{ textDecoration: "none", color: "inherit" }}
-        >
-          <Item>
-            <ReceiptLongIcon />
-            Works
-          </Item>
+        <Link to="/works" style={{ textDecoration: "none", color: "inherit" }}>
+          <Item><ReceiptLongIcon /> Works</Item>
         </Link>
-        <Link
-          to="teams"
-          style={{ textDecoration: "none", color: "inherit" }}
-        >
-          <Item>
-            <GroupsIcon />
-            Teams
-          </Item>
+        <Link to="/tasks" style={{ textDecoration: "none", color: "inherit" }}>
+          <Item><PlaylistAddCheckIcon /> Tasks</Item>
         </Link>
-        <Link
-          to="members"
-          style={{ textDecoration: "none", color: "inherit" }}
-        >
-          <Item>
-            <PersonIcon />
-            Members
-          </Item>
+        <Link to="/teams" style={{ textDecoration: "none", color: "inherit" }}>
+          <Item><GroupsIcon /> Teams</Item>
         </Link>
-        {/* <Link
-          to="community"
-          style={{ textDecoration: "none", color: "inherit" }}
-        >
-          <Item>
-            <People />
-            Community
-          </Item>
-        </Link> */}
-        <Hr />
-        <Title>
-          <Groups2Rounded /> Teams
-        </Title>
-        {teamsLoading ? (
-          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: '12px 0px'}}>
-            <CircularProgress size='24px' />
-          </div>
-        ) : (<>
-          {team.slice(0, 3).map((team, i) => (
-            <Link
-              to={`/teams/${team.teamId}`}
-              style={{ textDecoration: "none", color: "inherit" }}
-            >
-              <Item>
+        <Link to="/members" style={{ textDecoration: "none", color: "inherit" }}>
+          <Item><PersonIcon /> Members</Item>
+        </Link>
 
-                  <Avatar sx={{ width: "28px", height: "28px" }}>{team.teamName[0]}</Avatar>
+        <Hr />
+        <Title><Groups2Rounded /> Teams</Title>
+        {teamsLoading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '12px 0' }}>
+            <CircularProgress size="24px" />
+          </div>
+        ) : (
+          team.slice(0, 3).map((team) => (
+            <Link key={team.teamId} to={`/teams/${team.teamId}`} style={{ textDecoration: "none", color: "inherit" }}>
+              <Item>
+                <Avatar sx={{ width: "28px", height: "28px" }}>{team.teamName[0]}</Avatar>
                 {team.teamName}
               </Item>
             </Link>
-          ))}
-        </>
+          ))
         )}
         <Item onClick={() => setNewTeam(true)}>
-          <Add sx={{ fontSize: "20px" }} />
-          New Team
+          <Add sx={{ fontSize: "20px" }} /> New Team
         </Item>
+
         <Hr />
-        <Title>
-          <AccountTreeIcon /> Recent Projects
-        </Title>
+        <Title><AccountTreeIcon /> Recent Projects</Title>
         {projectsLoading ? (
-          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', margin: '12px 0px'}}>
-            <CircularProgress size='24px' />
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '12px 0' }}>
+            <CircularProgress size="24px" />
           </div>
-        ) : (<>
-          {recentProjects?.slice(0, 5).map((project, i) => (
-            <Link
-              to={`/projects/${project.projectId}`}
-              style={{ textDecoration: "none", color: "inherit" }}
-
-            >
-              <Item style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "200px" }}>
-
-                  <Avatar sx={{ width: "28px", height: "28px" }}>{project.projectName[0]}</Avatar>
-                {project.projectName.substring(0, 20)}...
+        ) : (
+          recentProjects?.slice(0, 5).map((project) => (
+            <Link key={project.projectId} to={`/projects/${project.projectId}`} style={{ textDecoration: "none", color: "inherit" }}>
+              <Item>
+                <Avatar sx={{ width: "28px", height: "28px" }}>{project.projectName[0]}</Avatar>
+                {project.projectName.length > 20 ? `${project.projectName.substring(0, 20)}...` : project.projectName}
               </Item>
             </Link>
-          ))}
-        </>
+          ))
         )}
+
         <Hr />
-        <Item onClick={() => setDarkMode(!darkMode)}>
-          <SettingsBrightnessOutlinedIcon />
-          {darkMode ? "Light" : "Dark"} Mode
+        <Item onClick={handleProfile}>
+          <AccountBoxIcon /> My Profile
         </Item>
-        <Item onClick={() => logoutUser()}>
-          <Logout />
-          Logout
+
+        <Item onClick={logoutUser}>
+          <ExitToAppIcon /> Logout
         </Item>
+
         <Space />
       </ContainerWrapper>
-    </Container >
+    </Container>
   );
 };
 

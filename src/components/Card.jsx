@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Fragment, useRef } from "react";
 import styled from "styled-components";
 import { TimelapseRounded } from "@mui/icons-material";
@@ -23,15 +23,6 @@ const Container = styled.div`
     transition: all 0.6s ease-in-out;
     box-shadow: 0 0 18px 0 rgba(0, 0, 0, 0.5);
   }
-`;
-
-const Image = styled.img`
-  height: 120px;
-  width: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-  margin-top: 1px;
-  margin-bottom: 8px;
 `;
 
 const Top = styled.div`
@@ -109,11 +100,11 @@ const AvatarGroup = styled.div`
   margin-right: 12px;
 `;
 
-const Card = ({ tagColor, item, index, status }) => {
-  const ref = useRef(null);
-  const [teams, setTeams] = React.useState([]);
-const [collaborators, setCollaborators] = React.useState([]);
-const [members, setMembers] = React.useState([]);
+const Card = ({ item }) => {
+const ref = useRef(null);
+const [teams, setTeams] = useState([]);
+const [collaborators, setCollaborators] = useState([]);
+const [members, setMembers] = useState([]);
 
 const getAvailableTeams = async () => {
   try {

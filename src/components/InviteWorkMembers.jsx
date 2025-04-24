@@ -3,7 +3,6 @@ import { Modal } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Avatar } from "@mui/material";
-import { useSelector } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -36,34 +35,6 @@ const Wrapper = styled.div`
   @media (max-width: 768px) {
     width: 100%;
   }
-`;
-
-const Title = styled.div`
-  font-size: 16px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.text};
-  margin: 12px;
-`;
-
-const Search = styled.div`
-  margin: 6px 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-radius: 12px;
-  color: ${({ theme }) => theme.textSoft};
-  background-color: ${({ theme }) => theme.bgDark};
-`;
-
-const Input = styled.input`
-  width: 100%;
-  border: none;
-  font-size: 14px;
-  padding: 10px 20px;
-  border-radius: 100px;
-  background-color: transparent;
-  outline: none;
-  color: ${({ theme }) => theme.textSoft};
 `;
 
 const UsersList = styled.div`
@@ -122,24 +93,6 @@ gap: 2px;
   flex-direction: column;
   align-items: center;
 }
-`;
-
-const Access = styled.div`
-padding: 6px 10px;
-border-radius: 12px;
-display: flex;
-align-items: center;
-justify-content: center;
-background-color: ${({ theme }) => theme.bgDark};
-`;
-
-const Select = styled.select`
-  border: none;
-  font-size: 12px;
-  background-color: transparent;
-  outline: none;
-  color: ${({ theme }) => theme.text};
-  background-color: ${({ theme }) => theme.bgDark};
 `;
 
 const Role = styled.div`
@@ -230,10 +183,9 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
 `;
 
-const InviteWorkMembers = ({ setInvitePopup, id, teamInvite, data, projectCollaboratorIds, projectTeamIds, workCollaborators, workTeams }) => {
+const InviteWorkMembers = ({ setInvitePopup, id, data, projectCollaboratorIds, projectTeamIds, workCollaborators, workTeams }) => {
 
   const [message, setMessage] = useState("");
-  const { currentUser } = useSelector((state) => state.user);
   const [Loading, setLoading] = useState(false);  
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState([]);
@@ -308,7 +260,6 @@ const InviteWorkMembers = ({ setInvitePopup, id, teamInvite, data, projectCollab
 
     useEffect(() => {
 
-    
       if (data?.collaboratorIds && workCollaborators.length > 0) {
         const matchingUsers = workCollaborators.filter((user) =>
             data.collaboratorIds.includes(user.id)
@@ -333,7 +284,6 @@ const InviteWorkMembers = ({ setInvitePopup, id, teamInvite, data, projectCollab
         setSelectedTeam(matchingTeams);
       }
 
-      
     }, [data, workCollaborators, workTeams]);
         
    
@@ -380,18 +330,7 @@ const InviteWorkMembers = ({ setInvitePopup, id, teamInvite, data, projectCollab
   const handleRemoveTeam = (team) => {
     setSelectedTeam(selectedTeam.filter((t) => t.id !== team.id));
   };
-  
-    
-  console.log(id);
-  console.log("In work: ",data);
-  console.log(data.collaboratorIds);
-  console.log(data.teamIds);
-  console.log(selectedUsers);
-  console.log(selectedTeam);
-  console.log("Work Collaborators: ",workCollaborators);
-  console.log("Work Teams: ",workTeams);
-  console.log("Project Collaborators: ",projectCollaboratorIds);
-  console.log("Project Teams: ",projectTeamIds);
+
 
   return (
     <Modal open={true} onClose={() => setInvitePopup(false)}>

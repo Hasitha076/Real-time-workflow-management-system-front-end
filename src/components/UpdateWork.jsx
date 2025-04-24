@@ -5,11 +5,9 @@ import styled from "styled-components";
 import {
     CloseRounded
 } from "@mui/icons-material";
-import { useSelector } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
-
 
 
 const Container = styled.div`
@@ -115,144 +113,6 @@ const TextInput = styled.input`
   color: ${({ theme }) => theme.textSoft};
 `;
 
-const ToolsContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  padding: 12px 18px;
-`;
-
-const Icon = styled.img`
-  width: 16px;
-  margin: 0px 6px 0px 0px;
-`;
-
-const AddMember = styled.div`
-  margin: 22px;
-  padding: 12px;
-  border-radius: 8px;
-  background-color: ${({ theme }) => theme.bgDark + "98"};
-`;
-
-const Search = styled.div`
-  margin: 6px 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-radius: 12px;
-  color: ${({ theme }) => theme.textSoft};
-  background-color: ${({ theme }) => theme.bgDark};
-`;
-
-const Input = styled.input`
-  width: 100%;
-  border: none;
-  font-size: 14px;
-  padding: 10px 20px;
-  border-radius: 100px;
-  background-color: transparent;
-  outline: none;
-  color: ${({ theme }) => theme.textSoft};
-`;
-
-const UsersList = styled.div`
-  padding: 18px 8px;
-  display: flex;
-  margin-bottom: 12px;
-  flex-direction: column;
-  gap: 12px;
-  border-radius: 12px;
-  color: ${({ theme }) => theme.textSoft};
-`;
-
-const MemberCard = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  justify-content: space-between;
-`;
-const UserData = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
-const Details = styled.div`
-  gap: 4px;
-`;
-
-const Name = styled.div`
-  font-size: 13px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.textSoft};
-`;
-
-const EmailId = styled.div`
-  font-size: 10px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.textSoft + "99"};
-  line-break: anywhere;
-`;
-
-const Flex = styled.div`
-display: flex;
-flex-direction: row;
-gap: 2px;
-@media (max-width: 768px) {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-`;
-
-const Access = styled.div`
-padding: 6px 10px;
-border-radius: 12px;
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 12px;
-background-color: ${({ theme }) => theme.bgDark};
-`;
-
-const Select = styled.select`
-  border: none;
-  font-size: 12px;
-  background-color: transparent;
-  outline: none;
-  color: ${({ theme }) => theme.text};
-  background-color: ${({ theme }) => theme.bgDark};
-`;
-
-const Role = styled.div`
-  background-color: ${({ theme }) => theme.bgDark};
-  border-radius: 12px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-
-const InviteButton = styled.button`
-  padding: 6px 14px;
-  background-color: transparent;
-  border: 1px solid ${({ theme }) => theme.primary};
-  color: ${({ theme }) => theme.primary};
-  border-radius: 1px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  &:hover {
-    background-color: ${({ theme }) => theme.primary};
-    color: ${({ theme }) => theme.text};
-  }
-`;
-
 const FlexDisplay = styled.div`
   display: flex;
   gap: 6px;
@@ -261,13 +121,12 @@ const FlexDisplay = styled.div`
 `;
 
 const UpdateWork = ({ openUpdate, setOpenUpdate }) => {
-    console.log(openUpdate.data);
+
     const [Loading, setLoading] = useState(false);
     const [disabled, setDisabled] = useState(true);
     const [backDisabled, setBackDisabled] = useState(false);
     const [showAddProject, setShowAddProject] = useState(true);
     const [showAddMember, setShowAddMember] = useState(false);
-
 
     const goToAddProject = () => {
         setShowAddProject(true);
@@ -290,13 +149,11 @@ const UpdateWork = ({ openUpdate, setOpenUpdate }) => {
     }, [openUpdate]);
 
     //add member part
-
-    const [search, setSearch] = React.useState("");
-    const [users, setUsers] = React.useState([]);
-    const { currentUser } = useSelector((state) => state.user);
+    const [search, setSearch] = useState("");
+    const [users, setUsers] = useState([]);
     const [role, setRole] = useState("");
     const [access, setAccess] = useState("");
-    const [selectedUsers, setSelectedUsers] = React.useState([]);
+    const [selectedUsers, setSelectedUsers] = useState([]);
     const [inputs, setInputs] = useState({ 
         workId: openUpdate.data.workId, 
         workName: openUpdate.data.workName, 
@@ -310,8 +167,6 @@ const UpdateWork = ({ openUpdate, setOpenUpdate }) => {
         memberIcons: openUpdate.data.memberIcons,
         tags: openUpdate.data.tags
     });
-
-        console.log(inputs);
 
     const handleSelect = (user) => {
         const User = {
@@ -402,7 +257,6 @@ const UpdateWork = ({ openUpdate, setOpenUpdate }) => {
             setDisabled(false);
         }
     }, [inputs]);
-
 
     const dispatch = useDispatch();
 

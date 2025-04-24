@@ -5,7 +5,6 @@ import styled from "styled-components";
 import {
     CloseRounded
 } from "@mui/icons-material";
-import { useSelector } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
@@ -125,7 +124,7 @@ const FlexDisplay = styled.div`
 `;
 
 const UpdateTask = ({ openUpdate, setOpenUpdate, setEditTask, setUpdateWorkFromTask }) => {
-    console.log(openUpdate.data);
+
     const [Loading, setLoading] = useState(false);
     const [disabled, setDisabled] = useState(true);
     const [backDisabled, setBackDisabled] = useState(false);
@@ -133,13 +132,13 @@ const UpdateTask = ({ openUpdate, setOpenUpdate, setEditTask, setUpdateWorkFromT
     const [showAddMember, setShowAddMember] = useState(false);
     const [works, setWorks] = useState([]);
     const [selectedWork, setSelectedWork] = useState(null);
-      const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
+    const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
 
-        const { loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
-          variables: { id: parseInt(openUpdate.data.projectId) },  // Ensure ID is an integer
-          skip: !openUpdate.data.projectId,  // Avoid sending query if ID is undefined
-          fetchPolicy: "cache-and-network" // Ensures fresh data is fetched
-        });
+    const { loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
+        variables: { id: parseInt(openUpdate.data.projectId) },  // Ensure ID is an integer
+        skip: !openUpdate.data.projectId,  // Avoid sending query if ID is undefined
+        fetchPolicy: "cache-and-network" // Ensures fresh data is fetched
+    });
 
     const goToAddProject = () => {
         setShowAddProject(true);
@@ -186,13 +185,6 @@ const UpdateTask = ({ openUpdate, setOpenUpdate, setEditTask, setUpdateWorkFromT
         getWork();
     }, [openUpdate.data.projectId]);
 
- 
-    const [search, setSearch] = useState("");
-    const [users, setUsers] = useState([]);
-    const { currentUser } = useSelector((state) => state.user);
-    const [role, setRole] = useState("");
-    const [access, setAccess] = useState("");
-    const [selectedUsers, setSelectedUsers] = useState([]);
     const [inputs, setInputs] = useState({ 
         taskId: openUpdate.data.taskId, 
         taskName: openUpdate.data.taskName, 
@@ -209,14 +201,14 @@ const UpdateTask = ({ openUpdate, setOpenUpdate, setEditTask, setUpdateWorkFromT
     });
 
     // Update `inputs.selectedWork` when `selectedWork` is fetched
-useEffect(() => {
-    if (selectedWork) {
-        setInputs((prev) => ({
-            ...prev,
-            selectedWork: selectedWork,
-        }));
-    }
-}, [selectedWork]);
+    useEffect(() => {
+        if (selectedWork) {
+            setInputs((prev) => ({
+                ...prev,
+                selectedWork: selectedWork,
+            }));
+        }
+    }, [selectedWork]);
 
 
     const handleChange = (e) => {
@@ -241,20 +233,10 @@ useEffect(() => {
         }
     };
 
-    console.log(inputs);
-    
-
     const updateWorkStatus = async (value) => {
-              try {
-                console.log(value);
-                console.log("selectedWork: ", selectedWork);
-                console.log("inputs.selectedWork: ", inputs.selectedWork);
-                
-                
+              try {               
                 const res = await axios.get(`http://localhost:8082/api/v1/task/getTasksByWorkId/${selectedWork.workId}`);
                 
-                console.log("res.data: ", res.data);
-
                 if (value.status) {
                     await axios.put(`http://localhost:8086/api/v1/work/updateWorkStatus`, {
                       workId: value.workId,

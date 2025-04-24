@@ -87,6 +87,10 @@ const OutlinedBox = styled.div`
   }
 `;
 
+const Selector = styled.select`
+  color: ${({ theme }) => theme.white};
+`;
+
 const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated}) => {
   const dispatch = useDispatch();
   const [projects, setProjects] = useState([]);
@@ -134,7 +138,7 @@ const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated})
       });
   
       setUsers(response.data);
-      loading(false);
+      // loading(false);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -151,13 +155,12 @@ const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated})
 
         <>
           <OutlinedBox style={{ width: "220px", marginBottom: "12px" }}>
-            <select
+            <Selector
               value={selectedUserId}
               onChange={(e) => setSelectedUserId(e.target.value)}
               style={{
                 width: "100%",
                 background: "transparent",
-                color: "#fff",
                 border: "none",
                 outline: "none",
                 fontSize: "16px",
@@ -169,7 +172,7 @@ const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated})
                   {user.userName}
                 </option>
               ))}
-            </select>
+            </Selector>
           </OutlinedBox>
         
         <Column>

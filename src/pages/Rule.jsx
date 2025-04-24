@@ -348,18 +348,7 @@ const Rule = () => {
         getRuleFlows();
     }
   }, [item, id]);
-  
 
-  console.log(id);
-    console.log(item);
-  console.log(collaborators);
-  console.log(teams);
-  console.log(works);
-  console.log(projectCollaborators);
-  console.log(projectTeams);
-  console.log(taskTemplates);
-  
-  
 
   const openWorkDetails = (work) => {
     setCurrentWork(work);
@@ -392,28 +381,25 @@ const Rule = () => {
     )
   );
   
-  
 
-  const [actions, setActions] = useState(() =>
-    (ruleDetails?.actions?.length > 0 
-      ? ruleDetails.actions.map((ele, index) => ({
-          id: index + 1,
-          name: `Action ${index + 1}`,
-          type: "action",
-          status: "inactive",
-          actionDetails: ele.actionDetails,
-        }))
-      : [{
-          id: 1,
-          name: 'Action 1',
-          type: 'action',
-          status: 'inactive',
-          actionDetails: {},
-        }]
-    )
-  );
-  
-  
+const [actions, setActions] = useState(() =>
+  (ruleDetails?.actions?.length > 0 
+    ? ruleDetails.actions.map((ele, index) => ({
+        id: index + 1,
+        name: `Action ${index + 1}`,
+        type: "action",
+        status: "inactive",
+        actionDetails: ele.actionDetails,
+      }))
+    : [{
+        id: 1,
+        name: 'Action 1',
+        type: 'action',
+        status: 'inactive',
+        actionDetails: {},
+      }]
+  )
+);
 
   const [activeTrigger, setActiveTrigger] = useState(triggers[0]);
   const [activeAction, setActiveAction] = useState(actions[0]);
@@ -569,13 +555,6 @@ const Rule = () => {
       actionEventHandle(activeAction);
     }
   }, [isActiveTrigger, isActiveAction, activeTrigger, activeAction]);
-  
-  console.log(triggers);
-  console.log(actions);
-  console.log(activeTrigger);
-    console.log(activeAction);
-    console.log(isActiveTrigger);
-    console.log(isActiveAction);
   
 
     const createRule = async () => {

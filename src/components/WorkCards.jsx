@@ -131,7 +131,7 @@ const IcoBtn = styled(IconButton)`
   color: ${({ theme }) => theme.textSoft} !important;
 `;
 
-const Card = ({ status, work, setWorkUpdated, setTaskUpdated }) => {
+const Card = ({ work }) => {
   
   const [color, setColor] = useState("primary");
   const [task, setTask] = useState([]);
@@ -186,10 +186,6 @@ const Card = ({ status, work, setWorkUpdated, setTaskUpdated }) => {
     getTasks();
   }, []);
 
-  console.log(work);
-  console.log(task);
-  
-
   useEffect(() => {
     let count = 0;
     let Members = [];
@@ -229,8 +225,8 @@ const Card = ({ status, work, setWorkUpdated, setTaskUpdated }) => {
       </Top>
       <Desc>{work.description}</Desc>
       <Tags>
-        {work.tags.map((tag) => (
-          <Tag
+        {work.tags.map((tag, key) => (
+          <Tag key={key}
             tagColor={tagColors[Math.floor(Math.random() * tagColors.length)]}
           >
             {tag}
@@ -241,7 +237,7 @@ const Card = ({ status, work, setWorkUpdated, setTaskUpdated }) => {
         <Text>
           Incompleted Tasks 
           <Span>
-            {task.length - completed}
+            {task.length - completed} / {task.length}
           </Span>
         </Text>
         <LinearProgress
@@ -257,8 +253,9 @@ const Card = ({ status, work, setWorkUpdated, setTaskUpdated }) => {
           {format(work.updatedAt)}
         </Time>
         <AvatarGroup>
-          {work.memberIcons.slice(0, 2).map((member) => (
+          {work.memberIcons.slice(0, 2).map((member, key) => (
             <Avatar
+            key={key}
               sx={{
                 marginRight: "-13px",
                 width: "26px",

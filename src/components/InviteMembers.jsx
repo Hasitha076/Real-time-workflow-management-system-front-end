@@ -186,15 +186,12 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
 `;
 
-const InviteMembers = ({ setInvitePopup, id, teamInvite, data, setCollaboratorUpdated }) => {
+const InviteMembers = ({ setInvitePopup, id, data, setCollaboratorUpdated }) => {
 
   const [message, setMessage] = useState("");
-  const { currentUser } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false)
-
   const [updateCollaborators] = useMutation(UPDATE_COLLABORATORS);
   
-
   const UpdateProjectCollaborators = async () => {
     setLoading(true);
 
@@ -228,20 +225,17 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data, setCollaboratorUp
             })
           );
         });
-      } else {
-        dispatch(
-          openSnackbar({
-            message: "Select atleast one user or team",
-            type: "error",
-          })
-        );
-      }
-      
-    
+        } else {
+          dispatch(
+            openSnackbar({
+              message: "Select atleast one user or team",
+              type: "error",
+            })
+          );
+        }
   };
 
   const dispatch = useDispatch();
-
   const [availableusers, setAvailableUsers] = useState([]);
   const [availableTeams, setAvailableTeams] = useState([]);
 
@@ -296,11 +290,11 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data, setCollaboratorUp
     
         setSelectedTeam(matchingTeams);
       }
-    }, [data, availableusers, availableTeams]); // Dependencies to re-run the effect
+    }, [data, availableusers, availableTeams]);
     
     
 
-       //Add members from selected users
+  //Add members from selected users
   const handleSelect = (user) => {
     const User = {
       id: user.userId,

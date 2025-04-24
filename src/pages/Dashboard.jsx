@@ -1,7 +1,7 @@
 
 import React from "react";
 import { useState, useEffect } from "react";
-import Styled, { useTheme } from "styled-components";
+import Styled from "styled-components";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { LinearProgress } from "@mui/material";
@@ -14,7 +14,9 @@ import WorkCards from "../components/WorkCards";
 import { tagColors } from "../data/data";
 import { LOAD_ALL_PROJECTS } from "../GraphQL/Queries";
 import { useQuery } from "@apollo/client";
-import { Bar, Line, Doughnut, PolarArea } from 'react-chartjs-2';
+import { Bar, Line, Doughnut } from 'react-chartjs-2';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 import {
   Chart,
@@ -30,14 +32,13 @@ import {
   Legend
 } from "chart.js";
 
-// Register all required chart components
 Chart.register(
   CategoryScale,
   LinearScale,
-  RadialLinearScale, // Needed for Polar Area chart
+  RadialLinearScale,
   BarElement,
   LineElement,
-  ArcElement,        // Needed for Doughnut & Pie charts
+  ArcElement,
   PointElement,
   Title,
   Tooltip,
@@ -67,22 +68,6 @@ const Left = Styled.div`
   justify-content: start;
   gap: 20px;
   overflow-y: visible !important;
-`;
-
-const Right = Styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: start;
-  gap: 20px;
-`;
-
-const TopBar = Styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: end;
-  gap: 16px;
-  margin: 20px 0px;
 `;
 
 const StatsWrapper = Styled.div`
@@ -215,6 +200,10 @@ const Dashboard = () => {
   const [totalTasksDone, setTotalTasksDone] = useState(0);
   const [totalWorksDone, setTotalWorksDone] = useState(0);
 
+    useEffect(() => {
+      AOS.init({ duration: 1000 });
+    }, []);
+
   const { loading, error, data } = useQuery(LOAD_ALL_PROJECTS);
   
   const getprojects = async () => {
@@ -228,7 +217,6 @@ const Dashboard = () => {
 
   };
   
-
   const getTasks = async () => {
 
     await axios.get("http://localhost:8082/api/v1/task/getAllTasks")
@@ -261,7 +249,7 @@ const Dashboard = () => {
       })
       .catch((err) => {
         console.log(err);
-        
+
       });
   }
   
@@ -274,12 +262,12 @@ const Dashboard = () => {
   }, [loading]);
 
   const completedProjects = projects.filter(p => p.status === "COMPLETED").length;
-  const pendingProjects = projects.length - completedProjects;
-  const completedTasks = tasks.filter(t => t.status).length;
+  const ongoingProjects = projects.filter(p => p.status === "ON_GOING").length;
+  const pendingProjects = projects.filter(p => p.status === "PENDING").length;
+  const completedTasks = tasks.filter(t => t.status == true).length;
   const pendingTasks = tasks.length - completedTasks;
   const completedWorks = works.filter(w => w.status).length;
   const pendingWorks = works.length - completedWorks;
-
 
   const barChartData = {
     labels: ["Projects", "Tasks", "Works"],
@@ -288,6 +276,11 @@ const Dashboard = () => {
         label: "Completed",
         data: [completedProjects, completedTasks, completedWorks],
         backgroundColor: "#4CAF50",
+      },
+      {
+        label: "In Progress",
+        data: [ongoingProjects],
+        backgroundColor: "#1b0bca",
       },
       {
         label: "Pending",
@@ -302,19 +295,19 @@ const Dashboard = () => {
     datasets: [
       {
         label: "Completed Projects",
-        data: Array.from({ length: 12 }, () => Math.floor(Math.random() * 10)),
+        data: [completedProjects],
         borderColor: "#4CAF50",
         fill: false,
       },
       {
         label: "Completed Tasks",
-        data: Array.from({ length: 12 }, () => Math.floor(Math.random() * 20)),
+        data: [completedTasks],
         borderColor: "#2196F3",
         fill: false,
       },
       {
         label: "Completed Works",
-        data: Array.from({ length: 12 }, () => Math.floor(Math.random() * 15)),
+        data: [completedWorks],
         borderColor: "#FF9800",
         fill: false,
       },
@@ -326,24 +319,12 @@ const Dashboard = () => {
     datasets: [
       {
         label: 'Summary Distribution',
-        data: [10, 25, 15], // sample data
+        data: [completedProjects, completedTasks, completedWorks],
         backgroundColor: ['#854CE6', '#FFB84C', '#00C897'],
         borderWidth: 1,
       },
     ],
   };
-  
-  const polarData = {
-    labels: ['Team A', 'Team B', 'Team C'],
-    datasets: [
-      {
-        label: 'Team Workload',
-        data: [12, 19, 11], // sample data
-        backgroundColor: ['#4FC3F7', '#FF6384', '#FFCE56'],
-      },
-    ],
-  };
-  
 
 
   return (
@@ -356,7 +337,7 @@ const Dashboard = () => {
         <Section>
           <Left>
             <StatsWrapper>
-              <StatCard>
+              <StatCard data-aos="zoom-in">
                 <TotalProjects>
                   <TitleText>Total Projects Done</TitleText>
                   <Progress>
@@ -379,7 +360,7 @@ const Dashboard = () => {
                 </TotalProjects>
               </StatCard>
 
-              <StatCard>
+              <StatCard data-aos="zoom-in">
                 <TotalWorks>
                   <TitleText>Total Works Done</TitleText>
                   <Progress>
@@ -399,7 +380,7 @@ const Dashboard = () => {
                 </TotalWorks>
               </StatCard>
 
-              <StatCard>
+              <StatCard data-aos="zoom-in">
                 <TaskCompleted>
                   <TitleText>Total Task Done</TitleText>
                   <Progress>
@@ -429,7 +410,7 @@ const Dashboard = () => {
                 padding: '20px',
               }}>
               <div style={{display: 'flex', flexDirection: 'column', gap: '20px'}}>
-              <Box
+              <Box data-aos="zoom-in"
                 sx={{
                   flex: '1 1 48%',
                   backgroundColor: 'transparent',
@@ -462,7 +443,7 @@ const Dashboard = () => {
                 />
               </Box>
 
-              <Box sx={{
+              <Box data-aos="zoom-in" sx={{
                   flex: '1 1 48%',
                   backgroundColor: 'transparent',
                   padding: '20px',
@@ -497,7 +478,7 @@ const Dashboard = () => {
               </Box>
               </div>
 
-              <Box
+              <Box data-aos="zoom-in"
                 sx={{
                   flex: '1 1 48%',
                   backgroundColor: 'transparent',
@@ -529,9 +510,9 @@ const Dashboard = () => {
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 1 }}>
                     <Masonry gutter="0px 16px">
                     {
-                    [...(projects || [])] // Clone the array to avoid mutating the original
-                        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)) // Sort based on updatedAt
-                        .slice(0, 4) // Get only the first 4 items
+                    [...(projects || [])]
+                        .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+                        .slice(0, 4)
                         .map((project, id) => (
                         <ProjectCard
                             key={id}

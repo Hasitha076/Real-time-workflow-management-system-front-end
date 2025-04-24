@@ -151,44 +151,6 @@ const Project = styled.div`
   flex: 1.6;
 `;
 
-const Allignment = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
-
-const ToggleButton = styled.div`
-  padding: 0px 16px;
-  height: 26px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid ${({ theme }) => theme.soft2};
-  color: ${({ theme }) => theme.soft2};
-  border-radius: 5px;
-  ${(props) => {
-    if (props.button == "row") {
-      return `border-radius: 5px 0px 0px 5px; border: 2px solid ${props.theme.soft2};`;
-    }
-    if (props.button == "col") {
-      return `border-radius: 0px 5px 5px 0px; border: 2px solid ${props.theme.soft2};`;
-    }
-  }}
-  ${(props) => {
-    if (props.alignment && props.button == "row") {
-      return `border-radius: 5px 0px 0px 5px; border: 2px solid ${props.theme.primary
-        }; color: ${props.theme.primary}; background-color: ${props.theme.primary + "11"
-        };`;
-    }
-    if (!props.alignment && props.button == "col") {
-      return `border-radius: 0px 5px 5px 0px; border: 2px solid ${props.theme.primary
-        }; color: ${props.theme.primary}; background-color: ${props.theme.primary + "11"
-        };`;
-    }
-  }}
-`;
-
 const ItemWrapper = styled.div`
   width: 100%;
   height: 100%;
@@ -232,18 +194,6 @@ const CardWrapper = styled.div`
   display: flex;
 flex-direction: column;
 flex: 1;
-`;
-
-const AddNewButton = styled.div`
-  padding: 5px;
-  background-color: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  background-color: ${({ theme }) => theme.primary + "33"};
-  color: ${({ theme }) => theme.primary};
-  cursor: pointer;
 `;
 
 const HrHor = styled.div`
@@ -383,12 +333,12 @@ const TeamDetails = () => {
     });
   }
 
-      useEffect(() => {
-        
-        if (data?.getProjectsByTeamId) {
-          setProjects(data.getProjectsByTeamId);
-        }
-      }, [Loading, data]);
+  useEffect(() => {
+    
+    if (data?.getProjectsByTeamId) {
+      setProjects(data.getProjectsByTeamId);
+    }
+  }, [Loading, data]);
 
 
   const getProjectCollaborators = async (projectId) => {
@@ -425,9 +375,6 @@ const TeamDetails = () => {
     getTeam(id); 
   }, [openWork, openUpdate, invitePopup, id]);
 
-  console.log(item);
-  
-
 
   return (
     <Container>
@@ -443,8 +390,9 @@ const TeamDetails = () => {
             <Title>{item.teamName}</Title>
             <Desc>{item.teamDescription}</Desc>
             <Tags>
-              {item.tags.map((tag) => (
+              {item.tags.map((tag, key) => (
                 <Tag
+                  key={key}
                   tagColor={
                     tagColors[Math.floor(Math.random() * tagColors.length)]
                   }
@@ -566,7 +514,7 @@ const TeamDetails = () => {
 
                     {projects?.length != 0 && projects?.filter((item) => item.status === "ON_GOING")
                       .map((ele, idx) => (
-                        <div onClick={() => openWorkDetails(ele)}>
+                        <div key={idx} onClick={() => openWorkDetails(ele)}>
                           <ProjectCard
                             key={ele.projectId}
                             item={ele}
@@ -638,9 +586,9 @@ const TeamDetails = () => {
                     <Masonry gutter="14px">
 
                     {works.length != 0 && works.filter((item) => item.status === false)
-                      .map((filteredItem) => (
-                        <div onClick={() => openWorkDetails(filteredItem)}>
-                          <WorkCards
+                      .map((filteredItem, key) => (
+                        <div key={key} onClick={() => openWorkDetails(filteredItem)}>
+                          <WorkCards                 
                             status="In Progress"
                             work={filteredItem}
                             projectId={id}
@@ -673,8 +621,8 @@ const TeamDetails = () => {
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">
                     {works.length != 0 && works.filter((item) => item.status === true)
-                      .map((item) => (
-                        <div onClick={() => openWorkDetails(item)}>
+                      .map((item, key) => (
+                        <div key={key} onClick={() => openWorkDetails(item)}>
                           <WorkCards
                             status={true}
                             work={item}

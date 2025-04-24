@@ -1,15 +1,7 @@
-import React, { use, useEffect } from "react";
+import React from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import { Button } from "@mui/material";
-import form from "../Images/google-forms.png";
-import taskIcon from "../Images/tasks.png";
-import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
-import AddTaskIcon from '@mui/icons-material/AddTask';
-import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
-import UpdateTaskTemplate from "./UpdateTaskTemplate";
-import DeletePopup from "./DeletePopup";
 import MoveUpIcon from '@mui/icons-material/MoveUp';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
@@ -26,7 +18,6 @@ import {Drawer, Slide} from '@mui/material';
 import Avatar from "@mui/material/Avatar";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import {PersonAdd} from "@mui/icons-material";
-import InviteActionMembers from "./InviteActionMember";
 import InviteTriggerMembers from "./InvitetriggerMembers";
 
 
@@ -78,25 +69,6 @@ const TaskMainText = styled.text`
   line-height: 2;
 `;
 
-const TaskText = styled.text`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 400;
-  text-transform: capitalize;
-  color: ${({ theme }) => theme.soft2};
-  line-height: 1.2;
-  overflow: hidden;
-`;
-
-const Span = styled.span`
-  font-size: 12px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.soft2};
-  line-height: 1.5;
-`;
-
 const Bottom = styled.div`
   display: flex;
   flex-direction: column;
@@ -105,10 +77,6 @@ const Bottom = styled.div`
   gap: 10px;
   margin: 20px 0px 14px 0px;
   text-align: left;
-`;
-
-const Image = styled.img`
-  height: 30px;
 `;
 
 const DrawerContainer = styled.div`
@@ -122,16 +90,6 @@ const DrawerContainer = styled.div`
 const Hr = styled.hr`
   margin: 18px 0px;
   border: 0.5px solid ${({ theme }) => theme.soft + "99"};
-`;
-
-const IcoBtn = styled(IconButton)`
-  width: 15px;
-  height: 15px;
-  color: ${({ theme }) => theme.white} !important;
-  &:hover {
-    background-color: ${({ theme }) => theme.white} !important;
-    color: ${({ theme }) => theme.black} !important;
-  }
 `;
 
 const ArrowIcoBtn = styled(IconButton)`
@@ -230,93 +188,85 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
     const [option6, setOption6] = useState("");
     const [icons, setIcons] = useState([]);
     const [isSetAssignee, setIsSetAssignee] = useState(false);
-     const [invitePopup, setInvitePopup] = useState(false);
-       const [assignee, setAssignee] = useState("");
+    const [invitePopup, setInvitePopup] = useState(false);
+    const [assignee, setAssignee] = useState("");
 
-    console.log(option1);
-    console.log(option2);
-    console.log(activeTrigger);
-    console.log(taskTemplates);
-    
-    
-    
-        const handleChange = (event) => {
-            setOption1(event.target.value);
-            if (event.target.value === "Section_changed") {
-                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section changed", section: "Any section" } });
-                setWhichSection(false);
-            } else if (event.target.value === "Section_is") {
-                setWhichSection(true);
-                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is", section: option2 } });
-                setIcons([]);
-            }
-            
-        }
-
-        const handleWorkChange = (event) => {
-            const { workId, workName } = JSON.parse(event.target.value);
-            setOption2({ workId, workName });
-            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is", section: { workId, workName } } });
+    const handleChange = (event) => {
+        setOption1(event.target.value);
+        if (event.target.value === "Section_changed") {
+            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section changed", section: "Any section" } });
+            setWhichSection(false);
+        } else if (event.target.value === "Section_is") {
+            setWhichSection(true);
+            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is", section: option2 } });
             setIcons([]);
-            
         }
+        
+    }
 
-        const handleTaskAddChange = (event) => {
-            setOption3(event.target.value);
-            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task is add from", task: event.target.value } });
+    const handleWorkChange = (event) => {
+        const { workId, workName } = JSON.parse(event.target.value);
+        setOption2({ workId, workName });
+        setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is", section: { workId, workName } } });
+        setIcons([]);
+        
+    }
+
+    const handleTaskAddChange = (event) => {
+        setOption3(event.target.value);
+        setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task is add from", task: event.target.value } });
+        setIcons([]);
+        
+    }
+
+    const handleAssigneeChange = (event) => {
+        setAssignee(event.target.value);
+        if (event.target.value === "Assignee is changed") {
+            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Assignee is changed" } });
+            setIsSetAssignee(false);
+        } else if (event.target.value === "Assignee is empty") {
+            setIsSetAssignee(false);
+            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Assignee is empty" } });
             setIcons([]);
-            
+        } else if (event.target.value === "Assignee is...") {
+            setIsSetAssignee(true);
+            setIcons([]);
         }
+        
+    }
 
-        const handleAssigneeChange = (event) => {
-            setAssignee(event.target.value);
-            if (event.target.value === "Assignee is changed") {
-                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Assignee is changed" } });
-                setIsSetAssignee(false);
-            } else if (event.target.value === "Assignee is empty") {
-                setIsSetAssignee(false);
-                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Assignee is empty" } });
-                setIcons([]);
-            } else if (event.target.value === "Assignee is...") {
-                setIsSetAssignee(true);
-                setIcons([]);
-            }
-            
+    const handleStatusChange = (event) => {
+        setOption5(event.target.value);
+        if (event.target.value === "Status_is_changed") {
+            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Status is changed" } });
+            setWhichSection(false);
+        } else if (event.target.value === "Status_is_incomplete") {
+            setWhichSection(true);
+            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Status is incomplete"} });
+            setIcons([]);
+        } else if (event.target.value === "Status_is_complete") {
+            setWhichSection(true);
+            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Status is complete"} });
+            setIcons([]);
         }
+        
+    }
 
-        const handleStatusChange = (event) => {
-            setOption5(event.target.value);
-            if (event.target.value === "Status_is_changed") {
-                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Status is changed" } });
-                setWhichSection(false);
-            } else if (event.target.value === "Status_is_incomplete") {
-                setWhichSection(true);
-                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Status is incomplete"} });
-                setIcons([]);
-            } else if (event.target.value === "Status_is_complete") {
-                setWhichSection(true);
-                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Status is complete"} });
-                setIcons([]);
-            }
-            
+    const handleDuedateChange = (event) => {
+        setOption6(event.target.value);
+        if (event.target.value === "duedate_is_changed") {
+            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Duedate is changed" } });
+            setWhichSection(false);
+        } else if (event.target.value === "duedate_is_before") {
+            setWhichSection(true);
+            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Duedate is before"} });
+            setIcons([]);
+        } else if (event.target.value === "duedate_is_after") {
+            setWhichSection(true);
+            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Duedate is after"} });
+            setIcons([]);
         }
-
-        const handleDuedateChange = (event) => {
-            setOption6(event.target.value);
-            if (event.target.value === "duedate_is_changed") {
-                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Duedate is changed" } });
-                setWhichSection(false);
-            } else if (event.target.value === "duedate_is_before") {
-                setWhichSection(true);
-                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Duedate is before"} });
-                setIcons([]);
-            } else if (event.target.value === "duedate_is_after") {
-                setWhichSection(true);
-                setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Duedate is after"} });
-                setIcons([]);
-            }
-            
-        }
+    }
 
     const toggleTriggerDrawer = (newOpen, number) => () => {
         if(number === 1) {
@@ -332,7 +282,6 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
         }
       };
 
-  console.log(existingRule);
 
   const eventHandle = (event) => {
     setIsActiveTrigger(true);

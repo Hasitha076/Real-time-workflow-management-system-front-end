@@ -1,11 +1,10 @@
-import { IconButton, Modal, Snackbar } from "@mui/material";
+import { IconButton, Modal } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import styled from "styled-components";
 import {
   CloseRounded
 } from "@mui/icons-material";
-import { Avatar } from "@mui/material";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
@@ -115,9 +114,7 @@ const AddNewUser = ({ setNewUser, setUserCreated }) => {
   const [disabled, setDisabled] = useState(true);
   const [backDisabled, setBackDisabled] = useState(false);
   const [showAddUser, setShowAddUser] = useState(true);
-
   const [createProject] = useMutation(CREATE_PROJECT);
-
   const token = localStorage.getItem("token");
 
   const goToAddUser = () => {
@@ -140,9 +137,6 @@ const AddNewUser = ({ setNewUser, setUserCreated }) => {
   const CreateUser = async () => {
     setLoading(true);
     setDisabled(true);
-
-    console.log(inputs);
-    
 
     axios.post("http://localhost:8081/api/v1/auth/register", {
         userName: inputs.userName,
@@ -276,6 +270,7 @@ const AddNewUser = ({ setNewUser, setUserCreated }) => {
                     <option value="MANAGER">MANAGER</option>
                     <option value="DEVELOPER">DEVELOPER</option>
                     <option value="QA">QA</option>
+                    <option value="USER">USER</option>
                     <option value="GUEST">GUEST</option>
                   </select>
                 </OutlinedBox>

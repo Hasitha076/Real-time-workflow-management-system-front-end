@@ -146,7 +146,7 @@ OTP.propTypes = {
   value: PropTypes.string.isRequired,
 };
 
-export default function OTPInput({option, setShowNewPassword, setShowOTP}) {
+export default function OTPInput({option, setShowNewPassword, setShowOTP, setResetDisabled}) {
   const [otp, setOtp] = React.useState('');
   const dispatch = useDispatch();
 
@@ -160,6 +160,7 @@ export default function OTPInput({option, setShowNewPassword, setShowOTP}) {
             severity: "success",
           })
         );
+        setResetDisabled(false);
     } else {
         dispatch(openSnackbar({
             message: "Invalid OTP",

@@ -41,17 +41,6 @@ const Title = styled.div`
   margin: 12px 0;
 `;
 
-const Desc = styled.textarea`
-  width: 100%;
-  border: none;
-  font-size: 14px;
-  border-radius: 3px;
-  background-color: transparent;
-  outline: none;
-  padding: 10px 0px;
-  color: ${({ theme }) => theme.textSoft};
-`;
-
 const Label = styled.div`
   font-size: 16px;
   font-weight: 500;
@@ -115,10 +104,11 @@ const TextInput = styled.input`
 const UpdateMember = ({ openUpdate, setOpenUpdate }) => {
     const [Loading, setLoading] = useState(false);
     const [disabled, setDisabled] = useState(true);
-
     const [showAddTeam, setShowAddTeam] = useState(true);
     const [showAddMember, setShowAddMember] = useState(false);
     const [backDisabled, setBackDisabled] = useState(false);
+    const dispatch = useDispatch();
+    const { currentUser } = useSelector((state) => state.user);
 
     const goToAddTeam = () => {
         setShowAddTeam(true);
@@ -140,7 +130,6 @@ const UpdateMember = ({ openUpdate, setOpenUpdate }) => {
 
     }, [openUpdate]);
 
-    const { currentUser } = useSelector((state) => state.user);
     const [inputs, setInputs] = useState(
         { 
             id: openUpdate.data.userId, 
@@ -161,8 +150,6 @@ const UpdateMember = ({ openUpdate, setOpenUpdate }) => {
         });
     };
 
-    console.log(inputs);
-
     useEffect(() => {
         if (inputs.userName === "") {
             setDisabled(true)
@@ -170,10 +157,6 @@ const UpdateMember = ({ openUpdate, setOpenUpdate }) => {
             setDisabled(false)
         }
     }, [inputs])
-
-
-    const dispatch = useDispatch();
-
 
     const UpdateTeam = async () => {
         setLoading(true);

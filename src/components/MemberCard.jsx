@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { Avatar } from "@mui/material";
-import axios from "axios";
 
 const Container = styled.div`
   padding: 6px 4px;
@@ -34,16 +33,6 @@ const EmailId = styled.div`
   font-size: 10px;
   font-weight: 400;
   color: ${({ theme }) => theme.textSoft + "99"};
-`;
-
-const Role = styled.div`
-display: inline-block;
-  font-size: 10px;
-  font-weight: 500;
-  padding: 4px 8px;
-  border-radius: 12px;
-  color: ${({ tagColor, theme }) => tagColor + theme.lightAdd};
-  background-color: ${({ tagColor, theme }) => tagColor + "10"};
 `;
 
 const Access = styled.div`

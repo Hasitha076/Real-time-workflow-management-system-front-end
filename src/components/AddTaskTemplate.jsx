@@ -1,15 +1,15 @@
-import { IconButton, Modal, Snackbar } from "@mui/material";
+import { IconButton, Modal } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import styled from "styled-components";
 import {
-    AddTask,
   CloseRounded
 } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import dayjs from 'dayjs';
 
 const Container = styled.div`
   width: 100%;
@@ -190,7 +190,6 @@ const Role = styled.div`
   text-align: center;
 `;
 
-
 const InviteButton = styled.button`
   padding: 6px 14px;
   background-color: transparent;
@@ -288,10 +287,6 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId, s
     }
   };
 
-  console.log(selectedUsers);
-  console.log(selectedTeam);
-  
-
   //remove members from selected users
   const handleRemove = (user) => {
     setSelectedUsers(selectedUsers.filter((u) => u.id !== user.userId));
@@ -332,6 +327,7 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId, s
         setAvailableUsers(res.data);
       })
         .then((res) => {
+          console.log(res);
 
           setLoading(false);
           setNewTaskTemplate(false);
@@ -385,9 +381,6 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId, s
   }, [inputs]);
 
   const dispatch = useDispatch();
-
-  console.log(availableUsers);
-  console.log(availableTeams);
 
   return (
     <Modal open={true} onClose={() => setNewTaskTemplate(false)}>
@@ -466,6 +459,7 @@ const AddTaskTemplate = ({ setNewTaskTemplate, teamId, teamProject, projectId, s
                     placeholder="Due Date"
                     value={inputs.taskTemplateDueDate}
                     onChange={handleChange}
+                    min={dayjs().format("YYYY-MM-DD")}
                   />
                 </OutlinedBox>
               </FlexDisplay>

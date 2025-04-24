@@ -1,11 +1,5 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React from "react";
 import styled from "styled-components";
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
-import { Button } from "@mui/material";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import MoveUpIcon from '@mui/icons-material/MoveUp';
@@ -55,41 +49,6 @@ const Title = styled.div`
   -webkit-box-orient: vertical;
 `;
 
-const Progress = styled.div`
-  position: relative;
-`;
-
-const Text = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.soft2};
-  margin: 14px 0px 10px 0px;
-  line-height: 1.5;
-  overflow: hidden;
-`;
-
-const TaskText = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 400;
-  text-transform: capitalize;
-  color: ${({ theme }) => theme.soft2};
-  line-height: 1.5;
-  overflow: hidden;
-`;
-
-const Span = styled.span`
-  font-size: 12px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.soft2};
-  line-height: 1.5;
-`;
-
 const Bottom = styled.div`
   display: flex;
   flex-direction: column;
@@ -102,11 +61,8 @@ const Bottom = styled.div`
 
 const RuleTemplateCard = ({ rule, existingRule }) => {
 
-    console.log("RuleTemplateCard", rule);
-
-    
+  const navigate = useNavigate();
   
-    const navigate = useNavigate();
   return (
    
     <Container style={{ backgroundColor: rule.status === 'active' && '#a4b3c4' }} className={"item"} onClick={() => navigate(`/rule/${rule.projectId}`, { state: { existingRule, ruleDetails: rule } })}>

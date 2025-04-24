@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import { UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
 import { useMutation } from "@apollo/client";
+import dayjs from 'dayjs';
 
 const Container = styled.div`
   width: 100%;
@@ -223,10 +224,9 @@ const FlexDisplay = styled.div`
 const AddNewTask = ({ setNewTask, WorkMembers, WorkTeams, ProjectId, WorkId, data, setTaskAdd, tasks, currentUser }) => {
   const dispatch = useDispatch();
   const [step, setStep] = useState(0);
-    const [disabled, setDisabled] = useState(true);
-      const [backDisabled, setBackDisabled] = useState(false);
+  const [disabled, setDisabled] = useState(true);
+  const [backDisabled, setBackDisabled] = useState(false);
   const [Loading, setLoading] = useState(false);
-  const [selectMember, setSelectMember] = useState(false);
   const [taskName, setTaskName] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
@@ -234,10 +234,9 @@ const AddNewTask = ({ setNewTask, WorkMembers, WorkTeams, ProjectId, WorkId, dat
   const [dueDate, setDueDate] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState([]);
-    const [showAddTask, setShowAddTask] = useState(true);
-    const [showAddMember, setShowAddMember] = useState(false);
-
-     const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
+  const [showAddTask, setShowAddTask] = useState(true);
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
 
   const goToNextpage = () => {
     if (!taskName || !description) {
@@ -261,7 +260,6 @@ const AddNewTask = ({ setNewTask, WorkMembers, WorkTeams, ProjectId, WorkId, dat
     setShowAddMember(true);
   };
 
-  
   
   //create new work card
   const createTaskCard = async () => {
@@ -387,13 +385,8 @@ const AddNewTask = ({ setNewTask, WorkMembers, WorkTeams, ProjectId, WorkId, dat
     setSelectedTeam(selectedTeam.filter((t) => t.id !== team.id));
   };
 
-
-  console.log(data);
-  console.log(selectedUsers);
-  console.log(selectedTeam);
-  console.log(ProjectId);
-  console.log(WorkMembers);
-  console.log(WorkTeams);
+  console.log("Work data: ", data);
+  
 
   return (
     <Modal open={true} onClose={() => setNewTask(false)}>
@@ -472,6 +465,8 @@ const AddNewTask = ({ setNewTask, WorkMembers, WorkTeams, ProjectId, WorkId, dat
                     placeholder="Due Date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
+                    min={dayjs().format("YYYY-MM-DD")}
+                    max={dayjs(data.dueDate).format("YYYY-MM-DD")}
                   />
                 </OutlinedBox>
               </FlexDisplay>

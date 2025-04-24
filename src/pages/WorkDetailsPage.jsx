@@ -1,10 +1,8 @@
-import React, { use, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
 import {
-  AlignHorizontalLeft,
-  AlignVerticalTop,
   CheckCircleOutlineOutlined,
   Delete,
   DonutLarge,
@@ -31,7 +29,6 @@ import AddNewTask from "../components/AddNewTask";
 import { LOAD_PROJECT_BY_ID, UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
 import { useMutation, useQuery } from "@apollo/client";
 import ReplyAllIcon from '@mui/icons-material/ReplyAll';
-import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -193,44 +190,6 @@ const Work = styled.div`
   flex: 1.6;
 `;
 
-const Allignment = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
-
-const ToggleButton = styled.div`
-  padding: 0px 16px;
-  height: 26px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid ${({ theme }) => theme.soft2};
-  color: ${({ theme }) => theme.soft2};
-  border-radius: 5px;
-  ${(props) => {
-    if (props.button == "row") {
-      return `border-radius: 5px 0px 0px 5px; border: 2px solid ${props.theme.soft2};`;
-    }
-    if (props.button == "col") {
-      return `border-radius: 0px 5px 5px 0px; border: 2px solid ${props.theme.soft2};`;
-    }
-  }}
-  ${(props) => {
-    if (props.alignment && props.button == "row") {
-      return `border-radius: 5px 0px 0px 5px; border: 2px solid ${props.theme.primary
-        }; color: ${props.theme.primary}; background-color: ${props.theme.primary + "11"
-        };`;
-    }
-    if (!props.alignment && props.button == "col") {
-      return `border-radius: 0px 5px 5px 0px; border: 2px solid ${props.theme.primary
-        }; color: ${props.theme.primary}; background-color: ${props.theme.primary + "11"
-        };`;
-    }
-  }}
-`;
-
 const ItemWrapper = styled.div`
   width: 100%;
   height: 100%;
@@ -337,7 +296,6 @@ const WorkDetailsPage = ({setUpdateWorkFromTask, setTaskUpdated}) => {
   const [taskTeams, setTaskTeams] = useState([]);
   const [newTask, setNewTask] = useState(false);
   const [taskAdd, setTaskAdd] = useState(false);
-  const [collaboratorBlock, setCollaboratorBlock] = useState({});
   const [editTask, setEditTask] = useState(false);
   const {currentUser} = useSelector((state) => state.user);
   const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
@@ -369,7 +327,6 @@ const WorkDetailsPage = ({setUpdateWorkFromTask, setTaskUpdated}) => {
       }, [taskAdd, editTask]);
   
   
-  //hooks for updates
   //use state enum to check for which updation
   const [openUpdate, setOpenUpdate] = useState({ state: false, type: "all", data: item });
 
@@ -399,9 +356,9 @@ const WorkDetailsPage = ({setUpdateWorkFromTask, setTaskUpdated}) => {
   };
 
   const { error, data } = useQuery(LOAD_PROJECT_BY_ID, {
-    variables: { id: parseInt(item.projectId) },  // Ensure ID is an integer
-    skip: !id,  // Avoid sending query if ID is undefined
-    fetchPolicy: "cache-and-network" // Ensures fresh data is fetched
+    variables: { id: parseInt(item.projectId) },
+    skip: !id,
+    fetchPolicy: "cache-and-network",
   });
 
   const getCollaborators = async () => {
@@ -550,13 +507,11 @@ const WorkDetailsPage = ({setUpdateWorkFromTask, setTaskUpdated}) => {
 const getAvailableTeams = async () => {
   try {
     const res = await axios.get("http://localhost:8085/api/v1/team/getAllTeams");
-    console.log(res.data);
     const matchingTeams = res.data
-      .filter((team) => item.teamIds.includes(team.teamId))
+      .filter((team) => item.teamIds?.includes(team.teamId))
       .map((team) => ({
         name: team.teamName
       }));
-    console.log(matchingTeams);
     
       setTeamNames(matchingTeams);
     return matchingTeams;
@@ -570,13 +525,11 @@ const getAvailableTeams = async () => {
 const getAvailableCollaborators = async () => {
   try {
     const res = await axios.get("http://localhost:8081/api/v1/user/getAllUsers");
-    console.log(res.data);
     const matchingCollaborators = res.data
-      .filter((user) => item.collaboratorIds.includes(user.userId))
+      .filter((user) => item.collaboratorIds?.includes(user.userId))
       .map((user) => ({
         name: user.userName
       }));
-    console.log(matchingCollaborators);
     
       setCollaboratorNames(matchingCollaborators);
     return matchingCollaborators;
@@ -730,8 +683,9 @@ useEffect(() => {
             <Title>{item?.workName}</Title>
             <Desc>{item?.description}</Desc>
             <Tags>
-              {item?.tags.map((tag) => (
+              {item?.tags.map((tag, idx) => (
                 <Tag
+                key={idx}
                   tagColor={
                     tagColors[Math.floor(Math.random() * tagColors.length)]
                   }
@@ -783,22 +737,6 @@ useEffect(() => {
           </Header>
           <Body>
             <Work>
-              <Allignment>
-                <ToggleButton
-                  alignment={alignment}
-                  button={"row"}
-                  onClick={() => setAlignment(true)}
-                >
-                  <AlignVerticalTop sx={{ fontSize: "18px" }} />
-                </ToggleButton>
-                <ToggleButton
-                  alignment={alignment}
-                  button={"col"}
-                  onClick={() => setAlignment(false)}
-                >
-                  <AlignHorizontalLeft sx={{ fontSize: "18px" }} />
-                </ToggleButton>
-              </Allignment>
               <Column alignment={alignment}>
                 <ItemWrapper>
                 <Heading>
@@ -820,7 +758,7 @@ useEffect(() => {
                           color: "white",
                         },
                       }}
-                      onClick={handleClick} // Open dropdown on click
+                      onClick={handleClick}
                     >
                     <QueueIcon sx={{ fontSize: "15px" }} />
                     Add New Task
@@ -844,8 +782,8 @@ useEffect(() => {
                     <Options onClick={() => {setNewTask(true); handleClose()}}>Black Task</Options>
                     <Divider />
                     <DropdownText> Task Templates</DropdownText>
-                    {taskTemplates?.map((template) => (
-                      <Options onClick={() => {createTaskCard(template); handleClose()}}>
+                    {taskTemplates?.map((template, idx) => (
+                      <Options key={idx} onClick={() => {createTaskCard(template); handleClose()}}>
                       <AddTaskIcon /> {template.taskTemplateName}
                     </Options>
                     ))}
@@ -870,8 +808,9 @@ useEffect(() => {
 
                     {tasks?.filter((task) => task.status === false && task.workId === item.workId && task.projectId === item.projectId)
                       .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-                      .map((filteredItem) => (
+                      .map((filteredItem, idx) => (
                           <TaskCard
+                          key={idx}
                             status="In Progress"
                             projectId={item.projectId}
                             item={filteredItem}
@@ -913,8 +852,9 @@ useEffect(() => {
                     <Masonry gutter="14px">
                     {tasks?.filter((task) => task.status === true && task.workId === item.workId)
                     .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-                      .map((filteredItem) => (
+                      .map((filteredItem, idx) => (
                           <TaskCard
+                          key={idx}
                             status="Completed"
                             item={filteredItem}
                             projectId={item.projectId}

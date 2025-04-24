@@ -1,17 +1,17 @@
 import React, { useEffect } from "react";
-import { Fragment, useState, useRef } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import { CloseRounded } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import { Avatar } from "@mui/material";
 import { Modal } from "@mui/material";
-// import { addWorks } from "../api";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useDispatch, useSelector } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import axios from "axios";
-import { UPDATE_PROJECT, UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
+import { UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
 import { useMutation } from "@apollo/client";
+import dayjs from 'dayjs';
 
 const Container = styled.div`
   padding: 12px 14px;
@@ -50,20 +50,6 @@ const Title = styled.div`
   -webkit-box-orient: vertical;
 `;
 
-const Desc = styled.div`
-  font-size: 14px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.soft2};
-  margin-top: 4px;
-  line-height: 1.5;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 5; /* number of lines to show */
-  line-clamp: 5;
-  -webkit-box-orient: vertical;
-`;
-
 const Task = styled.div`
   margin: 12px 0px;
 `;
@@ -72,27 +58,6 @@ const Bottom = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 2px 0px;
-`;
-
-const Members = styled.div`
-  display: flex;
-  flex: 1;
-  justify-content: start;
-  align-items: center;
-  gap: 2px;
-  flex-wrap: wrap;
-`;
-const MemberGroup = styled.div`
-  display: flex;
-  align-items: center;
-  background-color: ${({ theme }) => theme.soft};
-  padding: 4px 4px;
-  gap: 1px;
-  border-radius: 100px;
-`;
-
-const IcoButton = styled(IconButton)`
-  color: ${({ theme }) => theme.textSoft} !important;
 `;
 
 const TextBtn = styled.div`
@@ -126,6 +91,7 @@ const TextArea = styled.textarea`
   padding: 8px 0px;
   color: ${({ theme }) => theme.textSoft};
 `;
+
 const OutlinedBox = styled.div`
   min-height: 34px;
   border-radius: 8px;
@@ -156,6 +122,7 @@ const OutlinedBox = styled.div`
   font-weight: 500;
   padding: 0px 10px;
 `;
+
 const FlexDisplay = styled.div`
   display: flex;
   gap: 6px;
@@ -325,38 +292,20 @@ const OutlinedButtonBox = styled.div`
   }
 `;
 
-const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIcons, data, setWorkAdded, workCount }) => {
-  const dispatch = useDispatch();
+const AddWork = ({ ProjectMembers, ProjectId, ProjectTeams, data, setWorkAdded }) => {
 
+  const dispatch = useDispatch();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selectMember, setSelectMember] = useState(false);
-
   const [workName, setWorkName] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
   const [priority, setPriority] = useState("");
   const [dueDate, setDueDate] = useState("");
-
- const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
- const token = localStorage.getItem("token");
-   const { currentUser } = useSelector((state) => state.user);
-
-  //tasks
-  // const [task, setTask] = useState([
-  //   {
-  //     task: "",
-  //     start_date: "",
-  //     end_date: "",
-  //     members: [],
-  //   },
-  // ]);
-
-  // const handleTaskChange = (index, event) => {
-  //   let data = [...task];
-  //   data[index][event.target.name] = event.target.value;
-  //   setTask(data);
-  // };
+  const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
+  const token = localStorage.getItem("token");
+  const { currentUser } = useSelector((state) => state.user);
 
   const goToNextpage = () => {
     if (!workName || !description) {
@@ -367,42 +316,7 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
     }
   };
 
-  // const addTasks = () => {
-  //   let newfield = { task: "", start_date: "", end_date: "", members: [] };
-  //   setTask([...task, newfield]);
-  // };
-
-  // const deleteTasks = (index) => {
-  //   let data = [...task];
-  //   data.splice(index, 1);
-  //   setTask(data);
-  // };
-
-  //task member
-  // const addMember = (index) => {
-  //   setSelectMember(true);
-  //   setTaskIndex(index);
-  // };
-
-  // const removeMember = (index, memberIndex) => {
-  //   let data = [...task];
-  //   data[index].members.splice(memberIndex, 1);
-  //   setTask(data);
-  // };
-
-  // const AddToMember = (member, index) => {
-  //   //if member exist dont add
-
-  //   if (task[index].members.find((item) => item.id === member.id._id)) return;
-
-  //   let data = [...task];
-  //   data[index].members.push({ id: member.id._id, img: member.id.img });
-
-  //   setTask(data);
-  // };
-
-  console.log(ProjectId);
-
+  
   const updateProject = async () => {
     console.log(ProjectId);
 
@@ -440,9 +354,6 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
       collaboratorIds: selectedUsers.map((user) => user.id),
       teamIds: selectedTeam.map((team) => team.id)
     };
-
-    console.log(newWorkCard);
-
     
     await axios.post("http://localhost:8086/api/v1/work/createWork", newWorkCard, {
       headers: {
@@ -479,8 +390,6 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
     setWorkName("");
     setDescription("");
     setTags("");
-
-  
     setStep(0);
   };
 
@@ -513,7 +422,6 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
     .catch((err) => {
       console.log(err);
     });
-
   }
 
     useEffect(() => {
@@ -521,13 +429,6 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
       getAvailableTeams();
     }, [data, ProjectMembers, ProjectTeams]);
 
-      console.log(data);
-      
-      console.log(availableusers);
-      console.log(availableTeams);
-      console.log(selectedUsers);
-      console.log(selectedTeam);
-      
 
   //Add members from selected users
   const handleSelect = (user) => {
@@ -571,9 +472,6 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
   const handleRemoveTeam = (team) => {
     setSelectedTeam(selectedTeam.filter((t) => t.id !== team.teamId));
   };
-
-  console.log(selectedUsers);
-  console.log(selectedTeam);
 
   return (
     <Container className={"item"}>
@@ -662,6 +560,8 @@ const AddWork = ({ ProjectMembers, ProjectId, setCreated, ProjectTeams, memberIc
                     placeholder="Start date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
+                    min={dayjs().format("YYYY-MM-DD")}
+                    max={dayjs(data.dueDate).format("YYYY-MM-DD")}
                   />
                 </OutlinedBox>
               </FlexDisplay>

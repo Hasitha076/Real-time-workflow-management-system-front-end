@@ -3,13 +3,8 @@ import { Modal } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Avatar } from "@mui/material";
-import { useSelector } from "react-redux";
-import { openSnackbar } from "../redux/snackbarSlice";
-import { useDispatch } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import axios from "axios";
-import { useMutation } from "@apollo/client";
-import { UPDATE_COLLABORATORS } from "../GraphQL/Queries";
 
 const Container = styled.div`
   width: 100%;
@@ -186,19 +181,11 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
 `;
 
-const InviteTriggerMembers = ({ setInvitePopup, id, icons, setIcons, activeTrigger, setActiveTrigger }) => {
+const InviteTriggerMembers = ({ setInvitePopup, icons, setIcons, activeTrigger, setActiveTrigger }) => {
 
   const [message, setMessage] = useState("");
-  const { currentUser } = useSelector((state) => state.user);
   const [loading, setLoading] = useState(false)
-
   const [availableusers, setAvailableUsers] = useState([]);
-
-
-  console.log("activeTrigger", activeTrigger);
-  console.log("icons", icons);
-
-  
 
   const eventHandle = () => {
     setIcons(selectedUsers);

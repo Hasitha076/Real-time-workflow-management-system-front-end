@@ -1,10 +1,9 @@
-import { CloseRounded, SearchOutlined, SendRounded } from "@mui/icons-material";
+import { CloseRounded } from "@mui/icons-material";
 import { Modal } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Avatar } from "@mui/material";
 import { useSelector } from "react-redux";
-// import { inviteTeamMembers, inviteProjectMembers, searchUsers } from "../api/index";
 import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -20,7 +19,6 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  
 `;
 
 const Wrapper = styled.div`
@@ -125,24 +123,6 @@ gap: 2px;
 }
 `;
 
-const Access = styled.div`
-padding: 6px 10px;
-border-radius: 12px;
-display: flex;
-align-items: center;
-justify-content: center;
-background-color: ${({ theme }) => theme.bgDark};
-`;
-
-const Select = styled.select`
-  border: none;
-  font-size: 12px;
-  background-color: transparent;
-  outline: none;
-  color: ${({ theme }) => theme.text};
-  background-color: ${({ theme }) => theme.bgDark};
-`;
-
 const Role = styled.div`
   background-color: ${({ theme }) => theme.bgDark};
   border-radius: 12px;
@@ -231,11 +211,10 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
 `;
 
-const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
+const InviteMembers = ({ setInvitePopup, id, data }) => {
 
-  const [message, setMessage] = React.useState("");
-  const { currentUser } = useSelector((state) => state.user);
-  const [Loading, setLoading] = React.useState(false);
+  const [message, setMessage] = useState("");
+  const [Loading, setLoading] = useState(false);
 
   const UpdateProjectCollaborators = async () => {
     setLoading(true);
@@ -277,7 +256,6 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
   };
 
   const dispatch = useDispatch();
-
   const [availableusers, setAvailableUsers] = useState([]);
 
   const getAvailableUsers = async () => {
@@ -337,11 +315,6 @@ const InviteMembers = ({ setInvitePopup, id, teamInvite, data }) => {
   const handleRemove = (user) => {
     setSelectedUsers(selectedUsers.filter((u) => u.id !== user.userId));
   };
-
-  console.log(data);
-  console.log(selectedUsers);
-  
-
 
   return (
     <Modal open={true} onClose={() => setInvitePopup(false)}>

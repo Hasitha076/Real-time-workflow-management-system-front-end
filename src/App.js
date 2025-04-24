@@ -6,8 +6,6 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  useNavigate,
-  useNavigation,
 } from "react-router-dom"
 import Menu from './components/Menu';
 import Navbar from './components/Navbar';
@@ -17,12 +15,8 @@ import Works from './pages/Works';
 import Projects from './pages/Projects';
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-// import ProjectDetails from './pages/ProjectDetails';
-// import Teams from './pages/Teams';
 import ToastMessage from './components/ToastMessage';
-// import Community from './pages/Community';
 import { useSelector } from "react-redux";
-// import AddNewTeam from './components/AddNewTeam';
 import { useEffect } from 'react';
 import ProjectDetails from "./pages/ProjectDetails";
 import WorkDetailsPage from "./pages/WorkDetailsPage";
@@ -31,27 +25,19 @@ import TeamDetails from "./pages/TeamDetails";
 import AddNewProject from "./components/AddNewProject";
 import AddNewTeam from "./components/AddNewTeam";
 import Workflow from "./pages/Workflow";
-import AddForm from "./components/AddForm";
-// import { useDispatch } from 'react-redux';
-// import Home from './pages/Home/Home';
-// import Chats from './pages/Chats';
-// import ProjectInvite from './components/ProjectInvite';
-// import TeamInvite from './components/TeamInvite';
-// import AddNewProject from './components/AddNewProject';
-import Forms from './pages/Forms';
 import Home from "./pages/Home/Home";
 import Members from "./pages/Members";
 import MemberDetails from "./pages/MemberDetails";
 import AddNewUser from "./components/AddNewUser";
 import Rule from "./pages/Rule";
 import RulesPage from "./pages/RulesPage";
-// import WorkDetailsPage from './pages/WorkDetailsPage';
+import Tasks from "./pages/Tasks";
 
 
 const Container = styled.div`
 height: 100vh;
   display: flex; 
-  background-color: ${({ theme }) => theme.bg};
+  background-color: ${({ theme }) => theme.black};
   color: ${({ theme }) => theme.text};
   overflow-x: hidden;
 `;
@@ -75,12 +61,8 @@ function App() {
   const [projectCreated, setProjectCreated] = useState(false);
   const [userCreated, setUserCreated] = useState(false);
   const [updateWorkFromTask, setUpdateWorkFromTask] = useState(false);
-
   const { currentUser } = useSelector(state => state.user);
   const token = localStorage.getItem("token");
-
-  console.log(currentUser);
-  console.log(token);
 
 
   //set the menuOpen state to false if the screen size is less than 768px
@@ -107,7 +89,7 @@ function App() {
               {loading ? <div>Loading...</div> : <>
                 {menuOpen && <Menu setMenuOpen={setMenuOpen} setDarkMode={setDarkMode} darkMode={darkMode} setNewTeam={setNewTeam} />}
                 <Main>
-                  <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} token={token} />
+                  <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} token={token} setDarkMode={setDarkMode} darkMode={darkMode} />
                   <Wrapper>
                     {newTeam && <AddNewTeam setNewTeam={setNewTeam} />}
                     {newProject && <AddNewProject setNewProject={setNewProject} setProjectCreated={setProjectCreated} />}
@@ -127,6 +109,7 @@ function App() {
                         <Route path="works">
                           <Route path=":id" element={<WorkDetailsPage setUpdateWorkFromTask={setUpdateWorkFromTask} />} />
                         </Route>
+                        <Route path="tasks" element={<Tasks />} />
                         <Route path="teams" element={<Teams />} />
                         <Route path="teams">
                           <Route path=":id" element={<TeamDetails />} />

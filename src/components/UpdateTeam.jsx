@@ -108,7 +108,6 @@ const TextInput = styled.input`
 const UpdateTeam = ({ openUpdate, setOpenUpdate }) => {
     const [Loading, setLoading] = useState(false);
     const [disabled, setDisabled] = useState(true);
-
     const [showAddTeam, setShowAddTeam] = useState(true);
     const [showAddMember, setShowAddMember] = useState(false);
     const [backDisabled, setBackDisabled] = useState(false);
@@ -133,7 +132,6 @@ const UpdateTeam = ({ openUpdate, setOpenUpdate }) => {
 
     }, [openUpdate]);
 
-    const { currentUser } = useSelector((state) => state.user);
     const [inputs, setInputs] = useState(
         { 
             id: openUpdate.data.teamId, 
@@ -164,10 +162,6 @@ const UpdateTeam = ({ openUpdate, setOpenUpdate }) => {
 
 
     const dispatch = useDispatch();
-
-    console.log(openUpdate);
-    console.log(inputs);
-    
 
     const UpdateTeam = async () => {
         setLoading(true);

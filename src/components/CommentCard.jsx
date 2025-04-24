@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Avatar, Box, Button, Menu, MenuItem, IconButton } from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { Avatar, Box, Button, Menu, MenuItem } from "@mui/material";
 import styled from "styled-components";
 
 const OutlinedBox = styled.div`
@@ -73,16 +72,14 @@ const ButtonGroup = styled.button`
 
 const CommentCard = ({ item, allTaskMembers }) => {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [editCommentIndex, setEditCommentIndex] = useState(null); // Track which comment is being edited
+  const [editCommentIndex, setEditCommentIndex] = useState(null);
   const [editedComment, setEditedComment] = useState("");
-  const [showAllComments, setShowAllComments] = useState(false); // Toggle for "View More"
+  const [showAllComments, setShowAllComments] = useState(false);
 
 
   const handleComment = () => {
     // Logic to add a comment
-
   }
-
 
   const handleMenuOpen = (event, index) => {
     setAnchorEl(event.currentTarget);

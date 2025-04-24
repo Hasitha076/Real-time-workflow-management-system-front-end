@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Button } from "@mui/material";
-import axios from "axios";
 import MoveUpIcon from '@mui/icons-material/MoveUp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
@@ -16,16 +15,10 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 import Box from '@mui/material/Box';
 import {Drawer, Slide} from '@mui/material';
 import Divider from '@mui/material/Divider';
-import DiscountIcon from '@mui/icons-material/Discount';
-import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
-import FeedIcon from '@mui/icons-material/Feed';
 import Avatar from "@mui/material/Avatar";
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import {PersonAdd} from "@mui/icons-material";
-import InviteMembers from "./InviteMembers";
 import InviteActionMembers from "./InviteActionMember";
-import { isWhitelisted } from "validator";
-import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -81,25 +74,6 @@ const TaskMainText = styled.text`
   line-height: 2;
 `;
 
-const TaskText = styled.text`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 400;
-  text-transform: capitalize;
-  color: ${({ theme }) => theme.soft2};
-  line-height: 1.2;
-  overflow: hidden;
-`;
-
-const Span = styled.span`
-  font-size: 12px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.soft2};
-  line-height: 1.5;
-`;
-
 const Bottom = styled.div`
   display: flex;
   flex-direction: column;
@@ -108,10 +82,6 @@ const Bottom = styled.div`
   gap: 10px;
   margin: 20px 0px 14px 0px;
   text-align: left;
-`;
-
-const Image = styled.img`
-  height: 30px;
 `;
 
 const DrawerContainer = styled.div`
@@ -125,16 +95,6 @@ const DrawerContainer = styled.div`
 const Hr = styled.hr`
   margin: 18px 0px;
   border: 0.5px solid ${({ theme }) => theme.soft + "99"};
-`;
-
-const IcoBtn = styled(IconButton)`
-  width: 15px;
-  height: 15px;
-  color: ${({ theme }) => theme.white} !important;
-  &:hover {
-    background-color: ${({ theme }) => theme.white} !important;
-    color: ${({ theme }) => theme.black} !important;
-  }
 `;
 
 const ArrowIcoBtn = styled(IconButton)`
@@ -255,7 +215,7 @@ const ActionFunctionCards = ({ works, activeAction, setActiveAction, projectId, 
     const [option2, setOption2] = useState("");
     const [option3, setOption3] = useState("");
     const [option4, setOption4] = useState("");
-    const [option5, setOption5] = useState("");
+    const [option5, setOption5] = useState(works[0]);
     const [selectCollaboratorIds, setSelectCollaboratorIds] = useState([]);
     const [selectTeamIds, setSelectTeamIds] = useState([]);
     const [option6, setOption6] = useState({
@@ -268,7 +228,7 @@ const ActionFunctionCards = ({ works, activeAction, setActiveAction, projectId, 
         tags: [],
     });
     const [isSetAssignee, setIsSetAssignee] = useState(true);
-      const [selectedDate, setSelectedDate] = useState();
+    const [selectedDate, setSelectedDate] = useState();
 
     const toggleActionDrawer = (newOpen, number) => () => {
         if(number === 1) {
@@ -293,9 +253,6 @@ const ActionFunctionCards = ({ works, activeAction, setActiveAction, projectId, 
             setOpen7(newOpen);
         }
       };
-
-    console.log(existingRule);
-    
 
   const eventHandle = (event) => {
     setIsActiveAction(true);
@@ -457,6 +414,8 @@ const ActionFunctionCards = ({ works, activeAction, setActiveAction, projectId, 
 
     };
 
+    console.log("Active Action: ", activeAction);
+    
 
 
   const DrawerActionList = (

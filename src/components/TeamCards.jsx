@@ -62,22 +62,6 @@ const Desc = styled.div`
   -webkit-box-orient: vertical;
 `;
 
-const Progress = styled.div`
-  position: relative;
-`;
-
-const Text = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.soft2};
-  margin: 14px 0px 10px 0px;
-  line-height: 1.5;
-  overflow: hidden;
-`;
-
 const Tags = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -93,13 +77,6 @@ const Tag = styled.div`
   background-color: ${({ tagColor, theme }) => tagColor + "10"};
   font-size: 10px;
   font-weight: 500;
-`;
-
-const Span = styled.span`
-  font-size: 12px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.soft2};
-  line-height: 1.5;
 `;
 
 const Bottom = styled.div`
@@ -123,16 +100,11 @@ const AvatarGroup = styled.div`
   align-items: center;
   margin-right: 12px;
 `;
-const IcoBtn = styled(IconButton)`
-  color: ${({ theme }) => theme.textSoft} !important;
-`;
 
 const TeamCards = ({ teams }) => {
   
   const [collaborators, setCollaborators] = useState([]);
   const [availableCollaborators, setAvailableCollaborators] = useState([]);
-
-  console.log(teams);
 
   const getCollaborators = async () => {
     await axios.get(`http://localhost:8081/api/v1/user/getAllUsers`)
@@ -162,10 +134,6 @@ const TeamCards = ({ teams }) => {
     
       }, [teams, collaborators]);
 
-    console.log(collaborators);
-    console.log(availableCollaborators);
-  
-
   return (
     <Link to={`/teams/${teams.teamId}`} style={{ textDecoration: "none" }}>
     <Container className={"item"}>
@@ -185,23 +153,24 @@ const TeamCards = ({ teams }) => {
         <Title>{teams.teamName}</Title>
       </Top>
       <Desc>{teams.description}</Desc>
-      {/* <Tags>
-        {teams.tags.map((tag) => (
-          <Tag
+      <Tags>
+        {teams.tags.map((tag, key) => (
+          <Tag key={key}
             tagColor={tagColors[Math.floor(Math.random() * tagColors.length)]}
           >
             {tag}
           </Tag>
         ))}
-      </Tags> */}
+      </Tags>
       <Bottom>
         <Time>
           <TimelapseRounded sx={{ fontSize: "22px" }} /> Updated{" "}
           {format(teams.updatedAt)}
         </Time>
         <AvatarGroup>
-          {availableCollaborators.map((member) => (
+          {availableCollaborators.map((member, key) => (
             <Avatar
+            key={key}
               sx={{
                 marginRight: "-13px",
                 width: "26px",

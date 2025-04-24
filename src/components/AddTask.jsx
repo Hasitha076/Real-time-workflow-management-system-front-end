@@ -47,20 +47,6 @@ const Title = styled.div`
   -webkit-box-orient: vertical;
 `;
 
-const Desc = styled.div`
-  font-size: 14px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.soft2};
-  margin-top: 4px;
-  line-height: 1.5;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
-  line-clamp: 5;
-  -webkit-box-orient: vertical;
-`;
-
 const Task = styled.div`
   margin: 12px 0px;
 `;
@@ -69,27 +55,6 @@ const Bottom = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 2px 0px;
-`;
-
-const Members = styled.div`
-  display: flex;
-  flex: 1;
-  justify-content: start;
-  align-items: center;
-  gap: 2px;
-  flex-wrap: wrap;
-`;
-const MemberGroup = styled.div`
-  display: flex;
-  align-items: center;
-  background-color: ${({ theme }) => theme.soft};
-  padding: 4px 4px;
-  gap: 1px;
-  border-radius: 100px;
-`;
-
-const IcoButton = styled(IconButton)`
-  color: ${({ theme }) => theme.textSoft} !important;
 `;
 
 const TextBtn = styled.div`
@@ -399,8 +364,6 @@ const AddTask = ({ WorkMembers, ProjectId, WorkId, WorkTeams, data }) => {
     setTaskName("");
     setDescription("");
     setTags("");
-
-  
     setStep(0);
   };
       
@@ -447,16 +410,6 @@ const AddTask = ({ WorkMembers, ProjectId, WorkId, WorkTeams, data }) => {
   const handleRemoveTeam = (team) => {
     setSelectedTeam(selectedTeam.filter((t) => t.id !== team.id));
   };
-
-
-  console.log(data);
-  console.log(selectedUsers);
-  console.log(selectedTeam);
-  console.log(ProjectId);
-  console.log(WorkMembers);
-  console.log(WorkTeams);
-  console.log(selectedUsers);
-  console.log(selectedTeam);
 
   return (
     <Container className={"item"}>

@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import HeaderImage from "../../../Images/Header.png";
-// import logo from '../../../Images/logo.png';
+import HeaderImage from "../../../Images/bg-image.svg";
 import logo from '../../../Images/logo2.png';
 import LoginIcon from '@mui/icons-material/Login';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
-import Stack from '@mui/material/Stack';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import tinycolor from 'tinycolor2';
 
 const Container = styled.div`
   height: 80vh;
@@ -37,8 +36,8 @@ const Left = styled.div`
 `;
 
 const TitleTag = styled.div`
-font-family: "PT Serif", serif;
-  font-size: 58px;
+  font-family: "PT Serif", serif;
+  font-size: 50px;
   @media (max-width: 768px) {
     font-size: 40px;
   }
@@ -52,19 +51,19 @@ const ButtonContainer = styled.div`
   margin-top: 20px;
 `;
 
-const Button = styled.button`
+const StyledButton = styled.button`
   width: 30%;
   padding: 16px 20px;
   font-size: 20px;
   font-weight: 600;
-  background: linear-gradient(76.35deg, #801ae6 15.89%, #a21ae6 89.75%);
-  color: ${({ theme }) => theme.text};
+  background-color: #fff;
+  color: #000;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  transition: 800ms;
+  transition: all 0.4s ease;
   border-radius: 10px;
   cursor: pointer;
   @media (max-width: 1250px) {
@@ -75,14 +74,15 @@ const Button = styled.button`
     font-size: 16px;
   }
   &:hover {
-    background: #fff;
-    color: #a21ae6;
+    background-color: ${(props) => props.hoverColor};
+    color: ${(props) => props.hoverTextColor};
+    transform: translateY(-2px);
   }
 `;
 
 const Image = styled.img`
-  width: 500px;
-  height: 500px;
+  width: 600px;
+  height: 600px;
   flex: 0.8;
   display: flex;
   object-fit: scale-down;
@@ -104,7 +104,7 @@ const Logo = styled.img`
   }
 `;
 
-const LoginContent = ({ setSignInOpen, setSignUpOpen }) => {
+const LoginContent = ({ setSignInOpen, setSignUpOpen, bgColor }) => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
 
@@ -120,67 +120,74 @@ const LoginContent = ({ setSignInOpen, setSignUpOpen }) => {
           setLoading(false);
           return 100;
         }
-        return prevProgress + 1; // Increment by 1
+        return prevProgress + 1;
       });
-    }, 50); // Adjust timing as needed for smooth speed
-  
+    }, 50);
+
     return () => clearInterval(interval);
   }, []);
-  
+
+  const bgNewColor = bgColor || "#a21ae6";
+  const hoverColor = tinycolor(bgColor).lighten(20).toString();
+  const hoverTextColor = tinycolor(hoverColor).isLight() ? "#000" : "#fff";
 
   if (loading) {
     return (
       <Container id="home" style={{ justifyContent: 'center', alignItems: 'center' }}>
-  <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-    <CircularProgress 
-      variant="determinate" 
-      value={progress} 
-      sx={{ width: '120px !important', height: '120px !important', color: '#a21ae6' }} 
-      thickness={4}
-    />
-    <Box
-      sx={{
-        top: 0,
-        left: 0,
-        bottom: 0,
-        right: 0,
-        position: 'absolute',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <Typography
-        variant="h6" // Larger font for percentage
-        component="div"
-        sx={{ color: '#fff' }}
-      >
-        {`${Math.round(progress)}%`}
-      </Typography>
-    </Box>
-  </Box>
-</Container>
-
+        <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+          <CircularProgress
+            variant="determinate"
+            value={progress}
+            sx={{ width: '120px !important', height: '120px !important', color: '#a21ae6' }}
+            thickness={4}
+          />
+          <Box
+            sx={{
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+              position: 'absolute',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography variant="h6" component="div" sx={{ color: '#fff' }}>
+              {`${Math.round(progress)}%`}
+            </Typography>
+          </Box>
+        </Box>
+      </Container>
     );
   }
 
   return (
     <Container id="home">
-  <Left data-aos="fade-right">
-    <Logo src={logo} />
-    <TitleTag><b>Workflow Automation & Management System</b></TitleTag>
-    <ButtonContainer>
-      <Button onClick={() => setSignInOpen(true)}>
-        <LoginIcon /> Log In
-      </Button>
-      <Button onClick={() => setSignUpOpen(true)}>
-        <GroupAddIcon /> Register
-      </Button>
-    </ButtonContainer>
-  </Left>
-  <Image src={HeaderImage} data-aos="fade-left" />
-</Container>
-
+      <Left data-aos="fade-right">
+        <Logo src={logo} />
+        <TitleTag><b>Real-Time Workflow Automation & Management System</b></TitleTag>
+        <ButtonContainer>
+          <StyledButton
+            onClick={() => setSignInOpen(true)}
+            bgNewColor={bgNewColor}
+            hoverColor={hoverColor}
+            hoverTextColor={hoverTextColor}
+          >
+            <LoginIcon /> Log In
+          </StyledButton>
+          <StyledButton
+            onClick={() => setSignUpOpen(true)}
+            bgNewColor={bgNewColor}
+            hoverColor={hoverColor}
+            hoverTextColor={hoverTextColor}
+          >
+            <GroupAddIcon /> Register
+          </StyledButton>
+        </ButtonContainer>
+      </Left>
+      <Image src={HeaderImage} data-aos="fade-left" />
+    </Container>
   );
 };
 

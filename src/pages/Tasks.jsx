@@ -10,6 +10,8 @@ import { CircularProgress } from "@mui/material";
 import axios from "axios";
 import WorkDetails from "../pages/WorkDetailsPage";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
+import TaskCard from "../components/TaskCard";
+import TaskDetailCard from "../components/TaskDetailCard";
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -124,9 +126,9 @@ const OutlinedBox = styled.div`
   }
 `;
 
-const ProjectDetails = () => {
+const Tasks = () => {
   const [loading, setLoading] = useState(true);
-  const [works, setWorks] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [currentWork, setCurrentWork] = useState({});
   const [selectedUserId, setSelectedUserId] = useState("ALL");
   const token = localStorage.getItem("token");
@@ -134,17 +136,17 @@ const ProjectDetails = () => {
   const [openWork, setOpenWork] = useState(false);
   const [alignment, setAlignment] = useState(true);
 
-  const getAllWorks = async () => {
-    await axios.get(`http://localhost:8086/api/v1/work/getAllWorks`)
+  const getTasks = async () => {
+    await axios.get(`http://localhost:8082/api/v1/task/getAllTasks`)
       .then((res) => {
-        setWorks(res.data);
+        setTasks(res.data);
         setLoading(false);
       })
       .catch((err) => {
         console.log(err);
         setLoading(false);
       });
-  }
+  };
 
   const openWorkDetails = (work) => {
     setCurrentWork(work);
@@ -153,7 +155,7 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    getAllWorks();
+    getTasks();
     getAvailableMember();
   }, []);
 
@@ -174,6 +176,9 @@ const ProjectDetails = () => {
       console.error("Error fetching users:", error);
     }
   };
+
+  console.log("tasks", tasks);
+  
 
 
   return (
@@ -200,7 +205,7 @@ const ProjectDetails = () => {
                 fontSize: "16px",
               }}
             >
-              <option value="ALL">All Works</option>
+              <option value="ALL">All Tasks</option>
               {users.map((user) => (
                 <option key={user.userId} value={user.userId}>
                   {user.userName}
@@ -217,7 +222,7 @@ const ProjectDetails = () => {
                       <Span>
                         ({" "}
                         {
-                          works
+                          tasks
                           .filter((item) => item.status === false)
                             .length
                         }{" "}
@@ -227,13 +232,11 @@ const ProjectDetails = () => {
                   </Top>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 1, 900: 1 }}>
                     <Masonry gutter="14px">
-                      {works
+                      {tasks
                       ?.filter(selectedUserId === "ALL" ? (item) => item.status === false : (item) => item.collaboratorIds?.includes(parseInt(selectedUserId)))
                         .filter((item) => item.status == false)
                         .map((item) => (
-                          <div onClick={() => openWorkDetails(item)}>
-                            <WorkCards status="In Progress" work={item} />
-                          </div>
+                            <TaskDetailCard item={item} />
                         ))}
                     </Masonry>
                   </ResponsiveMasonry>
@@ -255,7 +258,7 @@ const ProjectDetails = () => {
                       <Span>
                         ({" "}
                         {
-                          works.filter((item) => item.status == true)
+                          tasks.filter((item) => item.status == true)
                             .length
                         }{" "}
                         )
@@ -264,13 +267,11 @@ const ProjectDetails = () => {
                   </Top>
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 1, 900: 1 }}>
                     <Masonry gutter="14px">
-                      {works
+                      {tasks
                       ?.filter(selectedUserId === "ALL" ? (item) => item.status === true : (item) => item.collaboratorIds?.includes(parseInt(selectedUserId)))
                         .filter((item) => item.status == true)
                         .map((item) => (
-                          <div onClick={() => openWorkDetails(item)}>
-                            <WorkCards status="In Progress" work={item} />
-                          </div>
+                            <TaskDetailCard item={item} />
                         ))}
                     </Masonry>
                   </ResponsiveMasonry>
@@ -285,4 +286,4 @@ const ProjectDetails = () => {
   );
 };
 
-export default ProjectDetails;
+export default Tasks;

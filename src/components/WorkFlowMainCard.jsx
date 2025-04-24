@@ -1,4 +1,4 @@
-import React, { use, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import { Button } from "@mui/material";
@@ -6,7 +6,6 @@ import form from "../Images/google-forms.png";
 import taskIcon from "../Images/tasks.png";
 import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
 import AddTaskIcon from '@mui/icons-material/AddTask';
-import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import UpdateTaskTemplate from "./UpdateTaskTemplate";
 import DeletePopup from "./DeletePopup";
@@ -92,7 +91,7 @@ const Image = styled.img`
   height: 30px;
 `;
 
-const WorkFlowMainCard = ({ status, work, newForm, setNewForm, setNewTaskTemplate, projectId, taskTemplateAdded, setTaskTemplateAdded }) => {
+const WorkFlowMainCard = ({ work, setNewForm, setNewTaskTemplate, projectId, taskTemplateAdded, setTaskTemplateAdded }) => {
   
   const [task, setTask] = useState([]);
   const [completed, setCompleted] = useState(0);
@@ -105,9 +104,6 @@ const WorkFlowMainCard = ({ status, work, newForm, setNewForm, setNewTaskTemplat
 
     //use state for delete popup
     const [openDelete, setOpenDelete] = useState({ state: false, type: "Task Template", name: "", id: "", workflow: projectId });
-
-  console.log(work);
-  console.log(task);
 
   useEffect(() => {
     let count = 0;

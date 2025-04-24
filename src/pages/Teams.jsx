@@ -48,19 +48,15 @@ const Wrapper = styled.div`
 
 
 const Teams = () => {
-  const { id } = useParams();
-  const [item, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useSelector((state) => state.user);
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')))
-
   const [teams, setTeams] = useState([]);
 
   const getAvailableTeams = async () => {
     await axios.get("http://localhost:8085/api/v1/team/getAllTeams")
     .then((res) => {
       setTeams(res.data);
-      loading(false);
+      // loading(false);
     })
     .catch((err) => {
       console.log(err);
@@ -70,9 +66,6 @@ const Teams = () => {
   useEffect(() => {
     getAvailableTeams();
   }, []);
-
-  console.log(teams);
-
 
   return (
     <Container>

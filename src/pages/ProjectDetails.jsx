@@ -18,7 +18,7 @@ import { CircularProgress, IconButton } from "@mui/material";
 import axios from "axios";
 import Avatar from "@mui/material/Avatar";
 import { openSnackbar } from "../redux/snackbarSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import InviteMembers from "../components/InviteMembers";
 import AddWork from "../components/AddWork";
 import WorkDetails from "../pages/WorkDetailsPage";
@@ -107,7 +107,7 @@ const Tag = styled.div`
   padding: 4px 10px;
   border-radius: 8px;
   color: ${({ tagColor, theme }) => tagColor + theme.lightAdd};
-  background-color: ${({ tagColor, theme }) => tagColor + "10"};
+  background-color: ${({ tagColor, theme }) => tagColor + "25"};
   font-size: 12px;
   font-weight: 500;
 `;
@@ -294,16 +294,16 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
   const [loading, setLoading] = useState(true);
   const [alignment, setAlignment] = useState(true);
   const [open, setOpen] = useState(false);
-    const [newForm, setNewForm] = useState(false);
+  const [newForm, setNewForm] = useState(false);
   const [newTaskTemplate, setNewTaskTemplate] = useState(false);
-  const [newRule, setNewRule] = useState(false);
   const [workAdded, setWorkAdded] = useState(false);
   const [workUpdated, setWorkUpdated] = useState(false);
   const [collaboratorUpdated, setCollaboratorUpdated] = useState(false);
   const [projectUpdated, setProjectUpdated] = useState(false);
   const [icons, setIcons] = useState([]);
   const token = localStorage.getItem("token");
-  const [taskUpdated, setTaskUpdated] = useState(false);
+  const { currentUser } = useSelector((state) => state.user);
+  const [taskTemplateAdded, setTaskTemplateAdded] = useState(false);
 
 
   const { loading: Loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
@@ -416,7 +416,6 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
       });
   }; 
 
-
   useEffect(() => {
     if (!item) return;
   
@@ -430,9 +429,6 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
   
     setIcons([...projectCollaborators, ...projectTeams]);
   }, [item, collaborators, teams]);
-
- console.log(icons);
-
 
   const getWorks = async () => {
     try {
@@ -622,7 +618,7 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
                   backgroundColor: '#e68911',
                   color: 'white'
                 }
-              }} onClick={() => navigate(`/workflow/${item.projectId}`)} >
+              }} onClick={currentUser.role === 'ADMIN' ? () => navigate(`/workflow/${item.projectId}`) : currentUser.role === 'MANAGER' ? () => navigate(`/workflow/${item.projectId}`) : null} >
                 <AccountTreeIcon sx={{ fontSize: "15px" }} />
                 Workflow
             </Button>
@@ -638,16 +634,16 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
                   backgroundColor: 'yellowgreen',
                   color: 'white'
                 }
-              }} onClick={toggleDrawer(true)} >
+              }} onClick={toggleDrawer( currentUser.role === 'ADMIN' ? true : currentUser.role === 'MANAGER' ? true : false)} >
                 <DashboardCustomizeIcon sx={{ fontSize: "15px" }} />
                 Customize
             </Button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: '10px' }}>
-              <IcoBtn style={{ border: '1px solid orange' }} onClick={() => setOpenUpdate({ state: true, type: 'all', data: item })}>
+              <IcoBtn style={{ border: '1px solid orange' }} onClick={() => setOpenUpdate(currentUser.role === "ADMIN" ? { state: true, type: 'all', data: item } : currentUser.role === "MANAGER" ? { state: true, type: 'all', data: item } : false)}>
                 <Edit sx={{ fontSize: "20px" }} />
               </IcoBtn>
-              <IcoBtn style={{ border: '1px solid red' }} onClick={() => setOpenDelete({ state: true, type: 'Project', name: item?.projectName, id: item.projectId })}>
+              <IcoBtn style={{ border: '1px solid red' }} onClick={() => setOpenDelete(currentUser.role === "ADMIN" ? { state: true, type: 'Project', name: item?.projectName, id: item.projectId } : currentUser.role === "MANAGER" ? { state: true, type: 'Project', name: item?.projectName, id: item.projectId } : false)}>
                 <Delete sx={{ fontSize: "20px" }} />
               </IcoBtn>
               
@@ -794,7 +790,7 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
         </Drawer>
 
         {newForm && <AddForm setNewForm={setNewForm} />}
-        {newTaskTemplate && <AddTaskTemplate setNewTaskTemplate={setNewTaskTemplate} projectId={item.projectId} />}
+        {newTaskTemplate && <AddTaskTemplate setTaskTemplateAdded={setTaskTemplateAdded} setNewTaskTemplate={setNewTaskTemplate} projectId={item.projectId} />}
     </Container>
   );
 };

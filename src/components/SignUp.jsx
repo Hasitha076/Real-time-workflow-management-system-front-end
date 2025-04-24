@@ -1,24 +1,21 @@
 import {
   CloseRounded,
-  EmailRounded,
-  PasswordRounded,
   Person,
   Visibility,
   VisibilityOff,
-  TroubleshootRounded,
 } from "@mui/icons-material";
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useTheme } from "styled-components";
-import Google from "../Images/google.svg";
-import { IconButton, Modal, MenuItem, Select } from "@mui/material";
+import { IconButton, Modal } from "@mui/material";
 import { openSnackbar } from "../redux/snackbarSlice";
-import { loginFailure, loginStart, loginSuccess } from "../redux/userSlice";
+import { loginFailure } from "../redux/userSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import validator from "validator";
-import { useNavigate } from "react-router-dom";
+import DraftsIcon from "@mui/icons-material/Drafts";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 
 const Container = styled.div`
   width: 100%;
@@ -34,9 +31,9 @@ const Container = styled.div`
 
 const Wrapper = styled.div`
   width: 400px;
-  border-radius: 30px;
-  background-color: ${({ theme }) => theme.bgLighter};
-  color: ${({ theme }) => theme.text};
+  border-radius: 0;
+  background-color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.black};
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -46,31 +43,27 @@ const Wrapper = styled.div`
 const Title = styled.div`
   font-size: 22px;
   font-weight: 500;
-  color: ${({ theme }) => theme.text};
+  color: ${({ theme }) => theme.black};
   margin: 16px 28px;
 `;
+
 const OutlinedBox = styled.div`
   height: 44px;
-  border-radius: 12px;
+  border-radius: 0;
   border: 1px solid ${({ theme }) => theme.soft2};
   color: ${({ theme }) => theme.soft2};
-  ${({ googleButton, theme }) =>
-    googleButton &&
-    `
-    user-select: none; 
-  gap: 16px;`}
   ${({ button, theme }) =>
     button &&
     `
     user-select: none; 
-  border: none;
+    border: none;
     background: ${theme.itemHover};
-    color: '${theme.soft2}';`}
-    ${({ activeButton, theme }) =>
+    color: ${theme.soft2};`}
+  ${({ activeButton, theme }) =>
     activeButton &&
     `
     user-select: none; 
-  border: none;
+    border: none;
     background: ${theme.primary};
     color: white;`}
   margin: 3px 20px;
@@ -81,37 +74,8 @@ const OutlinedBox = styled.div`
   font-weight: 500;
   padding: 0px 14px;
 `;
-const GoogleIcon = styled.img`
-  width: 22px;
-`;
-const Divider = styled.div`
-  display: flex;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: ${({ theme }) => theme.soft};
-  font-size: 14px;
-  font-weight: 600;
-`;
-const Line = styled.div`
-  width: 80px;
-  height: 1px;
-  border-radius: 10px;
-  margin: 0px 10px;
-  background-color: ${({ theme }) => theme.soft};
-`;
 
 const TextInput = styled.input`
-  width: 100%;
-  border: none;
-  font-size: 14px;
-  border-radius: 3px;
-  background-color: transparent;
-  outline: none;
-  color: ${({ theme }) => theme.textSoft};
-`;
-
-const SelectInput = styled(Select)`
   width: 100%;
   border: none;
   font-size: 14px;
@@ -130,6 +94,7 @@ const LoginText = styled.div`
   justify-content: center;
   align-items: center;
 `;
+
 const Span = styled.span`
   color: ${({ theme }) => theme.primary};
 `;
@@ -139,14 +104,12 @@ const Error = styled.div`
   font-size: 10px;
   margin: 2px 26px 8px 26px;
   display: block;
-  ${({ error, theme }) =>
+  ${({ error }) =>
     error === "" &&
-    `    display: none;
-    `}
+    `display: none;`}
 `;
 
-const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
-
+const SignUp = ({ SignUpOpen, setSignUpOpen, setSignInOpen }) => {
   const [nameValidated, setNameValidated] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -155,6 +118,7 @@ const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
   const [Loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const [emailError, setEmailError] = useState("");
+  const [nameError, setNameError] = useState("");
   const [credentialError, setcredentialError] = useState("");
   const [passwordCorrect, setPasswordCorrect] = useState(false);
   const [nameCorrect, setNameCorrect] = useState(false);
@@ -162,49 +126,41 @@ const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
     password: "",
     showPassword: false,
   });
-  const navigate = useNavigate()
-
-  const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
 
   const dispatch = useDispatch();
+  const theme = useTheme();
 
-  const createAccount = () => {
-   
-  };
-
-  console.log(selectedOption);
-  
+  const createAccount = () => {};
 
   const handleSignUp = async () => {
     if (!disabled) {
-      await axios.post("http://localhost:8081/api/v1/auth/register", {
-        userName: name,
-        email: email,
-        password: password
-      })
+      await axios
+        .post("http://localhost:8081/api/v1/auth/register", {
+          userName: name,
+          email: email,
+          password: password,
+        })
         .then((res) => {
-
-          if(res.data === "Username already exists") {
+          if (res.data === "Username already exists") {
             dispatch(
               openSnackbar({
-                message: "Username already exists",
+                message: "User already exists",
                 severity: "error",
               })
             );
-          }
-          else {
+          } else {
             dispatch(
               openSnackbar({
-                message: "Registerd Successfully",
+                message: "Registered Successfully",
                 severity: "success",
               })
             );
-            setSignInOpen(false);
+            setSignUpOpen(false);
             setSignInOpen(true);
           }
         })
-        .catch((err) => {
+        .catch(() => {
           dispatch(loginFailure());
           dispatch(
             openSnackbar({
@@ -212,12 +168,11 @@ const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
               severity: "error",
             })
           );
-      })
+        });
       setDisabled(true);
       setLoading(true);
     }
-
-  }
+  };
 
   useEffect(() => {
     if (email !== "") validateEmail();
@@ -239,19 +194,17 @@ const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
     createAccount();
   }, [otpVerified]);
 
-  //validate email
   const validateEmail = () => {
     if (validator.isEmail(email)) {
       setEmailError("");
     } else {
-      setEmailError("Enter a valid Email Id!");
+      setEmailError("Enter a valid Email");
     }
   };
 
-  //validate password
   const validatePassword = () => {
     if (password.length < 8) {
-      setcredentialError("Password must be atleast 8 characters long!");
+      setcredentialError("Password must be at least 8 characters long!");
       setPasswordCorrect(false);
     } else if (password.length > 16) {
       setcredentialError("Password must be less than 16 characters long!");
@@ -264,7 +217,7 @@ const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
     ) {
       setPasswordCorrect(false);
       setcredentialError(
-        "Password must contain atleast one lowercase, uppercase, number and special character!"
+        "Password must contain at least one lowercase, uppercase, number, and special character!"
       );
     } else {
       setcredentialError("");
@@ -272,27 +225,32 @@ const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
     }
   };
 
-  //validate name
   const validateName = () => {
-    if (name.length < 4) {
+    if (typeof name !== "string") {
       setNameValidated(false);
       setNameCorrect(false);
-      setcredentialError("Name must be atleast 4 characters long!");
+      setNameError("Name must be a string");
+    } else if (!isNaN(name)) {
+      setNameValidated(false);
+      setNameCorrect(false);
+      setNameError("Name must be a string");
+    } else if (name.trim() === "") {
+      setNameValidated(false);
+      setNameCorrect(false);
+      setNameError("Name cannot be empty!");
+    } else if (name.trim().length < 4) {
+      setNameValidated(false);
+      setNameCorrect(false);
+      setNameError("Name must be at least 4 characters long");
     } else {
       setNameCorrect(true);
-      if (!nameValidated) {
-        setcredentialError("");
-        setNameValidated(true);
-      }
-
+      setNameValidated(true);
+      setNameError("");
     }
   };
 
-
-  const theme = useTheme();
-  //ssetSignInOpen(false)
   return (
-    <Modal open={SignUpOpen} onClose={() => setSignInOpen(false)}>
+    <Modal open={SignUpOpen} onClose={() => setSignUpOpen(false)}>
       <Container>
         <Wrapper>
           <CloseRounded
@@ -304,84 +262,62 @@ const SignUp = ({SignUpOpen, setSignUpOpen, setSignInOpen }) => {
             }}
             onClick={() => setSignUpOpen(false)}
           />
-              <Title>Sign Up</Title>
-              <OutlinedBox
-                googleButton={TroubleshootRounded}
-                style={{ margin: "24px" }}
-              >
-                {Loading ? (
-                  <CircularProgress color="inherit" size={20} />
-                ) : (
-                  <>
-                    <GoogleIcon src={Google} />
-                    Sign In with Google</>
-                )}
-              </OutlinedBox>
-              <Divider>
-                <Line />
-                or
-                <Line />
-              </Divider>
-              <OutlinedBox style={{ marginTop: "24px" }}>
-                <Person
-                  sx={{ fontSize: "20px" }}
-                  style={{ paddingRight: "12px" }}
-                />
-                <TextInput
-                  placeholder="Full Name"
-                  type="text"
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </OutlinedBox>
-              <OutlinedBox>
-                <EmailRounded
-                  sx={{ fontSize: "20px" }}
-                  style={{ paddingRight: "12px" }}
-                />
-                <TextInput
-                  placeholder="Email Id"
-                  type="email"
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </OutlinedBox>
-              <Error error={emailError}>{emailError}</Error>
-              <OutlinedBox>
-                <PasswordRounded
-                  sx={{ fontSize: "20px" }}
-                  style={{ paddingRight: "12px" }}
-                />
-                <TextInput
-                  type={values.showPassword ? "text" : "password"}
-                  placeholder="password"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <IconButton
-                  color="inherit"
-                  onClick={() =>
-                    setValues({ ...values, showPassword: !values.showPassword })
-                  }
-                >
-                  {values.showPassword ? (
-                    <Visibility sx={{ fontSize: "20px" }} />
-                  ) : (
-                    <VisibilityOff sx={{ fontSize: "20px" }} />
-                  )}
-                </IconButton>
-              </OutlinedBox>
-              <OutlinedBox
-                button={true}
-                activeButton={!disabled}
-                style={{ marginTop: "6px" }}
-                onClick={handleSignUp}
-              >
-                {Loading ? (
-                  <CircularProgress color="inherit" size={20} />
-                ) : (
-                  "Create Account"
-                )}
-              </OutlinedBox>
+          <Title>Sign Up</Title>
+
+          <OutlinedBox style={{ marginTop: "10px" }}>
+            <Person sx={{ fontSize: "20px" }} style={{ paddingRight: "12px" }} />
+            <TextInput
+              placeholder="Full Name"
+              type="text"
+              onChange={(e) => setName(e.target.value)}
+            />
+          </OutlinedBox>
+          <Error error={nameError}>{nameError}</Error>
+          <OutlinedBox>
+            <DraftsIcon sx={{ fontSize: "20px" }} style={{ paddingRight: "12px" }} />
+            <TextInput
+              placeholder="Email"
+              type="email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </OutlinedBox>
+
+          <Error error={emailError}>{emailError}</Error>
+
+          <OutlinedBox>
+            <LockOpenIcon sx={{ fontSize: "20px" }} style={{ paddingRight: "12px" }} />
+            <TextInput
+              type={values.showPassword ? "text" : "password"}
+              placeholder="Password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <IconButton
+              color="inherit"
+              onClick={() =>
+                setValues({ ...values, showPassword: !values.showPassword })
+              }
+            >
+              {values.showPassword ? (
+                <Visibility sx={{ fontSize: "20px" }} />
+              ) : (
+                <VisibilityOff sx={{ fontSize: "20px" }} />
+              )}
+            </IconButton>
+          </OutlinedBox>
+
+          <Error error={credentialError}>{credentialError}</Error>
+
+          <OutlinedBox
+            button={true}
+            activeButton={!disabled}
+            style={{ marginTop: "6px" }}
+            onClick={handleSignUp}
+          >
+            {Loading ? <CircularProgress color="inherit" size={20} /> : "Register"}
+          </OutlinedBox>
+
           <LoginText>
-            Already have an account ?
+            Already have an account?
             <Span
               onClick={() => {
                 setSignUpOpen(false);

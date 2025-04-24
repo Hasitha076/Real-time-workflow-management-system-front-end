@@ -2,7 +2,10 @@ import { Avatar, Popover } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { IconButton } from "@mui/material";
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { openSnackbar } from "../redux/snackbarSlice";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -16,11 +19,23 @@ const Wrapper = styled.div`
   background-color: ${({ theme }) => theme.card};
 `;
 
+const IcoButton = styled(IconButton)`
+  color: ${({ theme }) => theme.black} !important;
+`;
+
+const Top = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  background-color: ${({ theme }) => theme.white};
+`
+
 const Heading = styled.div`
   font-size: 22px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.text};
-  margin: 4px 0px 12px 12px;
+  font-weight: 400;
+  color: ${({ theme }) => theme.black};
+  padding-left: 15px;
 `;
 
 const Item = styled.div`
@@ -59,11 +74,8 @@ const Hr = styled.hr`
 
 const NotificationDialog = ({
   open,
-  id,
   anchorEl,
-  handleClose,
-  // currentUser,
-  notification,
+  handleClose
 }) => {
 
 
@@ -71,8 +83,7 @@ const NotificationDialog = ({
   const { currentUser } = useSelector((state) => state.user);
   const token = localStorage.getItem("token");
 
-  console.log(currentUser);
-  
+  const dispatch = useDispatch();
 
   const getNotifications = async () => {
     await axios.get("http://localhost:8084/api/v1/notification/getAllNotifications", {
@@ -88,7 +99,6 @@ const NotificationDialog = ({
         return item.collaboratorIds.includes(currentUser.userId);
       }
       );
-      console.log("filterDAta", filterDAta);
       setNotifications(filterDAta);
     })
     .catch((err) => {
@@ -100,9 +110,28 @@ const NotificationDialog = ({
       getNotifications();
     }, []);
 
-    console.log(notifications);
-    
 
+    const clearAll =  async () => {
+      await axios.delete(`http://localhost:8084/api/v1/notification/clearNotificationById/${currentUser.userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type":   "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      })
+      .then((res) => {
+        dispatch(
+          openSnackbar({
+            message: "Clear all notifications",
+            severity: "success",
+          })
+        );
+        getNotifications();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    }
 
   return (
     <Popover
@@ -117,60 +146,70 @@ const NotificationDialog = ({
       anchorPosition={{ top: 60, left: 1800 }}
     >
       <Wrapper>
-        <Heading>Notifications</Heading>
+        <Top>
+          <Heading>Notifications</Heading>
+          {notifications.length != 0 ? <IcoButton onClick={clearAll}>
+                <DeleteForeverIcon />
+          </IcoButton>
+          : null}
+        </Top>
 
-        {[...notifications]
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-          // .slice(0, 10)
-          .map((item, index) => (
-          <Item key={index}>
-            <Avatar
-              sx={{ width: "32px", height: "32px" }}
-              src={currentUser.img}
-            >
-              {currentUser.userName.charAt(0)}
-            </Avatar>
-            <Details>
-              <Title>
-                {item.subject === "project-created"
-                  ? "Project Invitation"
-                  : item.subject === "project-changed"
-                  ? "Project changed"
-                  : item.subject === "removed-from-project"
-                  ? "Removed from project"
-                  : item.subject === "project-removed"
-                  ? "Project removed"
-                  : item.subject === "task-created"
-                  ? "Task Invitation"
-                  : item.subject === "task-changed"
-                  ? "Task changed"
-                  : item.subject === "removed-from-task"
-                  ? "Removed from task"
-                  : item.subject === "task-removed"
-                  ? "Task removed"
-                  : item.subject === "team-created"
-                  ? "Team Invitation"
-                  : item.subject === "team-changed"
-                  ? "Team changed"
-                  : item.subject === "removed-from-team"
-                  ? "Removed from team"
-                  : item.subject === "team-removed"
-                  ? "Team removed"
-                  : item.subject === "work-created"
-                  ? "Work Invitation"
-                  : item.subject === "work-changed"
-                  ? "Work changed"
-                  : item.subject === "removed-from-work"
-                  ? "Removed from work"
-                  : item.subject === "work-removed"
-                  ? "Work removed"
-                  : "Other"}
-              </Title>
-              <Desc>{item.body}</Desc>
-              <Hr />
-            </Details>
-          </Item>
-      ))}
+        {notifications.length === 0 ? (
+  <p style={{ textAlign: "center", color: "#888" }}>Empty</p>
+) : (
+  [...notifications]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    // .slice(0, 10)
+    .map((item, index) => (
+      <Item key={index}>
+        <Avatar
+          sx={{ width: "32px", height: "32px" }}
+          src={currentUser.img}
+        >
+          {currentUser.userName.charAt(0)}
+        </Avatar>
+        <Details>
+          <Title>
+            {item.subject === "project-created"
+              ? "Project Invitation"
+              : item.subject === "project-changed"
+              ? "Project changed"
+              : item.subject === "removed-from-project"
+              ? "Removed from project"
+              : item.subject === "project-removed"
+              ? "Project removed"
+              : item.subject === "task-created"
+              ? "Task Invitation"
+              : item.subject === "task-changed"
+              ? "Task changed"
+              : item.subject === "removed-from-task"
+              ? "Removed from task"
+              : item.subject === "task-removed"
+              ? "Task removed"
+              : item.subject === "team-created"
+              ? "Team Invitation"
+              : item.subject === "team-changed"
+              ? "Team changed"
+              : item.subject === "removed-from-team"
+              ? "Removed from team"
+              : item.subject === "team-removed"
+              ? "Team removed"
+              : item.subject === "work-created"
+              ? "Work Invitation"
+              : item.subject === "work-changed"
+              ? "Work changed"
+              : item.subject === "removed-from-work"
+              ? "Removed from work"
+              : item.subject === "work-removed"
+              ? "Work removed"
+              : "Other"}
+          </Title>
+          <Desc>{item.body}</Desc>
+          <Hr />
+        </Details>
+      </Item>
+    ))
+)}
       </Wrapper>
     </Popover>
   );

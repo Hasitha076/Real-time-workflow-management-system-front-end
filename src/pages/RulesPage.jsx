@@ -7,7 +7,6 @@ import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 import { Button } from "@mui/material";
 import { CircularProgress, IconButton } from "@mui/material";
 import axios from "axios";
-import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
@@ -20,20 +19,10 @@ import {Drawer, Slide} from '@mui/material';
 import Divider from '@mui/material/Divider';
 import { useNavigate } from "react-router-dom";
 import workflow from "../Images/workflow.png";
-import InviteWorkflowMembers from "../components/InviteWorkflowMembers";
 import { useQuery } from "@apollo/client";
 import { LOAD_PROJECT_BY_ID } from "../GraphQL/Queries";
-import { HiArrowDown } from "react-icons/hi";
-import ControlPointIcon from '@mui/icons-material/ControlPoint';
-import CancelIcon from '@mui/icons-material/Cancel';
-import TriggerFunctionCards from "../components/TriggerFunctionCards";
-import ActionFunctionCards from "../components/ActionFunctionCards";
-import TriggerRuleCard from "../components/TriggerRuleCard";
-import ActionRuleCard from "../components/ActionRuleCard";
-import PublishIcon from '@mui/icons-material/Publish';
 import AddTaskTemplate from "../components/AddTaskTemplate";
 import AddForm from "../components/AddForm";
-import WorkFlowCards from "../components/WorkFlowCards";
 import RuleTemplateCard from "../components/RuleTemplateCard";
 import PostAddIcon from '@mui/icons-material/PostAdd';
 
@@ -90,29 +79,6 @@ const Desc = styled.div`
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
-`;
-
-const Tags = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  gap: 6px;
-  margin-top: 14px;
-`;
-
-const Tag = styled.div`
-  padding: 4px 10px;
-  border-radius: 8px;
-  color: ${({ tagColor, theme }) => tagColor + theme.lightAdd};
-  background-color: ${({ tagColor, theme }) => tagColor + "10"};
-  font-size: 12px;
-  font-weight: 500;
-`;
-
-const AvatarGroup = styled.div`
-  display: flex;
-  align-items: center;
-  margin-right: 12px;
 `;
 
 const Hr = styled.hr`
@@ -179,11 +145,6 @@ const Customizer = styled.button`
 
 `;
 
-const HrHor = styled.div`
-  border: 0.5px solid ${({ theme }) => theme.soft + "99"};
-`;
-
-
 const ArrowIcoBtn = styled(IconButton)`
   color: ${({ theme }) => theme.textSoft} !important;
 `;
@@ -191,7 +152,6 @@ const ArrowIcoBtn = styled(IconButton)`
 const Extra = styled.div`
   flex: 1;
 `;
-
 
 const DrawerContainer = styled.div`
   padding: 30px;
@@ -203,16 +163,6 @@ const DrawerContainer = styled.div`
 
 const Image = styled.img`
   height: 50px;
-`;
-
-const IcoBtn = styled(IconButton)`
-  width: 15px;
-  height: 15px;
-  color: ${({ theme }) => theme.white} !important;
-  &:hover {
-    background-color: ${({ theme }) => theme.white} !important;
-    color: ${({ theme }) => theme.black} !important;
-  }
 `;
 
 const CustomRuleCard = styled.div`
@@ -247,8 +197,6 @@ const RulesPage = () => {
   const [projectCollaborators, setProjectCollaborators] = useState([]);
   const [projectTeams, setProjectTeams] = useState([]);
   const [inviteMemberPopup, setInviteMemberPopup] = useState(false);
-  const [inviteTeamPopup, setInviteTeamPopup] = useState(false);
-  const [created, setCreated] = useState(false);
   const [currentWork, setCurrentWork] = useState({});
   const [openWork, setOpenWork] = useState(false);
   const [collaborators, setCollaborators] = useState([]);
@@ -258,7 +206,6 @@ const RulesPage = () => {
   const [open, setOpen] = useState(false);
   const [newForm, setNewForm] = useState(false);
   const [newTaskTemplate, setNewTaskTemplate] = useState(false);
-  const [workDetails, setWorkDetails] = useState({});
   const [taskTemplateAdded, setTaskTemplateAdded] = useState(false);
 
   const { loading, error, data } = useQuery(LOAD_PROJECT_BY_ID, {
@@ -537,8 +484,8 @@ useEffect(() => {
                         <h2 style={{ margin: '10px 0 0 0' }}>Create a Custom Rule</h2>
                     </CustomRuleCard>
 
-                    {rules.length != 0 && rules.map((rule) => (
-                        <div>
+                    {rules.length != 0 && rules.map((rule, key) => (
+                        <div key={key}>
                           <RuleTemplateCard
                             rule={rule}
                             projectId={id}

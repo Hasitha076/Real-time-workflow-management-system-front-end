@@ -7,7 +7,6 @@ import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize';
 import { Button } from "@mui/material";
 import { CircularProgress, IconButton } from "@mui/material";
 import axios from "axios";
-import { openSnackbar } from "../redux/snackbarSlice";
 import { useDispatch } from "react-redux";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
@@ -203,7 +202,6 @@ const Workflow = () => {
   const [projectTeams, setProjectTeams] = useState([]);
   const [inviteMemberPopup, setInviteMemberPopup] = useState(false);
   const [inviteTeamPopup, setInviteTeamPopup] = useState(false);
-  const [created, setCreated] = useState(false);
   const [currentWork, setCurrentWork] = useState({});
   const [openWork, setOpenWork] = useState(false);
   const [collaborators, setCollaborators] = useState([]);
@@ -307,15 +305,6 @@ const Workflow = () => {
     getTeams();
     getWorks();
   }, [item, id]);
-  
-
-  console.log(id);
-    console.log(item);
-  console.log(collaborators);
-  console.log(teams);
-  console.log(works);
-  console.log(projectCollaborators);
-  console.log(projectTeams);
   
 
   const openWorkDetails = (work) => {

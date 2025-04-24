@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import SearchIcon from "@mui/icons-material/Search";
 import { useSelector } from "react-redux";
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import MenuIcon from "@mui/icons-material/Menu";
 import { IconButton } from "@mui/material";
-import { Forum, NotificationsRounded } from "@mui/icons-material";
+import { NotificationsRounded } from "@mui/icons-material";
 import Badge from "@mui/material/Badge";
-import { useDispatch } from "react-redux";
 import Avatar from "@mui/material/Avatar";
 import AccountDialog from "./AccountDialog";
 import NotificationDialog from "./NotificationDialog";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Person3Icon from '@mui/icons-material/Person3';
+import CustomizedSwitches from "./ModeButton";
 
 const Container = styled.div`
   position: sticky;
@@ -32,7 +30,7 @@ const Wrapper = styled.div`
   height: 100%;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 0px 14px;
   @media screen and (max-width: 480px) {
     padding: 0px 4px;
@@ -73,20 +71,18 @@ const Input = styled.input`
 const Button = styled.button`
   padding: 5px 18px;
   background-color: transparent;
-  border: 1px solid ${({ theme }) => theme.primary};
-  color: ${({ theme }) => theme.primary};
-  border-radius: 3px;
+  border: 1px solid ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.white};
   font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 15px;
-  border-radius: 100px;
   transition: all 0.3s ease;
   &:hover {
-    background-color: ${({ theme }) => theme.primary};
-    color: ${({ theme }) => theme.text};
+    background-color: ${({ theme }) => theme.white};
+    color: ${({ theme }) => theme.black};
   }
 `;
 
@@ -103,16 +99,27 @@ const User = styled.div`
 }
 `;
 
-const Navbar = ({ menuOpen, setMenuOpen, token }) => {
-  const [SignUpOpen, setSignUpOpen] = useState(false);
+const Item = styled.div`
+  display: flex;
+  align-items: center;
+  color: ${({ theme }) => theme.itemText};
+  gap: 20px;
+  cursor: pointer;
+  padding: 7.5px 26px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.itemHover};
+  }
+`;
+
+const Navbar = ({ menuOpen, setMenuOpen, token, darkMode, setDarkMode }) => {
   const [SignInOpen, setSignInOpen] = useState(false);
-  const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
-  const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
-
-console.log(currentUser);
-
 
   //Open the account dialog
   const [anchorEl, setAnchorEl] = useState(null);
@@ -155,8 +162,6 @@ console.log(currentUser);
     useEffect(() => {
       getNotification();
     }, []);
-
-    console.log("notifications", notifications);
     
 
   return (
@@ -166,13 +171,12 @@ console.log(currentUser);
           <IcoButton onClick={() => setMenuOpen(!menuOpen)}>
             <MenuIcon />
           </IcoButton>
-          <Search>
-            <Input placeholder="Search" />
-            <SearchIcon style={{ marginRight: "20px", marginLeft: "20px" }} />
-          </Search>
+        
           <User>
             {currentUser ? (
               <>
+              <CustomizedSwitches darkMode={darkMode} setDarkMode={setDarkMode} />
+         
                 <IcoButton aria-describedby={id} onClick={notificationClick}>
                   <Badge badgeContent={notifications.length} color="primary">
                     <NotificationsRounded />
@@ -200,7 +204,7 @@ console.log(currentUser);
               </>
             ) : (
               <Button onClick={() => setSignInOpen(true)}>
-                <AccountCircleOutlinedIcon /> Sign In
+                <Person3Icon /> Sign In
               </Button>
             )}
           </User>

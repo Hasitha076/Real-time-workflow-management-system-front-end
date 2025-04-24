@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import styled from "styled-components";
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import { Button } from "@mui/material";
@@ -89,9 +88,8 @@ const Bottom = styled.div`
   text-align: left;
 `;
 
-const WorkFlowCards = ({ status, work, setInviteMemberPopup, setInviteTeamPopup, setWorkDetails }) => {
+const WorkFlowCards = ({ work, setInviteMemberPopup, setInviteTeamPopup, setWorkDetails }) => {
   
-  const [color, setColor] = useState("primary");
   const [task, setTask] = useState([]);
   const [completed, setCompleted] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -109,14 +107,10 @@ const WorkFlowCards = ({ status, work, setInviteMemberPopup, setInviteTeamPopup,
     });
   }
 
-
   useEffect(() => {
     getTasks(work);
   }, [work]);
 
-  console.log(work);
-  console.log(task);
-  
 
   useEffect(() => {
     let count = 0;

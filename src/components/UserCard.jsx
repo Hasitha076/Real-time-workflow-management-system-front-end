@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import {
   TimelapseRounded
@@ -7,8 +6,7 @@ import {
 import { format } from "timeago.js";
 import { tagColors } from "../data/data";
 import { Link } from "react-router-dom";
-import { Avatar, IconButton } from "@mui/material";
-import axios from "axios";
+import { Avatar } from "@mui/material";
 
 const Container = styled.div`
   padding: 14px;
@@ -76,7 +74,6 @@ const Time = styled.div`
 
 
 const UserCard = ({ users }) => {
-  
   
   return (
     <Link to={`/members/${users.userId}`} style={{ textDecoration: "none" }}>

@@ -18,7 +18,7 @@ import { useDispatch } from "react-redux";
 import DeletePopup from "../components/DeletePopup";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 import ProjectCard from "../components/Card";
-import { LOAD_PROJECTS_BY__USER_ID, LOAD_PROJECTS_BY_TEAM_ID } from "../GraphQL/Queries";
+import { LOAD_PROJECTS_BY__USER_ID } from "../GraphQL/Queries";
 import { useQuery } from "@apollo/client";
 import Badge from '@mui/material/Badge';
 import Stack from '@mui/material/Stack';
@@ -295,12 +295,12 @@ const MemberDetails = ({ currentUser }) => {
     });
   }
 
-      useEffect(() => {
-        
-        if (data?.getProjectsByCollaboratorId) {
-          setProjects(data.getProjectsByCollaboratorId);
-        }
-      }, [Loading, data]);
+  useEffect(() => {
+    
+    if (data?.getProjectsByCollaboratorId) {
+      setProjects(data.getProjectsByCollaboratorId);
+    }
+  }, [Loading, data]);
 
 
   const getProjectCollaborators = async (projectId) => {
@@ -336,11 +336,6 @@ const MemberDetails = ({ currentUser }) => {
     window.scrollTo(0, 0);
     getUser(id); 
   }, [openWork, openUpdate, invitePopup, id]);
-
-  console.log(item);
-  console.log(projects);
-  
-console.log(currentUser);
 
 
   return (
