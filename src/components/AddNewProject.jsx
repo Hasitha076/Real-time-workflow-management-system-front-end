@@ -506,7 +506,7 @@ const AddNewProject = ({ setNewProject, teamId, teamProject, setProjectCreated }
               <AddMember>
 
                 <UsersList>
-                  {availableUsers.map((user) => ( user.status === true &&
+                  {availableUsers.map((user) => ( user.status === true && user.role != "GUEST" && user.role != "USER" &&
                     <MemberCard>
                       <UserData>
                         <Avatar

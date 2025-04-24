@@ -186,6 +186,7 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
     const [option4, setOption4] = useState("");
     const [option5, setOption5] = useState("");
     const [option6, setOption6] = useState("");
+    const [option7, setOption7] = useState("Any Work");
     const [icons, setIcons] = useState([]);
     const [isSetAssignee, setIsSetAssignee] = useState(false);
     const [invitePopup, setInvitePopup] = useState(false);
@@ -213,11 +214,69 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
     }
 
     const handleTaskAddChange = (event) => {
-        setOption3(event.target.value);
-        setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Task is add from", task: event.target.value } });
-        setIcons([]);
-        
-    }
+      const { name, value } = event.target;
+
+      if (name === "task") {
+        setOption3(value);
+    
+        // Case 1 & 2: task is "All tasks"
+        if (value === "All tasks") {
+          setActiveTrigger({
+            ...activeTrigger,
+            triggerDetails: {
+              triggerType: "All tasks",
+              section: {workName: "Any Work"}
+            }
+          });
+          setWhichSection(false);
+        } else {
+          // Case 3 & 4: taskTemplate selected
+          const { taskTemplateId, taskTemplateName } = JSON.parse(value);
+          const taskTemplateData = { taskTemplateId, taskTemplateName };
+          setOption3(taskTemplateData);
+
+          setActiveTrigger({
+            ...activeTrigger,
+            triggerDetails: {
+              triggerType: "Task is added from",
+              taskTemplate: taskTemplateData,
+              section: option7 === "Any Work" ? {workName: "Any Work"} : option7
+            }
+          });
+        }
+      }
+    
+      if (name === "work") {
+        if (value === "Any Work") {
+          setOption7("Any Work");
+    
+            setActiveTrigger((prev) => ({
+              ...prev,
+              triggerDetails: {
+                ...prev.triggerDetails,
+                section: {workName: "Any Work"}
+              }
+            }));
+        } else {
+          const { workId, workName } = JSON.parse(value);
+          const workData = { workId, workName };
+          setOption7(workData);
+    
+            setActiveTrigger((prev) => ({
+              ...prev,
+              triggerDetails: {
+                ...prev.triggerDetails,
+                section: workData
+              }
+            }));
+        }
+      }
+    
+      setIcons([]);
+    };
+
+    console.log(activeTrigger);
+    
 
     const handleAssigneeChange = (event) => {
         setAssignee(event.target.value);
@@ -399,27 +458,25 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
   const DrawerTriggerAddTaskList = (
     <DrawerContainer style={{ backgroundColor: '#f9f9f9' }}>
       <ArrowIcoBtn onClick={toggleTriggerDrawer(false, 2)}>
-        <KeyboardDoubleArrowRightIcon/>
+        <KeyboardDoubleArrowRightIcon />
       </ArrowIcoBtn>
+  
       <Box sx={{ width: '400px' }} role="presentation">
-          <top>
-            <h2 style={{ margin: '10px 0' }}>Task is added to this project</h2>
-          </top>
-
+        <div style={{ padding: '20px' }}>
+          <h2 style={{ margin: '10px 0' }}>Task is added to this project</h2>
           <Divider sx={{ padding: '10px 0' }} />
-
-
-            <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px', paddingTop: '20px'}}>
-            <p style={{ margin: '0' }}>Choose a source</p> 
-
-            <OutlinedBox style={{ marginTop: "0px", width: '-webkit-fill-available' }}>
-                <select
-                id="work"
-                name="work"
-                value={option3}
-                onChange={(e) => handleTaskAddChange(e)}
+  
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div>
+              <p style={{ marginBottom: '5px' }}>Choose a source</p>
+              <OutlinedBox style={{ width: '100%' }}>
+              <select
+                id="task"
+                name="task"
+                value={option3 === "" ? "-" : option3 === "All tasks" ? "All tasks" : JSON.stringify(option3)}
+                onChange={handleTaskAddChange}
                 style={{
-                    width: "100%",
+                  width: "100%",
                     padding: "0",
                     border: "1px solid #ccc",
                     borderRadius: "4px",
@@ -428,23 +485,51 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
                     color: "#C1C7C9",
                     border: "none",
                 }}
-                >
-                <option value="" disabled>
-                    -
-                </option>
-                <option value="All tasks">
-                    All tasks
-                </option>
+              >
+                <option value="-" disabled>-</option>
+                <option value="All tasks">All tasks</option>
                 {taskTemplates.map((taskTemplate) => (
-                    <option key={taskTemplate.taskTemplateId} value={taskTemplate.taskTemplateName}>
+                  <option key={taskTemplate.taskTemplateId} value={JSON.stringify({ taskTemplateId: taskTemplate.taskTemplateId, taskTemplateName: taskTemplate.taskTemplateName })}>
                     {taskTemplate.taskTemplateName}
-                    </option>
+                  </option>
                 ))}
-                </select>
-
-            </OutlinedBox>
+              </select>
+              </OutlinedBox>
+            </div>
+  
+            <div>
+              <p style={{ marginBottom: '5px' }}>Choose a Work</p>
+              <OutlinedBox style={{ width: '100%' }}>
+              <select
+                id="work"
+                name="work"
+                value={option7 === "Any Work" ? "Any Work" : JSON.stringify(option7)}
+                onChange={handleTaskAddChange}
+                style={{
+                  width: "100%",
+                    padding: "0",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    fontSize: "16px",
+                    backgroundColor: "transparent",
+                    color: "#C1C7C9",
+                    border: "none",
+                }}
+              >
+                <option value="Any Work">Any Work</option>
+                {works.map((work) => (
+                  <option
+                    key={work.workId}
+                    value={JSON.stringify({ workId: work.workId, workName: work.workName })}
+                  >
+                    {work.workName}
+                  </option>
+                ))}
+              </select>
+              </OutlinedBox>
+            </div>
           </Box>
-
+        </div>
       </Box>
     </DrawerContainer>
   );

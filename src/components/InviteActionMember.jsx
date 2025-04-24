@@ -275,7 +275,7 @@ const InviteActionMembers = ({ setInvitePopup, memberIcons, setMemberIcons, acti
           <AddMember>
 
             <UsersList>
-              {availableusers.map((user) => (
+              {availableusers.map((user) => ( user.role != "GUEST" && user.role != "USER" &&
                 <MemberCard>
                   <UserData>
                     <Avatar

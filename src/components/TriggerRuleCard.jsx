@@ -50,8 +50,12 @@ const TriggerRuleCard = ({  trigger }) => {
                  :
                 trigger.triggerDetails.triggerType === "Section is" ?
                 trigger.triggerDetails.section.workName
-                 : trigger.triggerDetails.triggerType === "Task is add from" ? 
-                trigger.triggerDetails.task 
+                 : 
+                trigger.triggerDetails.triggerType === "All tasks" ? 
+                trigger.triggerDetails.section === "Any Work" ? "Any Work" : trigger.triggerDetails.section.workName
+                : 
+                trigger.triggerDetails.triggerType === "Task is added from" ? 
+                trigger.triggerDetails.taskTemplate.taskTemplateName + " - " + (trigger.triggerDetails.section === "Any Work" ? "Any Work" : trigger.triggerDetails.section.workName)
                 : 
                 trigger.triggerDetails.triggerType === "Set assignee to" ? 
                 trigger.triggerDetails.assignee 

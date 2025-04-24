@@ -548,7 +548,7 @@ const UpdateTaskTemplate = ({ setTaskTemplateUpdated, setUpdateTaskTemplate, tem
               <AddMember>
 
                 <UsersList>
-                  {availableUsers.map((user) => (
+                  {availableUsers.map((user) => ( user.role != "GUEST" && user.role != "USER" &&
                     <MemberCard>
                       <UserData>
                         <Avatar
