@@ -131,7 +131,6 @@ const TaskDetailCard = ({item}) => {
     const [collaborators, setCollaborators] = useState([]);
     const [teams, setTeams] = useState([]);
 
-  console.log("Item: ", item);
 
   useEffect(() => {
     getCollaborators();
@@ -148,8 +147,7 @@ const TaskDetailCard = ({item}) => {
     try {
       const res = await axios.get(`http://localhost:8081/api/v1/user/getAllUsers`);
       setCollaborators(res.data);
-      console.log("Collaborators: ", res.data);
-      
+
     } catch (err) {
       console.error('Error fetching collaborators:', err);
     }
@@ -159,7 +157,6 @@ const TaskDetailCard = ({item}) => {
     try {
       const res = await axios.get(`http://localhost:8085/api/v1/team/getAllTeams`);
       setTeams(res.data);
-        console.log("Teams: ", res.data);
     } catch (err) {
       console.error('Error fetching teams:', err);
     }
@@ -208,8 +205,8 @@ const TaskDetailCard = ({item}) => {
             </Top>
             <Desc>{item.description}</Desc>
             <Tags>
-              {item.tags.map((tag) => (
-                <Tag
+              {item.tags.map((tag, idx) => (
+                <Tag key={idx}
                   tagColor={tagColors[Math.floor(Math.random() * tagColors.length)]}
                 >
                   {tag}
@@ -223,8 +220,9 @@ const TaskDetailCard = ({item}) => {
                 {format(item.updatedAt)}
               </Time>
               <AvatarGroup>
-                {allTaskMembers.map((member) => (
+                {allTaskMembers.map((member, idx) => (
                   <Avatar
+                  key={idx}
                     sx={{
                       marginRight: "-5px",
                       width: "26px",

@@ -413,8 +413,7 @@ const AddWork = ({ ProjectMembers, ProjectId, ProjectTeams, data, setWorkAdded }
   const getAvailableTeams = async () => {
     await axios.get("http://localhost:8085/api/v1/team/getAllTeams")
     .then((res) => {
-      console.log(res.data);
-      
+
       const filterData = res.data.filter((item) => 
         ProjectTeams.includes(item.teamId));
       setAvailableTeams(filterData);

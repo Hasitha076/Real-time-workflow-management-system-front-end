@@ -420,7 +420,7 @@ const TeamDetails = () => {
                     })
                 ))}
               </AvatarGroup>  : <Avatar sx={{ backgroundColor: 'transparent', border: '1px dashed #fff' }}><AccountCircleIcon/></Avatar>}
-              <InviteButton onClick={() => setInvitePopup(true)}>
+              <InviteButton onClick={() => currentUser.role === "ADMIN" ? setInvitePopup(true) : currentUser.role === "MANAGER" ? setInvitePopup(true) : dispatch(openSnackbar({ message: "You don't have permission to invite members", severity: "error" }))}>
                 <PersonAdd sx={{ fontSize: "12px" }} />
                 Invite
               </InviteButton>
@@ -483,7 +483,7 @@ const TeamDetails = () => {
                       .map((ele, idx) => (
                         <div onClick={() => openWorkDetails(ele)}>
                           <ProjectCard
-                            key={ele.projectId}
+                            key={idx}
                             item={ele}
                             index={idx}
                             status={ele.status}

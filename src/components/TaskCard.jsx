@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Avatar } from "@mui/material";
 import axios from "axios";
@@ -25,7 +25,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { useMutation, useQuery } from "@apollo/client";
 import { LOAD_PROJECT_BY_ID, UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { openSnackbar } from "../redux/snackbarSlice";
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
@@ -34,6 +34,7 @@ import UpdateTask from "./UpdateTask";
 import CheckIcon from '@mui/icons-material/Check';
 import PanoramaFishEyeIcon from '@mui/icons-material/PanoramaFishEye';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useSelect } from "@mui/base";
 
 const Container = styled.div`
   padding: 14px;
@@ -232,6 +233,7 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
   const [updateProjectStatus] = useMutation(UPDATE_PROJECT_STATUS);
   const token = localStorage.getItem("token");
   const dispatch = useDispatch();
+  const { currentUser } = useSelector(state => state.user);
 
     const { loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
       variables: { id: parseInt(item.projectId) },  // Ensure ID is an integer
@@ -375,7 +377,7 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
           await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${work.projectId}`)
           .then((res) => {
             console.log("res.data: ", res.data);
-            if (!res.data?.every((work) => work.status == false) && value === true) {      
+            if (res.data?.filter((work) => work.status == false).length === 0) {      
               console.log("Updating project status to COMPLETED");   
                updateProjectStatus({
                 variables: {
@@ -387,29 +389,29 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
               }).then((res) => {
                 console.log(res);
                 
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-          }
+              })
+              .catch((err) => {
+                  console.log(err);
+              });
+            }
 
-          if (value === false) {     
-            console.log("Updating project status to ON_GOING");    
-            updateProjectStatus({
-             variables: {
-               projectId: parseInt(work.projectId),
-               input: {
-                 status: "ON_GOING"
-               }
-             }
-           }).then((res) => {
-             console.log(res);
-             
-         })
-         .catch((err) => {
-             console.log(err);
-         });
-       }
+            else {     
+              console.log("Updating project status to ON_GOING");    
+              updateProjectStatus({
+              variables: {
+                projectId: parseInt(work.projectId),
+                input: {
+                  status: "ON_GOING"
+                }
+              }
+              }).then((res) => {
+              console.log(res);
+              
+              })
+              .catch((err) => {
+                  console.log(err);
+              });
+            }
           
           }).catch((err) => {
             console.log(err);
@@ -572,7 +574,11 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
       <IcoBtn style={{ backgroundColor: 'orange', color: '#000 !important' }} onClick={() => setOpenUpdate({ state: true, type: 'all', data: item })}>
         <EditNoteIcon />
       </IcoBtn>
-      <IcoBtn style={{ backgroundColor: 'red', color: '#000' }} onClick={() => {toggleDrawer(false); deleteTask(true);}}>
+      <IcoBtn style={{ backgroundColor: 'red', color: '#000' }} onClick={() =>
+                      currentUser.role === "ADMIN" || currentUser.role === "MANAGER"
+                        ? (toggleDrawer(false), deleteTask(true))
+                        : dispatch(openSnackbar({ message: "You don't have permission to delete task", severity: "error" }))
+                    }>
         <DeleteForeverIcon />
       </IcoBtn>
       </div>

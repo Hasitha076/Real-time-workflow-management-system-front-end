@@ -4,8 +4,9 @@ import styled from "styled-components";
 import { tagColors } from "../data/data";
 import { CircularProgress } from "@mui/material";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import UserCard from "../components/UserCard";
+import { openSnackbar } from "../redux/snackbarSlice";
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -91,6 +92,7 @@ const Members = ({setNewUser, userCreated, setUserCreated}) => {
   const { currentUser } = useSelector((state) => state.user);
   const token = localStorage.getItem('token');
   const [users, setUsers] = useState([]);
+  const dispatch = useDispatch();
 
   const getAvailableMember = async () => {
     if (!token) {
@@ -138,7 +140,7 @@ const Members = ({setNewUser, userCreated, setUserCreated}) => {
             <Column>
               <ItemWrapper>
                 <Wrapper>
-                <OutlinedBox button onClick={() => setNewUser(true)} style={{ marginBottom: "12px" }}>
+                <OutlinedBox button onClick={() => currentUser.role === "ADMIN" ? setNewUser(true) : dispatch(openSnackbar({ message: "You don't have permission to register new user", severity: "error" }))} style={{ marginBottom: "12px" }}>
                     New User
                   </OutlinedBox>
                 </Wrapper>

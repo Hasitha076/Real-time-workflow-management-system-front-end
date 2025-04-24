@@ -10,6 +10,7 @@ import { useQuery } from '@apollo/client'
 import { LOAD_ALL_PROJECTS } from '../GraphQL/Queries'
 import { data } from "react-router-dom";
 import axios from "axios";
+import { openSnackbar } from "../redux/snackbarSlice";
 
 const Container = styled.div`
   width: 100%;
@@ -182,7 +183,8 @@ const Projects = ({newProject,setNewProject, projectCreated, setProjectCreated})
               <Span>({projects?.filter((item) => item.status === s.status).length})</Span>
               <Wrapper>
                 {s.status === "PENDING" && (
-                  <OutlinedBox button onClick={() => setNewProject(currentUser.role === "ADMIN" ? true : currentUser.role === "MANAGER" ? true : false)} style={{ marginBottom: "12px" }}>
+
+                  <OutlinedBox button onClick={() => currentUser.role === "ADMIN" ? setNewProject(true) : currentUser.role === "MANAGER" ? setNewProject(true) : dispatch(openSnackbar({ message: "You don't have permission to create a project", severity: "error" }))} style={{ marginBottom: "12px" }}>
                     New Project
                   </OutlinedBox>
                 )}

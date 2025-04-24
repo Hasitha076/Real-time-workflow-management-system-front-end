@@ -435,7 +435,6 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
       const response = await axios.get(
         `http://localhost:8086/api/v1/work/getWorksByProjectId/${id}`
       );
-      console.log(response.data);
       setWorks(response.data);
       workStatusUpdate();
     } catch (error) {
@@ -580,8 +579,9 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
             <Title>{item?.projectName}</Title>
             <Desc>{item?.projectDescription}</Desc>
             <Tags>
-              {item?.tags.map((tag) => (
+              {item?.tags.map((tag, idx) => (
                 <Tag
+                key={idx}
                   tagColor={
                     tagColors[Math.floor(Math.random() * tagColors.length)]
                   }
@@ -592,15 +592,16 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
             </Tags>
             <Members>
               {icons?.length > 0 ? <AvatarGroup>
-                {icons?.map((member) => (
+                {icons?.map((member, idx) => (
                   <Avatar
+                  key={idx}
                     sx={{ marginRight: "-12px", width: "38px", height: "38px" }}
                   >
                     {member}
                   </Avatar>
                 ))}
               </AvatarGroup>  : <Avatar sx={{ backgroundColor: 'transparent', border: '1px dashed #fff' }}><AccountCircleIcon/></Avatar>}
-              <InviteButton onClick={() => setInvitePopup(true)}>
+              <InviteButton onClick={() => currentUser.role === "ADMIN" ? setInvitePopup(true) : currentUser.role === "MANAGER" ? setInvitePopup(true) : dispatch(openSnackbar({ message: "You don't have permission to invite collaborators", severity: "error" }))}>
                 <PersonAdd sx={{ fontSize: "12px" }} />
                 Invite
               </InviteButton>
@@ -618,7 +619,14 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
                   backgroundColor: '#e68911',
                   color: 'white'
                 }
-              }} onClick={currentUser.role === 'ADMIN' ? () => navigate(`/workflow/${item.projectId}`) : currentUser.role === 'MANAGER' ? () => navigate(`/workflow/${item.projectId}`) : null} >
+              }} onClick={() =>
+                currentUser.role === 'ADMIN' || currentUser.role === 'MANAGER'
+                  ? navigate(`/workflow/${item.projectId}`)
+                  : dispatch(openSnackbar({
+                      message: "You don't have permission to create a workflow",
+                      severity: "error"
+                    }))
+              } >
                 <AccountTreeIcon sx={{ fontSize: "15px" }} />
                 Workflow
             </Button>
@@ -627,23 +635,30 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
                 border: '1px solid yellowgreen',
                 color: 'yellowgreen',
                 cursor: 'pointer',
-                fontSize: '12px',
+                fontSize: '12px', 
                 display: 'flex',
                 gap: '5px',
                 '&:hover': {
                   backgroundColor: 'yellowgreen',
                   color: 'white'
                 }
-              }} onClick={toggleDrawer( currentUser.role === 'ADMIN' ? true : currentUser.role === 'MANAGER' ? true : false)} >
+              }} onClick={() =>
+                currentUser.role === 'ADMIN' || currentUser.role === 'MANAGER'
+                  ? toggleDrawer(true)
+                  : dispatch(openSnackbar({
+                      message: "You don't have permission to customize",
+                      severity: "error"
+                    }))
+              } >
                 <DashboardCustomizeIcon sx={{ fontSize: "15px" }} />
                 Customize
             </Button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: '10px' }}>
-              <IcoBtn style={{ border: '1px solid orange' }} onClick={() => setOpenUpdate(currentUser.role === "ADMIN" ? { state: true, type: 'all', data: item } : currentUser.role === "MANAGER" ? { state: true, type: 'all', data: item } : false)}>
+              <IcoBtn style={{ border: '1px solid orange' }} onClick={() => setOpenUpdate(currentUser.role === "ADMIN" ? { state: true, type: 'all', data: item } : currentUser.role === "MANAGER" ? { state: true, type: 'all', data: item } : dispatch(openSnackbar({ message: "You don't have permission to edit the project", severity: "error" })))}>
                 <Edit sx={{ fontSize: "20px" }} />
               </IcoBtn>
-              <IcoBtn style={{ border: '1px solid red' }} onClick={() => setOpenDelete(currentUser.role === "ADMIN" ? { state: true, type: 'Project', name: item?.projectName, id: item.projectId } : currentUser.role === "MANAGER" ? { state: true, type: 'Project', name: item?.projectName, id: item.projectId } : false)}>
+              <IcoBtn style={{ border: '1px solid red' }} onClick={() => setOpenDelete(currentUser.role === "ADMIN" ? { state: true, type: 'Project', name: item?.projectName, id: item.projectId } : currentUser.role === "MANAGER" ? { state: true, type: 'Project', name: item?.projectName, id: item.projectId } : dispatch(openSnackbar({ message: "You don't have permission to delete a project", severity: "error" })))}>
                 <Delete sx={{ fontSize: "20px" }} />
               </IcoBtn>
               
@@ -696,8 +711,8 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
 
                     {works.length != 0 && works?.filter((item) => item.status === false)
                       .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-                      .map((filteredItem) => (
-                        <div onClick={() => openWorkDetails(filteredItem)}>
+                      .map((filteredItem, idx) => (
+                        <div key={idx} onClick={() => openWorkDetails(filteredItem)}>
                           <WorkCards
                             status="In Progress"
                             work={filteredItem}

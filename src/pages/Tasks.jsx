@@ -177,9 +177,6 @@ const Tasks = () => {
     }
   };
 
-  console.log("tasks", tasks);
-  
-
 
   return (
     <Container>
@@ -235,8 +232,8 @@ const Tasks = () => {
                       {tasks
                       ?.filter(selectedUserId === "ALL" ? (item) => item.status === false : (item) => item.collaboratorIds?.includes(parseInt(selectedUserId)))
                         .filter((item) => item.status == false)
-                        .map((item) => (
-                            <TaskDetailCard item={item} />
+                        .map((item, idx) => (
+                            <TaskDetailCard key={idx} item={item} />
                         ))}
                     </Masonry>
                   </ResponsiveMasonry>
@@ -270,8 +267,8 @@ const Tasks = () => {
                       {tasks
                       ?.filter(selectedUserId === "ALL" ? (item) => item.status === true : (item) => item.collaboratorIds?.includes(parseInt(selectedUserId)))
                         .filter((item) => item.status == true)
-                        .map((item) => (
-                            <TaskDetailCard item={item} />
+                        .map((item, idx) => (
+                            <TaskDetailCard key={idx} item={item} />
                         ))}
                     </Masonry>
                   </ResponsiveMasonry>

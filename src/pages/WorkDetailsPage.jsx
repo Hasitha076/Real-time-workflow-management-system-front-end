@@ -706,16 +706,16 @@ useEffect(() => {
               ))}
             </AvatarGroup>
 
-              <InviteButton onClick={() => setInvitePopup(true)}>
+              <InviteButton onClick={() => currentUser.role === "ADMIN" ? setInvitePopup(true) : currentUser.role === "MANAGER" ? setInvitePopup(true) : dispatch(openSnackbar({ message: "You don't have permission to invite collaborators", severity: "error" }))}>
                 <PersonAdd sx={{ fontSize: "12px" }} />
                 Invite
               </InviteButton>
             </Members>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-              <IcoBtn onClick={() => setOpenUpdate({ state: true, type: 'all', data: item })}>
+              <IcoBtn onClick={() => currentUser.role === "ADMIN" ? setOpenUpdate({ state: true, type: 'all', data: item }) : currentUser.role === "MANAGER" ? setOpenUpdate({ state: true, type: 'all', data: item }) : dispatch(openSnackbar({ message: "You don't have permission to edit work", severity: "error" }))}>
                 <Edit sx={{ fontSize: "20px" }} />
               </IcoBtn>
-              <IcoBtn onClick={() => setOpenDelete({ state: true, type: 'Work', name: item.workName, id: item.workId, projectId: item.projectId })}>
+              <IcoBtn onClick={() => currentUser.role === "ADMIN" ? setOpenDelete({ state: true, type: 'Work', name: item.workName, id: item.workId, projectId: item.projectId }) : currentUser.role === "MANAGER" ? setOpenDelete({ state: true, type: 'Work', name: item.workName, id: item.workId, projectId: item.projectId }) : dispatch(openSnackbar({ message: "You don't have permission to delete work", severity: "error" }))}>
                 <Delete sx={{ fontSize: "20px" }} />
               </IcoBtn>
             </div>

@@ -222,7 +222,7 @@ const Menu = ({ setMenuOpen, setNewTeam }) => {
             </Link>
           ))
         )}
-        <Item onClick={() => setNewTeam(true)}>
+        <Item onClick={() => currentUser.role === "ADMIN" ? setNewTeam(true) : dispatch(openSnackbar({ message: "You don't have permission to create a team", severity: "error" }))}>
           <Add sx={{ fontSize: "20px" }} /> New Team
         </Item>
 
