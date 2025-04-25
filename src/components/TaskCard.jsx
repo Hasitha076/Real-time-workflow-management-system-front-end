@@ -235,6 +235,9 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
   const dispatch = useDispatch();
   const { currentUser } = useSelector(state => state.user);
 
+  console.log("User: ", currentUser);
+  
+
     const { loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
       variables: { id: parseInt(item.projectId) },  // Ensure ID is an integer
       skip: !item.projectId,  // Avoid sending query if ID is undefined
@@ -484,7 +487,7 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
     // comment
     const handleComment = async () => {
   
-      commentData.push(comment);
+      // commentData.push({...comment});
   
       await axios.put(`http://localhost:8082/api/v1/task/updateTask`, {
         taskId: item.taskId,
@@ -500,7 +503,7 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
         tags: item.tags,
         workId: item.workId,
         status: completed != item.status ? item.status : completed,
-        comments: commentData
+        comments: comment
       })
       .then((res) => {
         console.log(res.data);
@@ -508,6 +511,11 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
       })
     
     }
+
+    console.log("Comments: ", comment);
+    console.log("commentData: ", commentData);
+    
+    
 
   const handleBlur = async (newValue) => {
     const formattedDate = dayjs(newValue);
@@ -558,6 +566,11 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
       console.log(err);
     })
   }
+
+  console.log("Item: ", item);
+  console.log(members);
+  
+  
 
 
     //use state enum to check for which updation
@@ -794,13 +807,11 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
           <Box>
             <h3>Comments:</h3>
 
-           <CommentCard item={item} allTaskMembers={allTaskMembers}  />
+           <CommentCard item={item} allTaskMembers={members}  />
             
             <Box sx={{ display: 'flex', paddingTop: '20px' }}>
-              {allTaskMembers.slice(0, 1).map((member, idx) => (
-
+          
                 <Avatar
-                key={idx}
                   sx={{
                     marginRight: "5px",
                     width: "26px",
@@ -808,10 +819,9 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
                     fontSize: "16px",
                   }}
                 >
-                  {member.name.charAt(0)}
+                  {currentUser.userName.charAt(0)}
                 </Avatar>
 
-                ))}
                 
               <Box style={{
                   width: "100%",
@@ -823,13 +833,14 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
               }}>
                 <OutlinedBox style={{ marginTop: "6px", width: '-webkit-fill-available' }}>
                   <Description
-                      placeholder="Add a comment"
-                      name="description"
-                      rows={5}
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
+                    placeholder="Add a comment"
+                    name="description"
+                    rows={5}
+                    value={comment?.[0]?.comment || ""}
+                    onChange={(e) =>
+                      setComment([{ comment: e.target.value, userId: currentUser.userId }])
+                    }
                   />
-                    
                 </OutlinedBox>
                 <CommentButton onClick={() => handleComment()}>Submit</CommentButton>
               </Box>

@@ -642,7 +642,7 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
                   backgroundColor: 'yellowgreen',
                   color: 'white'
                 }
-              }} onClick={() =>
+              }} onClick={
                 currentUser.role === 'ADMIN' || currentUser.role === 'MANAGER'
                   ? toggleDrawer(true)
                   : dispatch(openSnackbar({

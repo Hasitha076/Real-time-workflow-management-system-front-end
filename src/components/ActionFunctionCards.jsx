@@ -24,6 +24,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import InviteRuleTaskMembers from "./InviteRuleTaskMembers";
+import { useSelector } from "react-redux";
 
 
 const Container = styled.div`
@@ -200,6 +201,7 @@ const Desc = styled.textarea`
 
 const ActionFunctionCards = ({ works, activeAction, setActiveAction, projectId, setIsActiveAction, setIsActiveTrigger, existingRule }) => {
 
+    const { currentUser } = useSelector((state) => state.user);
     const [open1, setOpen1] = useState(false);
     const [open2, setOpen2] = useState(false);
     const [open3, setOpen3] = useState(false);
@@ -226,6 +228,7 @@ const ActionFunctionCards = ({ works, activeAction, setActiveAction, projectId, 
         teamIds: [],
         priority: "",
         tags: [],
+        assignerId: currentUser.userId
     });
     const [isSetAssignee, setIsSetAssignee] = useState(true);
     const [selectedDate, setSelectedDate] = useState();

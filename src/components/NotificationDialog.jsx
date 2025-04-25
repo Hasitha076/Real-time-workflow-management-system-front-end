@@ -182,6 +182,8 @@ const NotificationDialog = ({
               ? "Task Invitation"
               : item.subject === "task-changed"
               ? "Task changed"
+              : item.subject === "task-status-changed"
+              ? "Task status changed"
               : item.subject === "removed-from-task"
               ? "Removed from task"
               : item.subject === "task-removed"

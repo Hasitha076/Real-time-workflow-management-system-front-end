@@ -64,7 +64,8 @@ const ActionRuleCard = ({  action }) => {
                 action.actionDetails.actionType === "Set due date to" ? 
                 action.actionDetails.date : 
                 action.actionDetails.actionType === "Create task" ? 
-                action.actionDetails.task?.name : null}
+                action.actionDetails.task?.name + " - " + action.actionDetails.whichSection.workName
+                : null}
             
             </div>
         </Title> 

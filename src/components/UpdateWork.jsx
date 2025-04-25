@@ -29,7 +29,7 @@ const Wrapper = styled.div`
   border-radius: 16px;
   background-color: ${({ theme }) => theme.bgLighter};
   color: ${({ theme }) => theme.text};
-  padding: 10px;
+  padding: 20px 25px;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -39,7 +39,7 @@ const Title = styled.div`
   font-size: 22px;
   font-weight: 500;
   color: ${({ theme }) => theme.text};
-  margin: 12px 20px;
+  margin: 12px 0;
 `;
 
 const Desc = styled.textarea`
@@ -57,7 +57,7 @@ const Label = styled.div`
   font-size: 16px;
   font-weight: 500;
   color: ${({ theme }) => theme.textSoft};
-  margin: 12px 20px 0px 20px;
+  margin: 12px 0 0px 0;
 `;
 
 const OutlinedBox = styled.div`
@@ -86,7 +86,7 @@ const OutlinedBox = styled.div`
   border: none;
     background: ${theme.primary};
     color: white;`}
-  margin: 3px 20px;
+  margin: 3px 0;
   font-weight: 600;
   font-size: 16px;
   display: flex;
@@ -96,11 +96,11 @@ const OutlinedBox = styled.div`
 `;
 
 const ButtonContainer = styled.div`
-  display: flex;
-  gap: 0px;
-  margin: 12px 20px;
-  align-items: center;
-  justify-content: space-between;
+    display: flex;
+    gap: 10px;
+    margin: 5px 0;
+    align-items: center;
+    justify-content: space-between;
 `;
 
 const TextInput = styled.input`
