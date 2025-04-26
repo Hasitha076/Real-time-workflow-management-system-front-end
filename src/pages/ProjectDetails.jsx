@@ -642,14 +642,7 @@ const ProjectDetails = ({updateWorkFromTask, setUpdateWorkFromTask}) => {
                   backgroundColor: 'yellowgreen',
                   color: 'white'
                 }
-              }} onClick={
-                currentUser.role === 'ADMIN' || currentUser.role === 'MANAGER'
-                  ? toggleDrawer(true)
-                  : dispatch(openSnackbar({
-                      message: "You don't have permission to customize",
-                      severity: "error"
-                    }))
-              } >
+              }} onClick={toggleDrawer(true)} >
                 <DashboardCustomizeIcon sx={{ fontSize: "15px" }} />
                 Customize
             </Button>

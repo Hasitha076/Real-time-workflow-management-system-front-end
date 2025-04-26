@@ -1076,12 +1076,12 @@ const [actions, setActions] = useState(() =>
                             </div>               
                         ))}
                         {/* Add New Trigger Button */}
-                        {!existingRule ? 
+                        {/* {!existingRule ? 
                         <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
                         <IcoBtn style={{ border: "1px solid orange" }} onClick={addTrigger}>
                             <ControlPointIcon />
                         </IcoBtn>
-                        </div> : null}
+                        </div> : null} */}
 
                         {/* Arrow Between Triggers and Actions */}
                         {triggers.length !== 0 && actions.length !== 0 && (
