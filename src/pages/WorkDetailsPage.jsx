@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import { useState } from "react";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   CheckCircleOutlineOutlined,
   Delete,
@@ -29,6 +29,7 @@ import AddNewTask from "../components/AddNewTask";
 import { LOAD_PROJECT_BY_ID, UPDATE_PROJECT_STATUS } from "../GraphQL/Queries";
 import { useMutation, useQuery } from "@apollo/client";
 import ReplyAllIcon from '@mui/icons-material/ReplyAll';
+import ElectricBoltIcon from '@mui/icons-material/ElectricBolt';
 
 const Container = styled.div`
   padding: 14px 14px;
@@ -303,6 +304,7 @@ const WorkDetailsPage = ({setUpdateWorkFromTask, setTaskUpdated}) => {
   const [collaboratorNames, setCollaboratorNames] = useState([]);
   const [members, setMembers] = useState([]);
   const [alignment, setAlignment] = useState(true);
+  const navigate = useNavigate();
 
       const [anchorEl, setAnchorEl] = useState(null);
       const openDropdown = Boolean(anchorEl);
@@ -676,6 +678,24 @@ useEffect(() => {
                      >
                         <ReplyAllIcon sx={{ fontSize: "15px" }} />
                         Back to project Info
+                    </Button>
+
+                    <Button sx={{
+                        borderRadius: '10px',
+                        border: '1px solid rgb(196 130 26)',
+                        color: 'rgb(196 130 26)',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        display: 'flex',
+                        gap: '5px',
+                        '&:hover': {
+                        backgroundColor: 'rgb(196 130 26)',
+                        color: 'white'
+                        }
+                    }} onClick={() => navigate(`/rule/${item.projectId}`, { state: { workDetails: item } })}
+                     >
+                        <ElectricBoltIcon sx={{ fontSize: "15px" }} />
+                        Add Rule to Work
                     </Button>
               
                 </div>

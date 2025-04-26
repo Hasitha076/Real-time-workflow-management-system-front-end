@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { use, useEffect } from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
@@ -233,21 +233,17 @@ const Rule = () => {
   const [newTaskTemplate, setNewTaskTemplate] = useState(false);
   const [workDetails, setWorkDetails] = useState({});
   const [taskTemplateAdded, setTaskTemplateAdded] = useState(false);
-    const [taskTemplates, setTaskTemplates] = useState([]);
-    const [publishFlow, setPublishFlow] = useState({});
+  const [taskTemplates, setTaskTemplates] = useState([]);
+  const [publishFlow, setPublishFlow] = useState({});
 
   const location = useLocation();
   const existingRule = location.state?.existingRule;
-    const existingRuleDetails = location.state?.ruleDetails;
-
-    console.log(existingRule);
-    console.log(existingRuleDetails);
-    
+  const existingRuleDetails = location.state?.ruleDetails;
   const [ruleDetails, setRuleDetails] = useState(existingRuleDetails);
 
-  console.log("Rule details ===> ", ruleDetails);
-  
-  
+  const locData = useLocation();
+  const workData = locData.state?.workDetails;
+  console.log("Work Data: ", workData);
 
   const { loading, error, data } = useQuery(LOAD_PROJECT_BY_ID, {
     variables: { id: parseInt(id) },  // Ensure ID is an integer
@@ -1135,7 +1131,7 @@ const [actions, setActions] = useState(() =>
             </Work>
             <HrHor />
             <Extra>
-                {triggerHandle && <TriggerFunctionCards works={works} taskTemplates={taskTemplates} existingRule={existingRule} setIsActiveTrigger={setIsActiveTrigger} setIsActiveAction={setIsActiveAction} projectId={id} activeTrigger={activeTrigger} setActiveTrigger={setActiveTrigger} />}
+                {triggerHandle && <TriggerFunctionCards workData={workData} works={works} taskTemplates={taskTemplates} existingRule={existingRule} setIsActiveTrigger={setIsActiveTrigger} setIsActiveAction={setIsActiveAction} projectId={id} activeTrigger={activeTrigger} setActiveTrigger={setActiveTrigger} />}
                 {actionHandle && <ActionFunctionCards works={works} existingRule={existingRule} setIsActiveAction={setIsActiveAction} setIsActiveTrigger={setIsActiveTrigger} projectId={id} activeAction={activeAction} setActiveAction={setActiveAction} />}
             </Extra>
           </Body>

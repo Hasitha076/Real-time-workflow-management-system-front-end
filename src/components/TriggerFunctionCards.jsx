@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import styled from "styled-components";
 import { Button } from "@mui/material";
@@ -172,7 +172,7 @@ const InviteButton = styled.button`
 `;
 
 
-const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, setActiveTrigger, projectId, setIsActiveTrigger, setIsActiveAction, existingRule }) => {
+const TriggerFunctionCards = ({ status, works, workData, taskTemplates, activeTrigger, setActiveTrigger, projectId, setIsActiveTrigger, setIsActiveAction, existingRule }) => {
   
     const [open1, setOpen1] = useState(false);
     const [open2, setOpen2] = useState(false);
@@ -192,18 +192,64 @@ const TriggerFunctionCards = ({ status, works, taskTemplates, activeTrigger, set
     const [invitePopup, setInvitePopup] = useState(false);
     const [assignee, setAssignee] = useState("");
 
-    const handleChange = (event) => {
-        setOption1(event.target.value);
-        if (event.target.value === "Section_changed") {
-            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section changed", section: "Any section" } });
-            setWhichSection(false);
-        } else if (event.target.value === "Section_is") {
-            setWhichSection(true);
-            setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is", section: option2 } });
-            setIcons([]);
-        }
+    // const handleChange = (event) => {
+    //     setOption1(event.target.value);
+    //     if (event.target.value === "Section_changed") {
+    //         setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section changed", section: "Any section" } });
+    //         setWhichSection(false);
+    //     } else if (event.target.value === "Section_is") {
+    //         setWhichSection(true);
+    //         setActiveTrigger({ ...activeTrigger, triggerDetails: { triggerType: "Section is", section: option2 } });
+    //         setIcons([]);
+    //     }
         
-    }
+    // }
+
+    const handleChange = (event) => {
+      const value = event.target.value;
+      setOption1(value);
+    
+      if (value === "Section_changed") {
+        setActiveTrigger((prev) => ({
+          ...prev,
+          triggerDetails: {
+            triggerType: "Section changed",
+            section: "Any section"
+          }
+        }));
+        setWhichSection(false);
+    
+      } else if (value === "Section_is") {
+        setWhichSection(true);
+    
+        // Prepare section data
+        let sectionData = option2; // default
+        if (workData) {
+          const { workId, workName } = workData;
+          sectionData = { workId, workName };
+        }
+    
+        setActiveTrigger((prev) => ({
+          ...prev,
+          triggerDetails: {
+            triggerType: "Section is",
+            section: sectionData
+          }
+        }));
+    
+        setIcons([]);
+      }
+    };
+    
+    // New useEffect that automatically triggers handleChange
+    useEffect(() => {
+      if (workData) {
+        // Simulate a synthetic event
+        const syntheticEvent = { target: { value: "Section_is" } };
+        handleChange(syntheticEvent);
+      }
+    }, [workData]);
+    
 
     const handleWorkChange = (event) => {
         const { workId, workName } = JSON.parse(event.target.value);
