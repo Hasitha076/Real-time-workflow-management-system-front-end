@@ -320,8 +320,6 @@ const TriggerFunctionCards = ({ status, works, workData, taskTemplates, activeTr
     
       setIcons([]);
     };
-
-    console.log(activeTrigger);
     
 
     const handleAssigneeChange = (event) => {

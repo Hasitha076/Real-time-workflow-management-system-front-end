@@ -261,7 +261,6 @@ const RulesPage = () => {
   const getWorks = async () => {
     await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${id}`)
     .then((res) => {
-      console.log(res.data);
       
         if(res.data !== null){
           setWorks(res.data);

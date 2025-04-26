@@ -243,7 +243,6 @@ const Rule = () => {
 
   const locData = useLocation();
   const workData = locData.state?.workDetails;
-  console.log("Work Data: ", workData);
 
   const { loading, error, data } = useQuery(LOAD_PROJECT_BY_ID, {
     variables: { id: parseInt(id) },  // Ensure ID is an integer
@@ -298,7 +297,6 @@ const Rule = () => {
   const getWorks = async () => {
     await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${id}`)
     .then((res) => {
-      console.log(res.data);
       
         if(res.data !== null){
           setWorks(res.data);
@@ -331,8 +329,6 @@ const Rule = () => {
             console.log(err);
           });
     };
-
-      console.log("PublishRules: ", publishFlow);
       
   
   useEffect(() => {
@@ -446,7 +442,6 @@ const [actions, setActions] = useState(() =>
   };
 
   const triggerEventHandle = (ele) => {
-    console.log("Trigger Event Handle");
     setIsActiveTrigger(true);
     setIsActiveAction(false);
 
@@ -544,10 +539,8 @@ const [actions, setActions] = useState(() =>
 
   useEffect(() => {
     if (isActiveTrigger) {
-      console.log("Trigger is active");
       triggerEventHandle(activeTrigger);
     } else if (isActiveAction) {
-      console.log("Action is active");
       actionEventHandle(activeAction);
     }
   }, [isActiveTrigger, isActiveAction, activeTrigger, activeAction]);
@@ -571,8 +564,6 @@ const [actions, setActions] = useState(() =>
             actions: actionData,
             status: "inactive",
         };
-    
-        console.log(data);
     
         await axios.post(`http://localhost:8082/api/v1/task/createRule`, data)
             .then((res) => {

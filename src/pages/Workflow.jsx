@@ -285,9 +285,7 @@ const Workflow = () => {
 
   const getWorks = async () => {
     await axios.get(`http://localhost:8086/api/v1/work/getWorksByProjectId/${id}`)
-    .then((res) => {
-      console.log(res.data);
-      
+    .then((res) => {      
         if(res.data !== null){
           setWorks(res.data);
         } else {
@@ -515,8 +513,8 @@ const Workflow = () => {
                   <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 2 }}>
                     <Masonry gutter="14px">
 
-                    {works.length != 0 && works.map((work) => (
-                        <div>
+                    {works.length != 0 && works.map((work, idx) => (
+                        <div key={idx}>
                           <WorkFlowCards
                             work={work}
                             projectId={id}

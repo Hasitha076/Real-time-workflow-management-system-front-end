@@ -85,8 +85,6 @@ const CommentCard = ({ item, allTaskMembers }) => {
   };
 
   const displayedComments = showAllComments ? item.comments : [item.comments[item.comments.length - 1]];
-
-  console.log(displayedComments);
   
 
   return (

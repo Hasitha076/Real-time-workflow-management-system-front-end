@@ -97,8 +97,6 @@ const WorkFlowCards = ({ work, setInviteMemberPopup, setInviteTeamPopup, setWork
   const getTasks = async (work) => {
     await axios.get(`http://localhost:8082/api/v1/task/getTasksByProjectId/${work.projectId}`)
     .then((res) => {
-      console.log(res.data);
-      
       const filterData = res.data.filter((item) => item.workId === work.workId);
       setTask(filterData);
     })

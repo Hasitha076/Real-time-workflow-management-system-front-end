@@ -235,9 +235,6 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
   const dispatch = useDispatch();
   const { currentUser } = useSelector(state => state.user);
 
-  console.log("User: ", currentUser);
-  
-
     const { loading, error, data, refetch } = useQuery(LOAD_PROJECT_BY_ID, {
       variables: { id: parseInt(item.projectId) },  // Ensure ID is an integer
       skip: !item.projectId,  // Avoid sending query if ID is undefined
@@ -512,11 +509,6 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
     
     }
 
-    console.log("Comments: ", comment);
-    console.log("commentData: ", commentData);
-    
-    
-
   const handleBlur = async (newValue) => {
     const formattedDate = dayjs(newValue);
     newValue ? setSelectedDate(formattedDate) : setSelectedDate(dayjs(item.dueDate));
@@ -566,12 +558,6 @@ const TaskCard = ({item, members, teams, setTaskAdd, work, editTask, setEditTask
       console.log(err);
     })
   }
-
-  console.log("Item: ", item);
-  console.log(members);
-  
-  
-
 
     //use state enum to check for which updation
     const [openUpdate, setOpenUpdate] = useState({ state: false, type: "all", data: item });

@@ -242,7 +242,6 @@ const MemberDetails = ({ currentUser }) => {
       });
   };
 
-  console.log(item);
   const { loading: Loading, error, data, refetch } = useQuery(LOAD_PROJECTS_BY__USER_ID, {
     variables: { collaboratorId: parseInt(item.userId) },  // Ensure ID is an integer
     fetchPolicy: "cache-and-network" // Ensures fresh data is fetched
